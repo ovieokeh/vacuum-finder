@@ -29,23 +29,23 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
   });
 
   return (
-    <div className="p-4 flex flex-col gap-4 bg-gray-100">
+    <div className="p-4 flex flex-col gap-4 bg-background">
       <Listbox
         value={formData.floorType}
         onChange={(value) => setFormData({ ...formData, floorType: value as FloorType })}
       >
         <div className="flex flex-col gap-2">
           <Label className="text-sm/6 font-medium">Floor Type</Label>
-          <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-white!">
+          <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-background!">
             {formData.floorType}
             <GoChevronDown className="w-4 h-4" />
           </ListboxButton>
-          <ListboxOptions anchor="bottom start" className="bg-white rounded shadow">
+          <ListboxOptions anchor="bottom start" className="bg-black rounded shadow">
             {Object.values(FloorType).map((type) => (
               <ListboxOption
                 key={type}
                 value={type}
-                className="group flex gap-2 px-4 py-2 data-[focus]:bg-blue-100 cursor-pointer"
+                className="group flex gap-2 px-4 py-2 data-[focus]:bg-slate-800 cursor-pointer"
               >
                 {type}
               </ListboxOption>
@@ -61,7 +61,7 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
             type="number"
             value={formData.houseSizeSqM.toString()}
             onChange={(e) => setFormData({ ...formData, houseSizeSqM: +e.target.value })}
-            className={"block bg-white p-2 rounded-md focus:ring-primary focus:border-primary"}
+            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
           />
         </div>
       </Field>
@@ -73,7 +73,7 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
             type="number"
             value={formData.budget.toString()}
             onChange={(e) => setFormData({ ...formData, budget: +e.target.value })}
-            className={"block bg-white p-2 rounded-md focus:ring-primary focus:border-primary"}
+            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
           />
         </div>
       </Field>
@@ -85,7 +85,7 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
             type="number"
             value={formData.numRooms.toString()}
             onChange={(e) => setFormData({ ...formData, numRooms: +e.target.value })}
-            className={"block bg-white p-2 rounded-md focus:ring-primary focus:border-primary"}
+            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
           />
         </div>
       </Field>
@@ -97,7 +97,7 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
             type="number"
             value={formData.numPets.toString()}
             onChange={(e) => setFormData({ ...formData, numPets: +e.target.value })}
-            className={"block bg-white p-2 rounded-md focus:ring-primary focus:border-primary"}
+            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
           />
         </div>
       </Field>
@@ -107,7 +107,8 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
         <Switch
           checked={formData.mopFunction}
           onChange={(e) => setFormData({ ...formData, mopFunction: e })}
-          className="group relative flex w-16 py-1! cursor-pointer rounded-full bg-white/10 transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-white/10"
+          className="group relative flex w-16 py-1! cursor-pointer rounded-full bg-background/10 transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-blue-100"
+          style={{ backgroundColor: formData.mopFunction ? "rgba(59, 130, 246, .3)" : "rgba(229, 231, 235, .3)" }}
         >
           <span
             aria-hidden="true"

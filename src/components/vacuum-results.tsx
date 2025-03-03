@@ -6,7 +6,7 @@ interface VacuumResultsProps {
 
 export function VacuumResults({ results }: VacuumResultsProps) {
   return (
-    <div className="bg-gray-50 grow p-4 rounded-lg">
+    <div className="bg-background grow p-4 rounded-lg">
       <h2 className="text-lg font-bold text-secondary">Recommended Vacuums</h2>
       {results.length === 0 ? (
         <p className="text-gray-500">No results found. Adjust filters and try again.</p>
