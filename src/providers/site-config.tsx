@@ -1,29 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, ReactNode } from "react";
-import { BsCurrencyDollar, BsCurrencyEuro } from "react-icons/bs";
-import { FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
-
-export enum Region {
-  America = "America",
-  Europe = "Europe",
-  Asia = "Asia",
-  Africa = "Africa",
-}
-export const RegionIconMapping = {
-  [Region.America]: FaGlobeAmericas,
-  [Region.Europe]: FaGlobeEurope,
-  [Region.Asia]: FaGlobeAsia,
-  [Region.Africa]: FaGlobeAfrica,
-};
-
-export enum Currency {
-  USD = "USD",
-  EUR = "EUR",
-}
-export const CurrencyIconMapping = {
-  [Currency.USD]: BsCurrencyDollar,
-  [Currency.EUR]: BsCurrencyEuro,
-};
+import { Currency, Region } from "../types";
 
 interface SiteConfigContextProps {
   language: string;

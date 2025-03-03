@@ -12,20 +12,20 @@ import {
 } from "@headlessui/react";
 import { GoChevronDown } from "react-icons/go";
 
-import { FloorType, VacuumFilterOptions } from "../types";
+import { FloorType, VacuumsFilter } from "../types";
 
 interface VacuumFormProps {
-  onSubmit: (formData: VacuumFilterOptions) => void;
+  onSubmit: (formData: VacuumsFilter) => void;
 }
 
 export function VacuumForm({ onSubmit }: VacuumFormProps) {
-  const [formData, setFormData] = useState<VacuumFilterOptions>({
+  const [formData, setFormData] = useState<VacuumsFilter>({
     houseSizeSqM: 32,
     floorType: FloorType.Hardwood,
     budget: 300,
     numRooms: 3,
     numPets: 0,
-    mopFeature: false,
+    mopFunction: false,
   });
 
   return (
@@ -105,15 +105,15 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
       <Field>
         <Label className="block text-sm/6 font-medium">Mop Feature</Label>
         <Switch
-          checked={formData.mopFeature}
-          onChange={(e) => setFormData({ ...formData, mopFeature: e })}
+          checked={formData.mopFunction}
+          onChange={(e) => setFormData({ ...formData, mopFunction: e })}
           className="group relative flex w-16 py-1! cursor-pointer rounded-full bg-white/10 transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-white/10"
         >
           <span
             aria-hidden="true"
             className="pointer-events-none inline-block size-6 -translate-x-4 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-4 "
             style={{
-              backgroundColor: formData.mopFeature ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
+              backgroundColor: formData.mopFunction ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
             }}
           />
         </Switch>

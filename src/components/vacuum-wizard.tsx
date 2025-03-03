@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { VacuumForm } from "./vacuum-form";
 import { VacuumResults } from "./vacuum-results";
-import { VacuumFilterOptions, Vacuum } from "../types";
+import { VacuumsFilter, Vacuum } from "../types";
 
 export function VacuumWizard() {
   const [results, setResults] = useState<Vacuum[]>([]);
 
-  const handleSubmit = (formData: VacuumFilterOptions) => {
+  const handleSubmit = (formData: VacuumsFilter) => {
     console.log(formData);
     // TODO: Fetch or filter results based on formData
     setResults([]); // Placeholder for now

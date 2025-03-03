@@ -1,6 +1,7 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 
-import { Currency, CurrencyIconMapping, Region, RegionIconMapping, useSiteConfig } from "../providers/site-config";
+import { useSiteConfig } from "../providers/site-config";
+import { Currency, CurrencyIconMapping, Region, RegionIconMapping } from "../types";
 
 export const Navigation = () => {
   const { region, currency, setRegion, setCurrency } = useSiteConfig();
