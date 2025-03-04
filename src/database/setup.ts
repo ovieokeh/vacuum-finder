@@ -1,6 +1,5 @@
-import Database from "better-sqlite3";
-
-const db = new Database("./src/database/database.db");
+import { db } from ".";
+import { mockVacuums } from "./mock";
 
 export const setupDatabase = () => {
   try {
@@ -53,4 +52,43 @@ export const setupDatabase = () => {
   }
 };
 
-// setupDatabase();
+export const populateMockData = () => {
+  try {
+    const insertVacuum = db.prepare(`
+      INSERT INTO vacuums (
+        id, name, image, brand, model, price, batteryLifeMins, suctionPowerPa, noiseLevelDb, 
+        mappingTechnology, multiFloorMapping, virtualWalls, mopFunction, selfEmptying, appControl, petHair
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+    return db.transaction(() => {
+      for (const vacuum of mockVacuums) {
+        try {
+          insertVacuum.run(
+            vacuum.id,
+            vacuum.name,
+            vacuum.image,
+            vacuum.brand,
+            vacuum.model,
+            vacuum.price,
+            vacuum.batteryLifeMins,
+            vacuum.suctionPowerPa,
+            vacuum.noiseLevelDb,
+            vacuum.mappingTechnology,
+            vacuum.multiFloorMapping ? 1 : 0,
+            vacuum.virtualWalls ? 1 : 0,
+            vacuum.mopFunction ? 1 : 0,
+            vacuum.selfEmptying ? 1 : 0,
+            vacuum.appControl ? 1 : 0,
+            vacuum.petHair ? 1 : 0
+          );
+        } catch (error) {
+          console.info("Error populating mock data:", error);
+        }
+      }
+      console.log("Mock data populated.");
+    })();
+  } catch (error) {
+    console.error("Error populating mock data:", error);
+  }
+};

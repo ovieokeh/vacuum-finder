@@ -1,128 +1,250 @@
-import { useState } from "react";
-import {
-  Field,
-  Button,
-  Input,
-  Label,
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Switch,
-} from "@headlessui/react";
-import { GoChevronDown } from "react-icons/go";
+import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
+import { BiRuler, BiWallet } from "react-icons/bi";
+import { LuDoorOpen } from "react-icons/lu";
+import { MdPets } from "react-icons/md";
+import { GiSoap, GiVacuumCleaner } from "react-icons/gi";
 
-import { FloorType, VacuumsFilter } from "../types";
+import { CurrencySymbolMapping, FloorType, VacuumsFilter } from "../types";
+import { useAppForm } from "./form";
+import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { IoMdClose } from "react-icons/io";
+import { AnyFormApi, useStore } from "@tanstack/react-form";
+import { useSiteConfig } from "../providers/site-config";
+import { CiEdit } from "react-icons/ci";
 
 interface VacuumFormProps {
   onSubmit: (formData: VacuumsFilter) => void;
 }
 
 export function VacuumForm({ onSubmit }: VacuumFormProps) {
-  const [formData, setFormData] = useState<VacuumsFilter>({
-    houseSizeSqM: 32,
-    floorType: FloorType.Hardwood,
-    budget: 300,
-    numRooms: 3,
-    numPets: 0,
-    mopFunction: false,
+  const form = useAppForm({
+    defaultValues: {
+      floorType: FloorType.Hardwood,
+      budget: 1000,
+      houseSizeSqM: 32,
+      numRooms: 3,
+      numPets: 0,
+      mopFunction: false,
+    },
+    validators: {
+      onChange: z.object({
+        floorType: z.nativeEnum(FloorType),
+        budget: z.number().int().min(100),
+        houseSizeSqM: z.number().int().min(5),
+        numRooms: z.number().int().min(1),
+        numPets: z.number().int().min(0),
+        mopFunction: z.boolean(),
+      }),
+    },
+    onSubmit: ({ value }) => {
+      onSubmit(value);
+    },
   });
 
-  return (
-    <div className="p-4 flex flex-col gap-4 bg-background">
-      <Listbox
-        value={formData.floorType}
-        onChange={(value) => setFormData({ ...formData, floorType: value as FloorType })}
-      >
-        <div className="flex flex-col gap-2">
-          <Label className="text-sm/6 font-medium">Floor Type</Label>
-          <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-background!">
-            {formData.floorType}
-            <GoChevronDown className="w-4 h-4" />
-          </ListboxButton>
-          <ListboxOptions anchor="bottom start" className="bg-black rounded shadow">
-            {Object.values(FloorType).map((type) => (
-              <ListboxOption
-                key={type}
-                value={type}
-                className="group flex gap-2 px-4 py-2 data-[focus]:bg-slate-800 cursor-pointer"
-              >
-                {type}
-              </ListboxOption>
-            ))}
-          </ListboxOptions>
-        </div>
-      </Listbox>
+  useEffect(() => {
+    form.handleSubmit();
+  }, [form]);
 
-      <Field>
-        <div className="space-y-2">
-          <Label className="block text-sm/6 font-medium">Living Area (sqm)</Label>
-          <Input
-            type="number"
-            value={formData.houseSizeSqM.toString()}
-            onChange={(e) => setFormData({ ...formData, houseSizeSqM: +e.target.value })}
-            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
-          />
-        </div>
-      </Field>
+  const simpleFilters = useMemo(
+    () => (
+      <>
+        <form.AppField
+          name="floorType"
+          children={(field) => (
+            <field.FormSelectField
+              label="Floor Type"
+              icon={<GiVacuumCleaner className="w-4 h-4 text-primary" />}
+              options={Object.values(FloorType)}
+              selectedOption={field.state.value}
+              onChange={(value) => field.setValue(value)}
+            />
+          )}
+        />
 
-      <Field>
-        <div className="space-y-2">
-          <Label className="block text-sm/6 font-medium">Budget</Label>
-          <Input
-            type="number"
-            value={formData.budget.toString()}
-            onChange={(e) => setFormData({ ...formData, budget: +e.target.value })}
-            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
-          />
-        </div>
-      </Field>
+        <form.AppField
+          name="budget"
+          children={(field) => (
+            <field.FormTextField
+              type="number"
+              label="Budget"
+              icon={<BiWallet className="w-4 h-4 text-primary" />}
+              value={field.state.value}
+              onChange={(value) => field.setValue(value as number)}
+            />
+          )}
+        />
 
-      <Field>
-        <div className="space-y-2">
-          <Label className="block text-sm/6 font-medium">Number of Rooms</Label>
-          <Input
-            type="number"
-            value={formData.numRooms.toString()}
-            onChange={(e) => setFormData({ ...formData, numRooms: +e.target.value })}
-            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
-          />
-        </div>
-      </Field>
+        <form.AppField
+          name="houseSizeSqM"
+          children={(field) => (
+            <field.FormTextField
+              type="number"
+              label="Living area (sqm)"
+              icon={<BiRuler className="w-4 h-4 text-primary" />}
+              value={field.state.value}
+              onChange={(value) => field.setValue(value as number)}
+            />
+          )}
+        />
 
-      <Field>
-        <div className="space-y-2">
-          <Label className="block text-sm/6 font-medium">Number of Pets</Label>
-          <Input
-            type="number"
-            value={formData.numPets.toString()}
-            onChange={(e) => setFormData({ ...formData, numPets: +e.target.value })}
-            className={"block bg-background p-2 rounded-md focus:ring-primary focus:border-primary"}
-          />
-        </div>
-      </Field>
+        <form.AppField
+          name="numRooms"
+          children={(field) => (
+            <field.FormTextField
+              type="number"
+              label="Number of Rooms"
+              icon={<LuDoorOpen className="w-4 h-4 text-primary" />}
+              value={field.state.value}
+              onChange={(value) => field.setValue(value as number)}
+            />
+          )}
+        />
 
-      <Field>
-        <Label className="block text-sm/6 font-medium">Mop Feature</Label>
-        <Switch
-          checked={formData.mopFunction}
-          onChange={(e) => setFormData({ ...formData, mopFunction: e })}
-          className="group relative flex w-16 py-1! cursor-pointer rounded-full bg-background/10 transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-blue-100"
-          style={{ backgroundColor: formData.mopFunction ? "rgba(59, 130, 246, .3)" : "rgba(229, 231, 235, .3)" }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none inline-block size-6 -translate-x-4 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-4 "
-            style={{
-              backgroundColor: formData.mopFunction ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
-            }}
-          />
-        </Switch>
-      </Field>
+        <form.AppField
+          name="numPets"
+          children={(field) => (
+            <field.FormTextField
+              type="number"
+              label="Number of pets"
+              icon={<MdPets className="w-4 h-4 text-primary" />}
+              value={field.state.value}
+              onChange={(value) => field.setValue(value as number)}
+            />
+          )}
+        />
 
-      <Button onClick={() => onSubmit(formData)}>
-        <span>Find Vacuums</span>
-      </Button>
+        <form.AppField
+          name="mopFunction"
+          children={(field) => (
+            <field.FormToggleField
+              label="Mop feature"
+              icon={<GiSoap className="w-4 h-4 text-primary" />}
+              checked={field.state.value}
+              onChange={(value) => field.setValue(value)}
+            />
+          )}
+        />
+      </>
+    ),
+    [form]
+  );
+
+  const desktopFilters = (
+    <div className="space-y-6 hidden sm:block">
+      {simpleFilters}
+      <form.AppForm>
+        <form.FormSubmitButton>Find Vacuums</form.FormSubmitButton>
+      </form.AppForm>
     </div>
   );
+
+  const mobileFilters = (
+    <MobileFiltersDialog className="block sm:hidden" form={form}>
+      <div className="flex flex-col gap-4">{simpleFilters}</div>
+    </MobileFiltersDialog>
+  );
+
+  return (
+    <form
+      className="p-4 flex flex-col gap-4 bg-background"
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      {desktopFilters}
+      {mobileFilters}
+    </form>
+  );
 }
+
+const MobileFiltersDialog = ({
+  className = "",
+  form,
+  children,
+}: {
+  className?: string;
+  form: AnyFormApi;
+  children: React.ReactNode;
+}) => {
+  const { currency } = useSiteConfig();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const formValues = useStore(form.store, (s) => s.values as VacuumsFilter);
+
+  const filtersDisplay = Object.entries(formValues).reduce((acc, filter) => {
+    const filterName = filter[0];
+    let filterValue = filter[1];
+
+    switch (filterName) {
+      case "floorType":
+        filterValue += " floor";
+        break;
+      case "budget":
+        filterValue = `${CurrencySymbolMapping[currency]}${filterValue}`;
+        break;
+      case "houseSizeSqM":
+        filterValue += "sqm";
+        break;
+      case "numRooms":
+        filterValue += " rooms";
+        break;
+      case "numPets":
+        filterValue += " pets";
+        break;
+      case "mopFunction": {
+        const transformedValue = filterValue ? "with mop" : "without mop";
+        filterValue = transformedValue;
+        break;
+      }
+      default:
+        break;
+    }
+
+    return acc + `${acc.length ? ", " : ""}${filterValue}`;
+  }, "");
+
+  const open = () => setIsOpen(true);
+  const close = () => setIsOpen(false);
+
+  return (
+    <div className={className}>
+      <p className="text-lg font-semibold">Filters</p>
+      <Button onClick={open} className="px-0! py-2! text-start outline-0! focus:outline-0!">
+        {filtersDisplay} <CiEdit className="inline w-5 h-5" />
+      </Button>
+
+      <Dialog open={isOpen} onClose={close} className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto bg-black/50 transition-all">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <DialogPanel
+              className="w-full flex flex-col max-w-md rounded-lg bg-background-alt p-4 space-y-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              transition
+            >
+              <DialogTitle as="h3">
+                <span className="font-semibold">Refine your vacuum search</span>
+                <Button onClick={close} className="absolute top-2 right-2 bg-transparent!">
+                  <IoMdClose className="w-6 h-6" />
+                </Button>
+              </DialogTitle>
+
+              {children}
+
+              <Button
+                className="ml-auto"
+                type="button"
+                onClick={() => {
+                  close();
+                  form.handleSubmit();
+                }}
+              >
+                Find Vacuums
+              </Button>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+    </div>
+  );
+};

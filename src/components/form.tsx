@@ -1,0 +1,159 @@
+/* eslint-disable react-refresh/only-export-components */
+import {
+  Field,
+  Button,
+  Input,
+  Label,
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Switch,
+} from "@headlessui/react";
+import { GoChevronDown } from "react-icons/go";
+import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+import clsx from "clsx";
+
+const FormTextField = ({
+  type = "text",
+  label,
+  icon,
+  onChange,
+  ...rest
+}: {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  type?: string;
+  label?: string;
+  icon?: React.ReactNode;
+}) => {
+  return (
+    <Field className="space-y-2">
+      {label && (
+        <Label className="flex items-center gap-2 text-sm/6 font-medium">
+          {icon}
+          {label}
+        </Label>
+      )}
+      <Input
+        type={type}
+        className={
+          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
+        }
+        onChange={(e) => onChange(type === "number" ? +e.target.value : e.target.value)}
+        {...rest}
+      />
+    </Field>
+  );
+};
+
+const FormToggleField = ({
+  icon,
+  label,
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (e: boolean) => void;
+  label?: string;
+  icon?: React.ReactNode;
+}) => {
+  return (
+    <Field className="flex items-center gap-2">
+      <Switch
+        checked={checked}
+        onChange={(e) => onChange(e)}
+        className={clsx(
+          `group relative flex w-10 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
+          checked ? "bg-blue-100!" : "bg-black/3!"
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none inline-block size-4 translate-x-0 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-5.5"
+          style={{
+            backgroundColor: checked ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
+          }}
+        />
+      </Switch>
+      {label && (
+        <Label className="flex items-center gap-2 text-sm/6 font-medium">
+          {icon}
+          {label}
+        </Label>
+      )}
+    </Field>
+  );
+};
+
+const FormSelectField = <T extends string>({
+  label,
+  icon,
+  options,
+  selectedOption,
+  onChange,
+}: {
+  label?: string;
+  icon?: React.ReactNode;
+  options: T[];
+  selectedOption: T;
+  onChange: (value: T) => void;
+}) => {
+  return (
+    <Listbox value={selectedOption} onChange={(value) => onChange(value)}>
+      <div className="flex flex-col gap-2">
+        {label && (
+          <Label className="flex items-center gap-2 text-sm/6 font-medium">
+            {icon}
+            {label}
+          </Label>
+        )}
+        <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-background! border! border-border!">
+          {selectedOption}
+          <GoChevronDown className="w-4 h-4" />
+        </ListboxButton>
+        <ListboxOptions anchor="bottom start" className="bg-background-alt rounded shadow">
+          {options.map((option, index) => (
+            <ListboxOption
+              key={option + index}
+              value={option}
+              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background cursor-pointer"
+            >
+              {option}
+            </ListboxOption>
+          ))}
+        </ListboxOptions>
+      </div>
+    </Listbox>
+  );
+};
+
+const FormSubmitButton = ({
+  type = "submit",
+  className,
+  children,
+}: {
+  type?: "submit" | "button";
+  className?: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <Button type={type} className={clsx("border! border-border!", className)}>
+      {children}
+    </Button>
+  );
+};
+
+const { fieldContext, formContext } = createFormHookContexts();
+export const { useAppForm } = createFormHook({
+  fieldComponents: {
+    FormTextField,
+    FormToggleField,
+    FormSelectField,
+  },
+  formComponents: {
+    FormSubmitButton,
+  },
+  fieldContext,
+  formContext,
+});

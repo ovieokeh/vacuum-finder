@@ -14,7 +14,7 @@ export interface Vacuum {
   price: number;
   batteryLifeMins: number;
   suctionPowerPa: number;
-  noiseLevelDb: number;
+  noiseLevelDb: number | null;
   mappingTechnology: VacuumMappingTechnology;
   multiFloorMapping: boolean | null;
   virtualWalls: boolean | null;
@@ -59,6 +59,10 @@ export enum Currency {
 export const CurrencyIconMapping = {
   [Currency.USD]: BsCurrencyDollar,
   [Currency.EUR]: BsCurrencyEuro,
+};
+export const CurrencySymbolMapping = {
+  [Currency.USD]: "$",
+  [Currency.EUR]: "€",
 };
 
 export interface AffiliateLink {

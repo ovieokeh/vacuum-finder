@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../../database";
+import { Vacuum } from "../../types";
 
 export const listVacuums = async (_req: Request, res: Response) => {
   const stmt = db.prepare("SELECT * FROM vacuums");
@@ -9,26 +10,52 @@ export const listVacuums = async (_req: Request, res: Response) => {
 
 export const getVacuum = async (req: Request, res: Response) => {
   const stmt = db.prepare("SELECT * FROM vacuums WHERE id = ?");
-  const vacuum = stmt.get(req.params.id);
+  const vacuum = stmt.get(req.params.id) as Vacuum & {
+    [key: string]: any;
+  };
+
+  // convert all 1/0 to true/false
+  Object.keys(vacuum).forEach((key) => {
+    if (typeof vacuum[key] === "number") {
+      vacuum[key] = !!vacuum[key];
+    }
+  });
+
   res.json(vacuum);
 };
 
 export const searchVacuums = async (req: Request, res: Response) => {
-  const { budget, mopFunction, numPets } = req.body;
+  try {
+    const { budget, mopFunction: mopFunctionBool, numPets } = req.body;
 
-  const petHair = numPets > 0 ? 1 : 0;
+    const petHair = numPets > 0 ? 1 : null;
+    const mopFunction = mopFunctionBool ? 1 : null;
 
-  const query = `
+    const query = `
     SELECT * FROM vacuums
     WHERE 
-      (? IS NULL OR price <= ?)
-      AND (? IS NULL OR mopFunction = ?)
-      AND (? IS NULL OR petHair = ?)
-  `;
+    (? IS NULL OR price <= ?)
+    AND (? IS NULL OR petHair = ?)
+    AND (? IS NULL OR mopFunction = ?)
+    `;
 
-  // For each condition we supply the filter value twice:
-  const stmt = db.prepare(query);
-  const vacuums = stmt.all(budget, budget, mopFunction, mopFunction, petHair, petHair);
+    // For each condition we supply the filter value twice:
+    const stmt = db.prepare(query);
+    const vacuums = stmt.all(budget, budget, petHair, petHair, mopFunction, mopFunction) as Vacuum[];
 
-  res.json(vacuums);
+    // convert all 1/0 to true/false
+    vacuums.forEach((vacuum) => {
+      vacuum.mopFunction = !!vacuum.mopFunction;
+      vacuum.petHair = !!vacuum.petHair;
+      vacuum.virtualWalls = !!vacuum.virtualWalls;
+      vacuum.selfEmptying = !!vacuum.selfEmptying;
+      vacuum.appControl = !!vacuum.appControl;
+      vacuum.multiFloorMapping = !!vacuum.multiFloorMapping;
+    });
+
+    res.json(vacuums);
+  } catch (error) {
+    console.error("Error searching vacuums:", error);
+    res.status(500).json({ error: (error as any).message });
+  }
 };

@@ -2,15 +2,23 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 
 import { useSiteConfig } from "../providers/site-config";
 import { Currency, CurrencyIconMapping, Region, RegionIconMapping } from "../types";
+import { useEffect, useRef } from "react";
 
 export const Navigation = () => {
-  const { region, currency, setRegion, setCurrency } = useSiteConfig();
+  const navRef = useRef<HTMLDivElement>(null);
+  const { region, currency, setRegion, setCurrency, setNavHeight } = useSiteConfig();
+
+  useEffect(() => {
+    if (navRef.current) {
+      setNavHeight(navRef.current.clientHeight);
+    }
+  }, [setNavHeight]);
 
   const CurrentRegionIcon = RegionIconMapping[region];
   const CurrentCurrencyIcon = CurrencyIconMapping[currency];
 
   return (
-    <nav className="p-4 grow flex justify-between items-center">
+    <nav className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
       <h2 className="font-semibold text-lg">Robot Vacuum Buyer Tool</h2>
       <div className="flex flow-row gap-4 min-w-48 justify-between">
         <Listbox value={region} onChange={(value) => setRegion(value)}>
@@ -24,7 +32,7 @@ export const Navigation = () => {
                 <ListboxOption
                   key={type}
                   value={type}
-                  className="group flex gap-2 px-4 py-2 data-[focus]:bg-slate-800 cursor-pointer"
+                  className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer"
                 >
                   {type}
                 </ListboxOption>
@@ -44,7 +52,7 @@ export const Navigation = () => {
                 <ListboxOption
                   key={type}
                   value={type}
-                  className="group flex gap-2 px-4 py-2 data-[focus]:bg-slate-800 cursor-pointer"
+                  className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer"
                 >
                   {type}
                 </ListboxOption>

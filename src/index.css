@@ -1,9 +1,19 @@
 @import "tailwindcss";
 
-:root {
+@tailwind utilities;
+@theme {
   --color-background: #242424;
   --color-background-alt: #1a1a1a;
+  --color-border: #d6d9db;
+}
+@media (prefers-color-scheme: light) {
+  @theme {
+    --color-background: #f9f9f9;
+    --color-background-alt: #ffffff;
+  }
+}
 
+:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -57,8 +67,6 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    --color-background: #f9f9f9;
-    --color-background-alt: #ffffff;
     color: #213547;
   }
   a:hover {
@@ -67,9 +75,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
-
-@theme {
-  --bg-background: var(--color-background);
-  --bg-background-alt: var(--color-background-alt);
 }

@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import express from "express";
-import { setupDatabase } from "./src/database/setup";
+// import { populateMockData, setupDatabase } from "./src/database/setup";
 import { ViteDevServer } from "vite";
 import { createVacuumHandler, deleteVacuumHandler, updateVacuumHandler } from "./src/api-handlers/vacuums/admin";
 import { getVacuum, listVacuums, searchVacuums } from "./src/api-handlers/vacuums/public";
@@ -75,7 +75,8 @@ async function startServer() {
   });
 
   app.listen(port, () => {
-    setupDatabase();
+    // setupDatabase();
+    // populateMockData();
     console.log(`Server started at http://localhost:${port}`);
   });
 }

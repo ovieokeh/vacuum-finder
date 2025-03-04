@@ -7,12 +7,13 @@
     "build:client": "vite build --outDir dist/client",
     "build:server": "node esbuild.config.js",
     "build": "npm run build:client && npm run build:server",
-    "preview": "cross-env NODE_ENV=production node dist/server/server.js",
+    "start": "cross-env NODE_ENV=production node dist/server/server.js",
     "dev": "vite-node server.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@tailwindcss/vite": "^4.0.9",
+    "@tanstack/react-form": "^1.0.0",
     "@tanstack/react-query": "^5.67.1",
     "autoprefixer": "^10.4.20",
     "better-sqlite3": "^11.8.1",
@@ -23,9 +24,11 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "react-range-slider-input": "^3.2.1",
     "react-router-dom": "^7.2.0",
     "sirv": "^3.0.1",
-    "tailwindcss": "^4.0.9"
+    "tailwindcss": "^4.0.9",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
