@@ -1,51 +1,38 @@
-import { useEffect, useMemo, useState } from "react";
-import { z } from "zod";
+import { useMemo, useState } from "react";
 import { BiRuler, BiWallet } from "react-icons/bi";
 import { LuDoorOpen } from "react-icons/lu";
 import { MdPets } from "react-icons/md";
 import { GiSoap, GiVacuumCleaner } from "react-icons/gi";
 
 import { CurrencySymbolMapping, FloorType, VacuumsFilter } from "../types";
-import { useAppForm } from "./form";
-import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { IoMdClose } from "react-icons/io";
-import { AnyFormApi, useStore } from "@tanstack/react-form";
+import { AppFieldExtendedReactFormApi, formInit } from "./form";
+import { Button } from "@headlessui/react";
+import { AnyFormApi, FormValidateOrFn, useStore } from "@tanstack/react-form";
 import { useSiteConfig } from "../providers/site-config";
 import { CiEdit } from "react-icons/ci";
+import { Modal } from "./modal";
+import { IoFilterOutline } from "react-icons/io5";
+
+export type VacuumFormInterface = AppFieldExtendedReactFormApi<
+  VacuumsFilter,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  FormValidateOrFn<VacuumsFilter> | undefined,
+  typeof formInit.fieldComponents,
+  typeof formInit.formComponents
+>;
 
 interface VacuumFormProps {
-  onSubmit: (formData: VacuumsFilter) => void;
+  form: VacuumFormInterface;
 }
 
-export function VacuumForm({ onSubmit }: VacuumFormProps) {
-  const form = useAppForm({
-    defaultValues: {
-      floorType: FloorType.Hardwood,
-      budget: 1000,
-      houseSizeSqM: 32,
-      numRooms: 3,
-      numPets: 0,
-      mopFunction: false,
-    },
-    validators: {
-      onChange: z.object({
-        floorType: z.nativeEnum(FloorType),
-        budget: z.number().int().min(100),
-        houseSizeSqM: z.number().int().min(5),
-        numRooms: z.number().int().min(1),
-        numPets: z.number().int().min(0),
-        mopFunction: z.boolean(),
-      }),
-    },
-    onSubmit: ({ value }) => {
-      onSubmit(value);
-    },
-  });
-
-  useEffect(() => {
-    form.handleSubmit();
-  }, [form]);
-
+export function VacuumForm({ form }: VacuumFormProps) {
   const simpleFilters = useMemo(
     () => (
       <>
@@ -147,7 +134,7 @@ export function VacuumForm({ onSubmit }: VacuumFormProps) {
 
   return (
     <form
-      className="p-4 flex flex-col gap-4 bg-background"
+      className="p-4 flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
@@ -210,41 +197,34 @@ const MobileFiltersDialog = ({
 
   return (
     <div className={className}>
-      <p className="text-lg font-semibold">Filters</p>
-      <Button onClick={open} className="px-0! py-2! text-start outline-0! focus:outline-0!">
+      <p className="text-lg font-semibold flex items-center gap-2">
+        <IoFilterOutline className="inline w-5 h-5" />
+        Filters
+      </p>
+      <Button onClick={open} className="mt-2 px-2! py-2! text-start outline-0! focus:outline-0! opacity-70 text-xs">
         {filtersDisplay} <CiEdit className="inline w-5 h-5" />
       </Button>
 
-      <Dialog open={isOpen} onClose={close} className="fixed inset-0 z-50">
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto bg-black/50 transition-all">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <DialogPanel
-              className="w-full flex flex-col max-w-md rounded-lg bg-background-alt p-4 space-y-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
-              transition
-            >
-              <DialogTitle as="h3">
-                <span className="font-semibold">Refine your vacuum search</span>
-                <Button onClick={close} className="absolute top-2 right-2 bg-transparent!">
-                  <IoMdClose className="w-6 h-6" />
-                </Button>
-              </DialogTitle>
+      <Modal
+        title="Refine your vacuum search"
+        isOpen={isOpen}
+        close={close}
+        panelClassName="h-screen justify-between"
+        childrenClassName="space-y-6"
+      >
+        {children}
 
-              {children}
-
-              <Button
-                className="ml-auto"
-                type="button"
-                onClick={() => {
-                  close();
-                  form.handleSubmit();
-                }}
-              >
-                Find Vacuums
-              </Button>
-            </DialogPanel>
-          </div>
-        </div>
-      </Dialog>
+        <Button
+          className="ml-auto bg-background/90!"
+          type="button"
+          onClick={() => {
+            close();
+            form.handleSubmit();
+          }}
+        >
+          Find Vacuums
+        </Button>
+      </Modal>
     </div>
   );
 };

@@ -1,0 +1,263 @@
+import React from "react";
+import { flexRender, Table, Row, Cell, Header, HeaderGroup } from "@tanstack/react-table";
+import { VirtualItem, Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
+
+interface TableContainerProps<T> {
+  table: Table<T>;
+}
+
+export function TableContainer<T extends Record<string, unknown>>({ table }: TableContainerProps<T>) {
+  const visibleColumns = table.getVisibleLeafColumns();
+  const tableContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Virtualize columns
+  const columnVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableCellElement>({
+    count: visibleColumns.length,
+    estimateSize: (index) => visibleColumns[index].getSize(),
+    getScrollElement: () => tableContainerRef.current,
+    horizontal: true,
+    overscan: 3,
+  });
+
+  const virtualColumns = columnVirtualizer.getVirtualItems();
+
+  let virtualPaddingLeft: number | undefined;
+  let virtualPaddingRight: number | undefined;
+
+  if (columnVirtualizer && virtualColumns.length) {
+    virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
+    virtualPaddingRight = columnVirtualizer.getTotalSize() - (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
+  }
+
+  return (
+    <div
+      ref={tableContainerRef}
+      className="
+        relative
+        overflow-auto
+        h-[800px]
+        mx-auto
+        border
+        border-border
+        rounded
+      "
+    >
+      <table className="grid w-full text-sm">
+        <TableHead
+          columnVirtualizer={columnVirtualizer}
+          table={table}
+          virtualPaddingLeft={virtualPaddingLeft}
+          virtualPaddingRight={virtualPaddingRight}
+        />
+        <TableBody
+          columnVirtualizer={columnVirtualizer}
+          table={table}
+          tableContainerRef={tableContainerRef}
+          virtualPaddingLeft={virtualPaddingLeft}
+          virtualPaddingRight={virtualPaddingRight}
+        />
+      </table>
+    </div>
+  );
+}
+
+/* ------------------ Table Head ------------------ */
+
+interface TableHeadProps<T> {
+  columnVirtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  table: Table<T>;
+  virtualPaddingLeft: number | undefined;
+  virtualPaddingRight: number | undefined;
+}
+
+function TableHead<T extends Record<string, unknown>>({
+  columnVirtualizer,
+  table,
+  virtualPaddingLeft,
+  virtualPaddingRight,
+}: TableHeadProps<T>) {
+  return (
+    <thead className="grid sticky top-0 z-10 bg-gray-50 dark:bg-background">
+      {table.getHeaderGroups().map((headerGroup) => (
+        <TableHeadRow
+          key={headerGroup.id}
+          headerGroup={headerGroup}
+          columnVirtualizer={columnVirtualizer}
+          virtualPaddingLeft={virtualPaddingLeft}
+          virtualPaddingRight={virtualPaddingRight}
+        />
+      ))}
+    </thead>
+  );
+}
+
+interface TableHeadRowProps<T> {
+  columnVirtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  headerGroup: HeaderGroup<T>;
+  virtualPaddingLeft: number | undefined;
+  virtualPaddingRight: number | undefined;
+}
+
+function TableHeadRow<T extends Record<string, unknown>>({
+  columnVirtualizer,
+  headerGroup,
+  virtualPaddingLeft,
+  virtualPaddingRight,
+}: TableHeadRowProps<T>) {
+  const virtualColumns = columnVirtualizer.getVirtualItems();
+
+  return (
+    <tr className="flex w-full border-b border-border">
+      {virtualPaddingLeft ? <th className="flex" style={{ width: virtualPaddingLeft }} /> : null}
+
+      {virtualColumns.map((virtualColumn) => {
+        const header = headerGroup.headers[virtualColumn.index];
+        return <TableHeadCell key={header.id} header={header} />;
+      })}
+
+      {virtualPaddingRight ? <th className="flex" style={{ width: virtualPaddingRight }} /> : null}
+    </tr>
+  );
+}
+
+interface TableHeadCellProps<T> {
+  header: Header<T, unknown>;
+}
+
+function TableHeadCell<T extends Record<string, unknown>>({ header }: TableHeadCellProps<T>) {
+  const canSort = header.column.getCanSort();
+  const sortHandler = header.column.getToggleSortingHandler();
+  const isSorted = header.column.getIsSorted() as string;
+  const sortIndicator = { asc: " 🔼", desc: " 🔽" }[isSorted] ?? null;
+
+  return (
+    <th
+      key={header.id}
+      className="flex items-center border-r border-border last:border-none"
+      style={{ width: header.getSize() }}
+    >
+      <div
+        onClick={canSort ? sortHandler : undefined}
+        className={canSort ? "cursor-pointer select-none px-3 py-2" : "px-3 py-2"}
+      >
+        {flexRender(header.column.columnDef.header, header.getContext())}
+        {sortIndicator}
+      </div>
+    </th>
+  );
+}
+
+/* ------------------ Table Body ------------------ */
+
+interface TableBodyProps<T> {
+  columnVirtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  table: Table<T>;
+  tableContainerRef: React.RefObject<HTMLDivElement | null>;
+  virtualPaddingLeft: number | undefined;
+  virtualPaddingRight: number | undefined;
+}
+
+function TableBody<T extends Record<string, unknown>>({
+  columnVirtualizer,
+  table,
+  tableContainerRef,
+  virtualPaddingLeft,
+  virtualPaddingRight,
+}: TableBodyProps<T>) {
+  const rows = table.getRowModel().rows;
+
+  const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
+    count: rows.length,
+    estimateSize: () => 33,
+    getScrollElement: () => tableContainerRef.current,
+    measureElement:
+      typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") === -1
+        ? (el) => el?.getBoundingClientRect().height
+        : undefined,
+    overscan: 5,
+  });
+
+  const virtualRows = rowVirtualizer.getVirtualItems();
+
+  return (
+    <tbody
+      className="grid relative"
+      style={{
+        height: `${rowVirtualizer.getTotalSize()}px`,
+      }}
+    >
+      {virtualRows.map((virtualRow) => {
+        const row = rows[virtualRow.index] as Row<T>;
+        return (
+          <TableBodyRow
+            key={row.id}
+            row={row}
+            virtualRow={virtualRow}
+            rowVirtualizer={rowVirtualizer}
+            columnVirtualizer={columnVirtualizer}
+            virtualPaddingLeft={virtualPaddingLeft}
+            virtualPaddingRight={virtualPaddingRight}
+          />
+        );
+      })}
+    </tbody>
+  );
+}
+
+interface TableBodyRowProps<T> {
+  columnVirtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  row: Row<T>;
+  rowVirtualizer: Virtualizer<HTMLDivElement, HTMLTableRowElement>;
+  virtualPaddingLeft: number | undefined;
+  virtualPaddingRight: number | undefined;
+  virtualRow: VirtualItem;
+}
+
+function TableBodyRow<T extends Record<string, unknown>>({
+  columnVirtualizer,
+  row,
+  rowVirtualizer,
+  virtualPaddingLeft,
+  virtualPaddingRight,
+  virtualRow,
+}: TableBodyRowProps<T>) {
+  const visibleCells = row.getVisibleCells();
+  const virtualColumns = columnVirtualizer.getVirtualItems();
+
+  return (
+    <tr
+      data-index={virtualRow.index}
+      ref={(node) => rowVirtualizer.measureElement(node)}
+      className="flex w-full border-b border-border hover:bg-gray-50 dark:hover:bg-background/70"
+      style={{
+        position: "absolute",
+        transform: `translateY(${virtualRow.start}px)`,
+      }}
+    >
+      {virtualPaddingLeft ? <td className="flex" style={{ width: virtualPaddingLeft }} /> : null}
+
+      {virtualColumns.map((vc) => {
+        const cell = visibleCells[vc.index];
+        return <TableBodyCell key={cell.id} cell={cell} />;
+      })}
+
+      {virtualPaddingRight ? <td className="flex" style={{ width: virtualPaddingRight }} /> : null}
+    </tr>
+  );
+}
+
+interface TableBodyCellProps<T> {
+  cell: Cell<T, unknown>;
+}
+
+function TableBodyCell<T extends Record<string, unknown>>({ cell }: TableBodyCellProps<T>) {
+  return (
+    <td
+      key={cell.id}
+      className="flex items-center border-r border-border last:border-none"
+      style={{ width: cell.column.getSize() }}
+    >
+      <div className="px-3 py-2">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
+    </td>
+  );
+}

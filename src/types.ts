@@ -22,6 +22,7 @@ export interface Vacuum {
   selfEmptying: boolean | null;
   appControl: boolean | null;
   petHair: boolean | null;
+  [key: string]: unknown;
 }
 
 export enum FloorType {

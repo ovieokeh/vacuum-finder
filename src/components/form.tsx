@@ -11,8 +11,16 @@ import {
   Switch,
 } from "@headlessui/react";
 import { GoChevronDown } from "react-icons/go";
-import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+import {
+  FieldComponent,
+  FormAsyncValidateOrFn,
+  FormValidateOrFn,
+  ReactFormExtendedApi,
+  createFormHook,
+  createFormHookContexts,
+} from "@tanstack/react-form";
 import clsx from "clsx";
+import { ComponentType, PropsWithChildren } from "react";
 
 const FormTextField = ({
   type = "text",
@@ -64,8 +72,8 @@ const FormToggleField = ({
         checked={checked}
         onChange={(e) => onChange(e)}
         className={clsx(
-          `group relative flex w-10 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
-          checked ? "bg-blue-100!" : "bg-black/3!"
+          `border-border! group relative flex w-10 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
+          checked ? "bg-blue-100!" : "bg-background/70!"
         )}
       >
         <span
@@ -138,14 +146,14 @@ const FormSubmitButton = ({
   children: React.ReactNode;
 }) => {
   return (
-    <Button type={type} className={clsx("border! border-border!", className)}>
+    <Button type={type} className={clsx("bg-background! border! border-border!", className)}>
       {children}
     </Button>
   );
 };
 
 const { fieldContext, formContext } = createFormHookContexts();
-export const { useAppForm } = createFormHook({
+export const formInit = {
   fieldComponents: {
     FormTextField,
     FormToggleField,
@@ -156,4 +164,48 @@ export const { useAppForm } = createFormHook({
   },
   fieldContext,
   formContext,
-});
+};
+
+export type AppFieldExtendedReactFormApi<
+  TFormData,
+  TOnMount extends undefined | FormValidateOrFn<TFormData>,
+  TOnChange extends undefined | FormValidateOrFn<TFormData>,
+  TOnChangeAsync extends undefined | FormAsyncValidateOrFn<TFormData>,
+  TOnBlur extends undefined | FormValidateOrFn<TFormData>,
+  TOnBlurAsync extends undefined | FormAsyncValidateOrFn<TFormData>,
+  TOnSubmit extends undefined | FormValidateOrFn<TFormData>,
+  TOnSubmitAsync extends undefined | FormAsyncValidateOrFn<TFormData>,
+  TOnServer extends undefined | FormAsyncValidateOrFn<TFormData>,
+  TSubmitMeta,
+  TFieldComponents extends Record<string, ComponentType<any>>,
+  TFormComponents extends Record<string, ComponentType<any>>
+> = ReactFormExtendedApi<
+  TFormData,
+  TOnMount,
+  TOnChange,
+  TOnChangeAsync,
+  TOnBlur,
+  TOnBlurAsync,
+  TOnSubmit,
+  TOnSubmitAsync,
+  TOnServer,
+  TSubmitMeta
+> &
+  TFormComponents & {
+    AppField: FieldComponent<
+      TFormData,
+      TOnMount,
+      TOnChange,
+      TOnChangeAsync,
+      TOnBlur,
+      TOnBlurAsync,
+      TOnSubmit,
+      TOnSubmitAsync,
+      TOnServer,
+      TSubmitMeta,
+      NoInfer<TFieldComponents>
+    >;
+    AppForm: ComponentType<PropsWithChildren>;
+  };
+
+export const { useAppForm } = createFormHook(formInit);

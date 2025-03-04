@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
+import { MemoryRouter } from "react-router-dom";
 
 import App from "./app";
-import { MemoryRouter } from "react-router-dom";
 
 export function render() {
   const html = renderToString(
