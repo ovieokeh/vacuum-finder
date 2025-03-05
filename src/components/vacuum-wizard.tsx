@@ -10,12 +10,16 @@ import { useEffect, useRef } from "react";
 import { useStore } from "@tanstack/react-form";
 import { useWindowWidth } from "../hooks/use-window-width";
 import { twMerge } from "tailwind-merge";
+import { useAppDispatch } from "../redux";
+import { replaceState } from "../redux/vacuum-filters-reducer";
 
 export function VacuumWizard({ className = "" }: { className?: string }) {
   const windowWidth = useWindowWidth();
   const { navHeight } = useSiteConfig();
   const { filterVacuumsMutation } = useDatabase();
   const filtersContainerRef = useRef<HTMLDivElement>(null);
+
+  const dispatch = useAppDispatch();
 
   const form = useAppForm({
     defaultValues: {
@@ -37,6 +41,11 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
       }),
     },
     onSubmit: ({ value }) => {
+      dispatch(
+        replaceState({
+          value: value,
+        })
+      );
       filterVacuumsMutation.mutate(value);
     },
   });
@@ -49,8 +58,6 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
 
   const filtersContainerWidth = filtersContainerRef.current?.clientWidth ?? 300;
   const vacuumResultsWidth = Math.min(windowWidth - (filtersContainerWidth + 64), 868);
-
-  console.log("vacuumResultsWidth", vacuumResultsWidth);
 
   return (
     <div

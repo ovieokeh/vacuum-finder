@@ -4,9 +4,10 @@ import { VirtualItem, Virtualizer, useVirtualizer } from "@tanstack/react-virtua
 
 interface TableContainerProps<T> {
   table: Table<T>;
+  handleRowClick: (row: T) => void;
 }
 
-export function TableContainer<T extends Record<string, unknown>>({ table }: TableContainerProps<T>) {
+export function TableContainer<T extends Record<string, unknown>>({ table, handleRowClick }: TableContainerProps<T>) {
   const visibleColumns = table.getVisibleLeafColumns();
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -55,6 +56,7 @@ export function TableContainer<T extends Record<string, unknown>>({ table }: Tab
           tableContainerRef={tableContainerRef}
           virtualPaddingLeft={virtualPaddingLeft}
           virtualPaddingRight={virtualPaddingRight}
+          handleRowClick={handleRowClick}
         />
       </table>
     </div>
@@ -155,6 +157,7 @@ interface TableBodyProps<T> {
   tableContainerRef: React.RefObject<HTMLDivElement | null>;
   virtualPaddingLeft: number | undefined;
   virtualPaddingRight: number | undefined;
+  handleRowClick: (row: T) => void;
 }
 
 function TableBody<T extends Record<string, unknown>>({
@@ -163,6 +166,7 @@ function TableBody<T extends Record<string, unknown>>({
   tableContainerRef,
   virtualPaddingLeft,
   virtualPaddingRight,
+  handleRowClick,
 }: TableBodyProps<T>) {
   const rows = table.getRowModel().rows;
 
@@ -197,6 +201,7 @@ function TableBody<T extends Record<string, unknown>>({
             columnVirtualizer={columnVirtualizer}
             virtualPaddingLeft={virtualPaddingLeft}
             virtualPaddingRight={virtualPaddingRight}
+            handleRowClick={handleRowClick}
           />
         );
       })}
@@ -211,6 +216,7 @@ interface TableBodyRowProps<T> {
   virtualPaddingLeft: number | undefined;
   virtualPaddingRight: number | undefined;
   virtualRow: VirtualItem;
+  handleRowClick: (row: T) => void;
 }
 
 function TableBodyRow<T extends Record<string, unknown>>({
@@ -220,6 +226,7 @@ function TableBodyRow<T extends Record<string, unknown>>({
   virtualPaddingLeft,
   virtualPaddingRight,
   virtualRow,
+  handleRowClick,
 }: TableBodyRowProps<T>) {
   const visibleCells = row.getVisibleCells();
   const virtualColumns = columnVirtualizer.getVirtualItems();
@@ -228,11 +235,12 @@ function TableBodyRow<T extends Record<string, unknown>>({
     <tr
       data-index={virtualRow.index}
       ref={(node) => rowVirtualizer.measureElement(node)}
-      className="flex w-full border-b border-border hover:bg-gray-50 dark:hover:bg-background/70"
+      className="cursor-pointer flex w-full border-b border-border hover:bg-gray-50 dark:hover:bg-background/70"
       style={{
         position: "absolute",
         transform: `translateY(${virtualRow.start}px)`,
       }}
+      onClick={() => handleRowClick(row.original)}
     >
       {virtualPaddingLeft ? <td className="flex" style={{ width: virtualPaddingLeft }} /> : null}
 

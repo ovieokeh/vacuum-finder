@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Vacuum, VacuumsFilter } from "../types";
 
-export function useDatabase(vacuumId?: number) {
+export function useDatabase(vacuumId?: string) {
   const queryClient = useQueryClient();
   // Fetch all vacuums.
   const vacuumsQuery = useQuery<Vacuum[]>({

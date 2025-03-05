@@ -7,6 +7,7 @@
   --color-background-alt: #ffffff;
   --color-border: #d6d9db;
   --color-text: #000;
+  --color-accent: #646cff;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -47,6 +48,7 @@ button:focus-visible {
   --color-border: var(--color-border);
   --color-background: var(--color-background);
   --color-background-alt: var(--color-background-alt);
+  --color-accent: var(--color-accent);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -61,15 +63,6 @@ button:focus-visible {
   button {
     background-color: #1a1a1a;
   }
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
 }
 
 body {

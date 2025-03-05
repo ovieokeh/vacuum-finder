@@ -14,14 +14,18 @@ export const getVacuum = async (req: Request, res: Response) => {
     [key: string]: any;
   };
 
-  // convert all 1/0 to true/false
-  Object.keys(vacuum).forEach((key) => {
-    if (typeof vacuum[key] === "number") {
-      vacuum[key] = !!vacuum[key];
-    }
-  });
+  if (!vacuum) {
+    res.status(404).json({ error: "Vacuum not found" });
+  } else {
+    // convert all 1/0 to true/false
+    Object.keys(vacuum).forEach((key) => {
+      if ([0, 1].includes(vacuum[key])) {
+        vacuum[key] = !!vacuum[key];
+      }
+    });
 
-  res.json(vacuum);
+    res.json(vacuum);
+  }
 };
 
 export const searchVacuums = async (req: Request, res: Response) => {
@@ -41,7 +45,7 @@ export const searchVacuums = async (req: Request, res: Response) => {
 
     // For each condition we supply the filter value twice:
     const stmt = db.prepare(query);
-    const vacuums = stmt.all(budget, budget, petHair, petHair, mopFunction, mopFunction) as Vacuum[];
+    const vacuums = (stmt.all(budget, budget, petHair, petHair, mopFunction, mopFunction) as Vacuum[]) ?? [];
 
     // convert all 1/0 to true/false
     vacuums.forEach((vacuum) => {

@@ -20,15 +20,20 @@ export const Navigation = () => {
 
   return (
     <nav className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         <Link to="/" className="text-text!">
           <h2 className="hidden sm:block font-semibold text-lg">Robot Vacuum Buyer Tool</h2>
           <h2 className="sm:hidden font-semibold text-lg">RVBT</h2>
         </Link>
 
-        <Link to="/help-center" className="hidden sm:block text-primary hover:text-primary-dark">
-          Help
-        </Link>
+        <div className="flex gap-4">
+          <Link to="/vacuum-search" className="hidden sm:block text-primary hover:text-primary-dark">
+            Tool
+          </Link>
+          <Link to="/help-center" className="hidden sm:block text-primary hover:text-primary-dark">
+            Help Center
+          </Link>
+        </div>
       </div>
 
       <div className="flex flow-row gap-4 min-w-38 justify-between">
