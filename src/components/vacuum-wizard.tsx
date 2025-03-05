@@ -61,26 +61,25 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
 
   return (
     <div
-      className={twMerge(`flex flex-col-reverse justify-between  sm:flex-row sm:justify-normal`, className)}
+      className={twMerge(`flex flex-col-reverse justify-between  md:flex-row md:justify-normal`, className)}
       style={{
         height: `calc(100% - ${navHeight + 16}px)`,
       }}
     >
       <div
-        className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border sm:rounded-tl-lg sm:rounded-bl-lg"
+        className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:rounded-tl-lg md:rounded-bl-lg"
         ref={filtersContainerRef}
       >
-        <div className="hidden sm:block p-4 pb-0">
+        <div className="hidden md:block p-4 pb-0">
           <h2 className="text-lg font-bold text-secondary">Refine your search</h2>
         </div>
 
         <VacuumForm form={form as unknown as VacuumFormInterface} />
       </div>
 
-      <div className="sm:w-3/4 sm:h-full overflow-y-scroll py-4 pb-24 md:pb-4 sm:rounded-tr-lg sm:rounded-br-lg sm:p-4 pt-0">
-        <div className="p-4 pb-0 sm:p-0">
-          <h2 className="text-lg font-bold text-secondary mb-4">Recommended Vacuums</h2>
-        </div>
+      <div className="md:bg-background md:w-3/4 md:h-full overflow-y-scroll md:overflow-auto py-4 pb-24 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0">
+        <h2 className="text-lg font-bold text-secondary mb-4">Recommended Vacuums</h2>
+
         <VacuumResults
           containerWidth={vacuumResultsWidth}
           filters={filters}

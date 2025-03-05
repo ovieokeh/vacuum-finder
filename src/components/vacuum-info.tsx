@@ -24,9 +24,9 @@ export const VacuumInfo = ({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex flex-col md:flex-row gap-4">
       {/* Image */}
-      <div className={twMerge(" h-36 flex-shrink-0 sm:mb-0 overflow-hidden rounded", imageClassName)}>
+      <div className={twMerge(" h-36 flex-shrink-0 md:mb-0 overflow-hidden rounded", imageClassName)}>
         <img className="object-cover w-full h-full" src={vacuum.image} alt={vacuum.name} />
       </div>
       {/* Main info */}
@@ -37,7 +37,7 @@ export const VacuumInfo = ({
             {vacuum.brand} – {vacuum.model}
           </p>
         </div>
-        <p className="mt-2 sm:mt-0 text-lg font-bold text-accent">
+        <p className="mt-2 md:mt-0 text-lg font-bold text-accent">
           {CurrencySymbolMapping[currency]}
           {price}
         </p>

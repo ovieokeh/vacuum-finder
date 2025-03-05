@@ -33,7 +33,7 @@ export function VacuumInfoPage() {
         <div className="flex flex-col flex-grow gap-4">
           {vacuum ? (
             <>
-              <VacuumInfo vacuum={vacuum} filters={filters} imageClassName="w-full h-64 sm:size-52 mx-auto grow" />
+              <VacuumInfo vacuum={vacuum} filters={filters} imageClassName="w-full h-64 md:size-52 mx-auto grow" />
               <VacuumSpecExplanations vacuum={vacuum} filters={filters} />
             </>
           ) : (

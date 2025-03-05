@@ -118,7 +118,7 @@ export function VacuumForm({ form }: VacuumFormProps) {
   );
 
   const desktopFilters = (
-    <div className="space-y-6 hidden sm:block">
+    <div className="space-y-6 hidden md:block">
       {simpleFilters}
       <form.AppForm>
         <form.FormSubmitButton>Find Vacuums</form.FormSubmitButton>
@@ -127,7 +127,7 @@ export function VacuumForm({ form }: VacuumFormProps) {
   );
 
   const mobileFilters = (
-    <MobileFiltersDialog className="block sm:hidden" form={form}>
+    <MobileFiltersDialog className="block md:hidden" form={form}>
       <div className="flex flex-col gap-4">{simpleFilters}</div>
     </MobileFiltersDialog>
   );
@@ -209,7 +209,7 @@ const MobileFiltersDialog = ({
         title="Refine your vacuum search"
         isOpen={isOpen}
         close={close}
-        panelClassName="sm:h-screen justify-between"
+        panelClassName="md:h-screen justify-between"
         childrenClassName="space-y-6"
       >
         {children}

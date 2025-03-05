@@ -20,10 +20,10 @@ export const Navigation = () => {
 
   return (
     <nav className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
-      <div className="flex items-center gap-4 sm:gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
         <Link to="/" className="text-text!">
-          <h2 className="hidden sm:block font-semibold text-lg">Robot Vacuum Buyer Tool</h2>
-          <h2 className="sm:hidden font-semibold text-lg">RVBT</h2>
+          <h2 className="hidden md:block font-semibold text-lg">Robot Vacuum Buyer Tool</h2>
+          <h2 className="md:hidden font-semibold text-lg">RVBT</h2>
         </Link>
 
         <div className="flex gap-4">

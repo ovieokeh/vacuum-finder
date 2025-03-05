@@ -36,7 +36,6 @@ export function TableContainer<T extends Record<string, unknown>>({ table, handl
       className="
         relative
         overflow-auto
-        h-[800px]
         mx-auto
         border
         border-border

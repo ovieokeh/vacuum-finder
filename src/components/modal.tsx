@@ -20,11 +20,11 @@ export const Modal = ({
 }) => {
   return (
     <Dialog open={isOpen} onClose={close} className="fixed inset-0 z-50">
-      <div className="fixed inset-0 z-10 w-screen h-full sm:h-auto overflow-hidden sm:overflow-y-auto sm:bg-black/50 transition-all">
-        <div className="flex min-h-full items-center justify-center sm:p-4">
+      <div className="fixed inset-0 z-10 w-screen h-full md:h-auto overflow-hidden md:overflow-y-auto md:bg-black/50 transition-all">
+        <div className="flex min-h-full items-center justify-center md:p-4">
           <DialogPanel
             className={twMerge(
-              "w-full flex flex-col sm:max-w-md rounded-lg bg-background-alt p-4 sm:pt-0 space-y-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0",
+              "w-full flex flex-col md:max-w-md rounded-lg bg-background-alt p-4 md:pt-0 space-y-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0",
               panelClassName
             )}
             transition
@@ -32,13 +32,13 @@ export const Modal = ({
             <DialogTitle as="h3" className="flex justify-between items-center h-12">
               <span className="font-semibold">{title}</span>
               <Button onClick={close} className="bg-transparent! p-1!">
-                <IoMdClose className="size-5 sm:size-6" />
+                <IoMdClose className="size-5 md:size-6" />
               </Button>
             </DialogTitle>
 
             <div
               className={twMerge(
-                "grow max-h-[calc(100svh-4rem)] sm:max-h-[calc(100svh-2rem)] overflow-y-scroll pb-8 sm:pb-0",
+                "grow max-h-[calc(100svh-4rem)] md:max-h-[calc(100svh-2rem)] overflow-y-scroll pb-8 md:pb-0",
                 childrenClassName
               )}
             >
