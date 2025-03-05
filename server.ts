@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import express from "express";
-// import { populateMockData, setupDatabase } from "./src/database/setup";
+import { populateMockData, setupDatabase } from "./src/database/setup";
 import { ViteDevServer } from "vite";
 import { createVacuumHandler, deleteVacuumHandler, updateVacuumHandler } from "./src/api-handlers/vacuums/admin";
 import { getVacuum, listVacuums, searchVacuums } from "./src/api-handlers/vacuums/public";
@@ -49,22 +49,20 @@ async function startServer() {
 
       let template: string;
       let render: (url: string) => Promise<{ head?: string; html?: string }>;
+      let html: string;
 
       if (!isProduction && vite) {
         // Always read fresh template in development
         template = await fs.readFile("./index.html", "utf-8");
         template = await vite.transformIndexHtml(url, template);
         render = (await vite.ssrLoadModule("/src/entry-server.tsx")).render;
+        const rendered = await render(url);
+        html = template.replace(`<!--app-head-->`, rendered.head ?? "").replace(`<!--app-html-->`, rendered.html ?? "");
       } else {
         template = templateHtml;
         // Use string concatenation to avoid static resolution during build
-        render = (await import("./" + "dist/server/entry-server.js")).render;
+        html = templateHtml;
       }
-
-      const rendered = await render(url);
-      const html = template
-        .replace(`<!--app-head-->`, rendered.head ?? "")
-        .replace(`<!--app-html-->`, rendered.html ?? "");
 
       res.status(200).set({ "Content-Type": "text/html" }).send(html);
     } catch (e: any) {
@@ -75,8 +73,8 @@ async function startServer() {
   });
 
   app.listen(port, () => {
-    // setupDatabase();
-    // populateMockData();
+    setupDatabase();
+    populateMockData();
     console.log(`Server started at http://localhost:${port}`);
   });
 }

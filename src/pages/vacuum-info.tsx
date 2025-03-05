@@ -27,7 +27,7 @@ export function VacuumInfoPage() {
   return (
     <>
       <Helmet>
-        <title>{vacuum?.name} - Robot Vacuum Buyer Tool & Guide</title>
+        <title>{`${vacuum?.name} - Robot Vacuum Buyer Tool & Guide`}</title>
       </Helmet>
       <Modal title={vacuum?.name ?? ""} isOpen close={handleClose} panelClassName="min-w-[80%]">
         <div className="flex flex-col flex-grow gap-4">

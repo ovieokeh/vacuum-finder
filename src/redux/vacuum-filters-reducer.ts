@@ -19,7 +19,6 @@ const vacuumFiltersSlice = createSlice({
   initialState,
   reducers: {
     replaceState: (state, action: PayloadAction<UpdateValuePayload>) => {
-      console.log("Replacing state with", action.payload);
       return action.payload.value;
     },
   },

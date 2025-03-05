@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   getCoreRowModel,
   getPaginationRowModel,
@@ -123,8 +123,9 @@ const VacuumMobileList = ({ results, filters }: VacuumResultsProps) => {
     <ul className="space-y-4">
       {results.map((vacuum) => (
         <li key={vacuum.id} className="flex flex-col gap-4 p-4 border border-border rounded-lg shadow">
-          {/* Info */}
-          <VacuumInfo vacuum={vacuum} filters={filters} />
+          <Link to={`/vacuum-search/${vacuum.id}`}>
+            <VacuumInfo vacuum={vacuum} filters={filters} />
+          </Link>
         </li>
       ))}
     </ul>

@@ -20,9 +20,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-a:hover {
-  color: #747bff;
-}
 button {
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -57,17 +54,19 @@ button:focus-visible {
     --color-background: #242424;
     --color-background-alt: #1a1a1a;
   }
-  a:hover {
-    color: #646cff;
-  }
   button {
     background-color: #1a1a1a;
   }
 }
 
+html,
+body,
+.app {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  min-height: 100vh;
 }
 
 h1 {

@@ -55,7 +55,7 @@ export const setupDatabase = () => {
 export const populateMockData = () => {
   try {
     const insertVacuum = db.prepare(`
-      INSERT INTO vacuums (
+      INSERT OR IGNORE INTO vacuums (
         id, name, image, brand, model, price, batteryLifeMins, suctionPowerPa, noiseLevelDb, 
         mappingTechnology, multiFloorMapping, virtualWalls, mopFunction, selfEmptying, appControl, petHair
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -83,7 +83,7 @@ export const populateMockData = () => {
             vacuum.petHair ? 1 : 0
           );
         } catch (error) {
-          console.info("Error populating mock data:", error);
+          console.info("Error populating mock data:", (error as any).message);
         }
       }
       console.log("Mock data populated.");
