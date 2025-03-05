@@ -61,8 +61,17 @@ button:focus-visible {
 
 html,
 body,
-.app {
+#root {
   height: 100%;
+}
+
+@media (max-width: 640px) {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 body {

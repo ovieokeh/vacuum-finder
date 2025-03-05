@@ -120,7 +120,7 @@ const FormSelectField = <T extends string>({
           {selectedOption}
           <GoChevronDown className="w-4 h-4" />
         </ListboxButton>
-        <ListboxOptions anchor="bottom start" className="bg-background-alt rounded shadow">
+        <ListboxOptions anchor="bottom start" className="bg-background-alt rounded shadow z-10">
           {options.map((option, index) => (
             <ListboxOption
               key={option + index}

@@ -63,11 +63,11 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
     <div
       className={twMerge(`flex flex-col-reverse justify-between  sm:flex-row sm:justify-normal`, className)}
       style={{
-        height: `calc(100vh - ${navHeight + 16}px)`,
+        height: `calc(100% - ${navHeight + 16}px)`,
       }}
     >
       <div
-        className="grow pt-4 sm:pt-0 bg-white dark:bg-background/80 border border-border sm:rounded-tl-lg sm:rounded-bl-lg"
+        className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border sm:rounded-tl-lg sm:rounded-bl-lg"
         ref={filtersContainerRef}
       >
         <div className="hidden sm:block p-4 pb-0">
@@ -77,7 +77,7 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
         <VacuumForm form={form as unknown as VacuumFormInterface} />
       </div>
 
-      <div className="h-[99%] sm:w-3/4 sm:h-full overflow-y-scroll py-4 sm:rounded-tr-lg sm:rounded-br-lg sm:p-4 pt-0 dark:bg-background-alt">
+      <div className="sm:w-3/4 sm:h-full overflow-y-scroll py-4 pb-36 md:pb-4 sm:rounded-tr-lg sm:rounded-br-lg sm:p-4 pt-0">
         <div className="p-4 pb-0 sm:p-0">
           <h2 className="text-lg font-bold text-secondary mb-4">Recommended Vacuums</h2>
         </div>

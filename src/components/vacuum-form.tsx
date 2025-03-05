@@ -209,7 +209,7 @@ const MobileFiltersDialog = ({
         title="Refine your vacuum search"
         isOpen={isOpen}
         close={close}
-        panelClassName="h-screen justify-between"
+        panelClassName="sm:h-screen justify-between"
         childrenClassName="space-y-6"
       >
         {children}

@@ -6,7 +6,7 @@ import { Helmet } from "react-helmet";
 import { SiteConfigProvider } from "./providers/site-config";
 import { Navigation } from "./components/navigation";
 import { HomePage } from "./pages/home";
-import { HelpCenterPage } from "./pages/help-center";
+import { GuidesPage } from "./pages/guides";
 import { VacuumSearchPage } from "./pages/vacuum-search";
 import { VacuumInfoPage } from "./pages/vacuum-info";
 import { PrivacyPolicyPage } from "./pages/privacy-policy";
@@ -30,15 +30,18 @@ export default function App() {
             />
           </Helmet>
           <Navigation />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="help-center" element={<HelpCenterPage />} />
-            <Route path="vacuum-search" element={<VacuumSearchPage />}>
-              <Route path=":vacuumId" element={<VacuumInfoPage />} />
-            </Route>
-            <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-            <Route path="terms-of-service" element={<TermsOfServicePage />} />
-          </Routes>
+
+          <div className="h-[calc(100%-4rem)] overflow-y-scroll">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="guides" element={<GuidesPage />} />
+              <Route path="vacuum-search" element={<VacuumSearchPage />}>
+                <Route path=":vacuumId" element={<VacuumInfoPage />} />
+              </Route>
+              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="terms-of-service" element={<TermsOfServicePage />} />
+            </Routes>
+          </div>
         </SiteConfigProvider>
       </QueryClientProvider>
     </Provider>

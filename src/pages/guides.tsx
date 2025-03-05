@@ -1,4 +1,4 @@
-export function HelpCenterPage() {
+export function GuidesPage() {
   return (
     <div className="sm:mx-auto sm:max-w-[1200px]">
       <p>TODO</p>
