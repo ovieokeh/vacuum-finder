@@ -77,7 +77,7 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
         <VacuumForm form={form as unknown as VacuumFormInterface} />
       </div>
 
-      <div className="sm:w-3/4 sm:h-full overflow-y-scroll py-4 pb-36 md:pb-4 sm:rounded-tr-lg sm:rounded-br-lg sm:p-4 pt-0">
+      <div className="sm:w-3/4 sm:h-full overflow-y-scroll py-4 pb-24 md:pb-4 sm:rounded-tr-lg sm:rounded-br-lg sm:p-4 pt-0">
         <div className="p-4 pb-0 sm:p-0">
           <h2 className="text-lg font-bold text-secondary mb-4">Recommended Vacuums</h2>
         </div>

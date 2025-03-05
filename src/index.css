@@ -66,10 +66,7 @@ body,
 }
 
 @media (max-width: 640px) {
-  html,
-  body,
   #root {
-    height: 100%;
     overflow: hidden;
   }
 }
