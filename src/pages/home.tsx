@@ -6,7 +6,7 @@ import { PageHeader } from "../components/page-header";
 const tryLink = (
   <Link
     to="/vacuum-search"
-    className="px-6 py-3 rounded border border-accent! text-white! bg-accent! hover:bg-accent/50!"
+    className="px-6 py-3 rounded border border-accent! dark:text-black bg-accent! hover:bg-accent/50! font-semibold"
   >
     Try it Now
   </Link>
@@ -17,6 +17,7 @@ export const HomePage = () => {
     <div className="flex flex-col min-h-screen bg-background">
       {/* Hero / Top Section */}
       <PageHeader
+        containerClassName="border-b-0"
         className="items-center text-center"
         title="Vacuum Finder"
         subtitle="Find your perfect vacuum in seconds. Let us compare top models based on your needs and deliver the best match for your home."

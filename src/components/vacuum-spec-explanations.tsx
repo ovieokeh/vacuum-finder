@@ -5,7 +5,7 @@ const COLOR_CLASSES = {
   warning: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-50",
   error: "text-red-700 bg-red-50 border-red-200",
   info: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-900/50 dark:text-blue-50",
-  neutral: "text-gray-700 dark:text-gray-300 bg-gray-50 border-gray-200 dark:bg-gray-900/50",
+  neutral: "text-text/90 dark:text-text/60 bg-gray-50 border-gray-200 dark:bg-gray-900/50",
 };
 
 interface SpecItem {
@@ -202,7 +202,7 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
 
   return (
     <div className="mt-4 space-y-4">
-      <h4 className="font-semibold text-base text-gray-900 dark:text-gray-300">What do the features mean?</h4>
+      <h4 className="font-semibold text-base text-text/90">What do the features mean?</h4>
       <div className="space-y-3 md:h-[50svh] overflow-y-scroll">
         {specsList.map((item, idx) => (
           <div key={idx} className={`flex flex-col p-3 border-l-4 rounded ${item.colorClass}`}>

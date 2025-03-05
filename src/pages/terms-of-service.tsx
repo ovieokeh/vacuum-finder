@@ -14,7 +14,7 @@ export const TermsOfServicePage = () => {
         <PageHeader title="Terms of Service" subtitle="Last Updated: March 5, 2025" />
 
         {/* Main Content */}
-        <main className="flex-grow mx-auto max-w-7xl px-6 py-8 md:py-12 text-sm md:text-base leading-6 text-gray-700 space-y-6">
+        <main className="flex-grow mx-auto max-w-7xl px-6 py-8 md:py-12 text-sm md:text-base leading-6 text-text/90 space-y-6">
           <section>
             <h2 className="text-xl font-semibold mb-2">1. Acceptance of Terms</h2>
             <p>
