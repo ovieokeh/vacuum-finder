@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Helmet } from "react-helmet";
 
-import { VacuumWizard } from "../components/vacuum-wizard";
+import { VacuumWizard } from "../../components/vacuum-wizard";
 
 export function VacuumSearchPage() {
   return (

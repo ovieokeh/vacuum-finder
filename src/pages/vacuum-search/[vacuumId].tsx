@@ -3,11 +3,11 @@ import { invariant } from "es-toolkit";
 import { CiCircleInfo } from "react-icons/ci";
 import { Helmet } from "react-helmet";
 
-import { useDatabase } from "../database/hooks";
-import { Modal } from "../components/modal";
-import { VacuumSpecExplanations } from "../components/vacuum-spec-explanations";
-import { VacuumInfo } from "../components/vacuum-info";
-import { useAppSelector } from "../redux";
+import { useDatabase } from "../../database/hooks";
+import { Modal } from "../../components/modal";
+import { VacuumSpecExplanations } from "../../components/vacuum-spec-explanations";
+import { VacuumInfo } from "../../components/vacuum-info";
+import { useAppSelector } from "../../redux";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();

@@ -36,7 +36,7 @@ export const useUserLocation = () => {
 
   const getLocationByIP = async () => {
     try {
-      const url = `https://api.ipbase.com/v1/json/`;
+      const url = `/api/geolocate`;
       const response = await fetch(url);
       const data = await response.json();
       setUserLocation(data);

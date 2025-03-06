@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 export const Navigation = () => {
   const navRef = useRef<HTMLDivElement>(null);
   const { region, currency, setRegion, setCurrency, setNavHeight } = useSiteConfig();
+  const { user } = useSiteConfig();
 
   useEffect(() => {
     if (navRef.current) {
@@ -33,6 +34,11 @@ export const Navigation = () => {
           <Link to="/guides" className="text-text hover:text-text/90">
             Guides
           </Link>
+          {user?.id ? (
+            <Link to="/admin/dashboard" className="text-text hover:text-text/90">
+              Dashboard
+            </Link>
+          ) : null}
         </div>
       </div>
 

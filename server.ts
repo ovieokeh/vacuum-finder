@@ -2,8 +2,13 @@ import fs from "node:fs/promises";
 import express from "express";
 import { populateMockData, setupDatabase } from "./src/database/setup";
 import { ViteDevServer } from "vite";
-import { createVacuumHandler, deleteVacuumHandler, updateVacuumHandler } from "./src/api-handlers/vacuums/admin";
+import { config } from "dotenv";
+
+import { addVacuumHandler, deleteVacuumHandler, updateVacuumHandler } from "./src/api-handlers/vacuums/admin";
 import { getVacuum, listVacuums, searchVacuums } from "./src/api-handlers/vacuums/public";
+import { geolocateHandler } from "./src/api-handlers/utils/geolocate";
+
+config();
 
 async function startServer() {
   const isProduction = process.env.NODE_ENV === "production";
@@ -35,12 +40,15 @@ async function startServer() {
   app.use(express.json());
 
   // API endpoints…
-  app.post("/api/vacuums", createVacuumHandler);
+  app.post("/api/vacuums", addVacuumHandler);
   app.put("/api/vacuums/:id", updateVacuumHandler as any);
   app.delete("/api/vacuums/:id", deleteVacuumHandler as any);
   app.get("/api/vacuums", listVacuums);
   app.get("/api/vacuums/:id", getVacuum);
   app.post("/api/search-vacuums", searchVacuums);
+
+  // Utils endpoints
+  app.get("/api/geolocate", geolocateHandler);
 
   // Serve HTML
   app.all("*", async (req, res) => {

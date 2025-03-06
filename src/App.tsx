@@ -8,11 +8,14 @@ import { Navigation } from "./components/navigation";
 import { HomePage } from "./pages/home";
 import { GuidesPage } from "./pages/guides";
 import { VacuumSearchPage } from "./pages/vacuum-search";
-import { VacuumInfoPage } from "./pages/vacuum-info";
+import { VacuumInfoPage } from "./pages/vacuum-search/[vacuumId]";
 import { PrivacyPolicyPage } from "./pages/privacy-policy";
 import { TermsOfServicePage } from "./pages/terms-of-service";
 import { reduxStore } from "./redux";
 import "./index.css";
+import { AdminPage } from "./pages/admin";
+import { AdminAuthPage } from "./pages/admin/auth";
+import { AdminDashboardPage } from "./pages/admin/dashboard";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +43,11 @@ export default function App() {
               </Route>
               <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="terms-of-service" element={<TermsOfServicePage />} />
+
+              <Route path="admin" element={<AdminPage />}>
+                <Route path="auth" element={<AdminAuthPage />} />
+                <Route path="dashboard" element={<AdminDashboardPage />} />
+              </Route>
             </Routes>
           </div>
         </SiteConfigProvider>
