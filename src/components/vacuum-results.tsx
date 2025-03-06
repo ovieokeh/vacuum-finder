@@ -9,10 +9,12 @@ import {
 } from "@tanstack/react-table";
 
 import { CurrencySymbolMapping, Vacuum, VacuumsFilter } from "../types";
-import { useSiteConfig } from "../providers/site-config";
 import { TableContainer } from "./table";
 import { VacuumInfo } from "./vacuum-info";
 import { VacuumFeatures } from "./vacuum-features";
+import { getCheapestPrice } from "../shared-utils/price";
+import { MdInfoOutline } from "react-icons/md";
+import { Popover } from "./popover";
 
 interface VacuumResultsProps {
   filters: VacuumsFilter;
@@ -31,60 +33,84 @@ export function VacuumResults({
   containerWidth: number;
 }) {
   const navigate = useNavigate();
-  const { currency } = useSiteConfig();
-  const USD_TO_EUR = 0.85;
 
-  const options: TableOptions<Vacuum> = useMemo(
+  const tableOptions: TableOptions<Vacuum> = useMemo(
     () => ({
       columns: [
-        { header: "Name", accessorKey: "name", size: relativeWidth(containerWidth, 30) },
+        {
+          header: "Name",
+          accessorKey: "name",
+          size: relativeWidth(containerWidth, 25),
+          cell: (value) => {
+            const brand = value.row.original.brand;
+            const model = value.row.original.model;
+            return `${brand} ${model}`;
+          },
+          enableSorting: false,
+        },
         {
           header: "Price",
           accessorKey: "price",
           size: relativeWidth(containerWidth, 11),
-          enableSorting: true,
           cell: (value) => {
-            const priceValue = value.getValue();
-            const price = currency === "USD" ? priceValue : (priceValue * USD_TO_EUR).toFixed(2);
-            return `${CurrencySymbolMapping[currency]}${price}`;
+            const cheapestPrice = getCheapestPrice(value.row.original, filters.currency);
+            return cheapestPrice === 0 ? (
+              <span className="text-center block w-full">n/a</span>
+            ) : cheapestPrice === -1 ? (
+              <Popover
+                className="grow flex justify-center"
+                panelClassName="bg-background p-4 border border-border"
+                trigger={<MdInfoOutline className="w-4 h-4 text-text!" />}
+              >
+                <p className="text-text/90">No price available in your chosen currency.</p>
+                <p className="text-text/90">Try changing your selected currency at the top of the page.</p>
+              </Popover>
+            ) : (
+              `${CurrencySymbolMapping[filters.currency]}${cheapestPrice}`
+            );
           },
+          enableSorting: true,
         },
         {
           header: "Battery",
-          accessorKey: "batteryLifeMins",
-          size: relativeWidth(containerWidth, 9),
+          accessorKey: "batteryLifeInMinutes",
+          size: relativeWidth(containerWidth, 12),
           cell: (value) => {
             const batteryLife = value.getValue();
             const batteryLifeHours = Math.floor(batteryLife / 60);
             return `${batteryLifeHours}h ${batteryLife % 60}m`;
           },
+          enableSorting: true,
         },
         {
           header: "Suction",
-          accessorKey: "suctionPowerPa",
-          size: relativeWidth(containerWidth, 10),
+          accessorKey: "suctionPowerInPascals",
+          size: relativeWidth(containerWidth, 12),
           cell: (value) => {
             return `${value.getValue()} Pa`;
           },
+          enableSorting: true,
         },
         {
           header: "Noise",
-          accessorKey: "noiseLevelDb",
-          size: relativeWidth(containerWidth, 8),
+          accessorKey: "noiseLevelInDecibels",
+          size: relativeWidth(containerWidth, 11),
           cell: (value) => `${value.getValue()} dB`,
+          enableSorting: true,
         },
         {
           header: "Features",
           accessorKey: "features",
-          size: relativeWidth(containerWidth, 26),
+          size: relativeWidth(containerWidth, 23),
           cell: (value) => (
             <VacuumFeatures
               filters={filters}
               vacuum={value.row.original}
-              exclude={["batteryLifeMins", "suctionPowerPa", "noiseLevelDb"]}
+              exclude={["batteryLifeInMinutes", "suctionPowerInPascals", "noiseLevelInDecibels"]}
               limit={3}
             />
           ),
+          enableSorting: false,
         },
       ],
       data: results,
@@ -92,17 +118,10 @@ export function VacuumResults({
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
     }),
-    [results, filters, currency, containerWidth]
+    [results, filters, containerWidth]
   );
 
-  const table = useReactTable(options);
-
-  const desktopTable = useMemo(
-    () => <TableContainer<Vacuum> table={table} handleRowClick={(vacuum) => navigate(`/vacuum-search/${vacuum.id}`)} />,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [table, currency, navigate]
-  );
-  const mobileList = useMemo(() => <VacuumMobileList results={results} filters={filters} />, [results, filters]);
+  const table = useReactTable(tableOptions);
 
   return (
     <>
@@ -110,8 +129,15 @@ export function VacuumResults({
         <p>No results found. Adjust filters and try again.</p>
       ) : (
         <>
-          <div className="hidden md:block">{desktopTable}</div>
-          <div className="md:hidden">{mobileList}</div>
+          <div className="hidden md:block">
+            <TableContainer<Vacuum>
+              table={table}
+              handleRowClick={(vacuum) => navigate(`/vacuum-search/${vacuum.id}`)}
+            />
+          </div>
+          <div className="md:hidden">
+            <VacuumMobileList results={results} filters={filters} />
+          </div>
         </>
       )}
     </>

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FloorType, VacuumsFilter } from "../types";
+import { Currency, FloorType, Region, VacuumsFilter } from "../types";
 
 const initialState: VacuumsFilter = {
   floorType: FloorType.Hardwood,
@@ -8,6 +8,8 @@ const initialState: VacuumsFilter = {
   numRooms: 1,
   numPets: 0,
   mopFunction: true,
+  region: Region.Europe,
+  currency: Currency.USD,
 };
 
 interface UpdateValuePayload {

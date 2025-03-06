@@ -182,21 +182,22 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
       "info"
     );
 
+  const PET_HAIR_SUCKING_POWER_THRESHOLD = 3000;
   const specsList = [
-    getBatteryLifeExplanation(vacuum.batteryLifeMins),
-    getSuctionExplanation(vacuum.suctionPowerPa),
-    getNoiseExplanation(vacuum.noiseLevelDb),
-    getSelfEmptyExplanation(vacuum.selfEmptying),
-    getPetHairExplanation(vacuum.petHair),
-    getMappingExplanation(vacuum.mappingTechnology),
-    getMultiFloorMappingExplanation(vacuum.multiFloorMapping),
-    getMopExplanation(vacuum.mopFunction),
+    getBatteryLifeExplanation(vacuum.batteryLifeInMinutes),
+    getSuctionExplanation(vacuum.suctionPowerInPascals),
+    getNoiseExplanation(vacuum.noiseLevelInDecibels),
+    getSelfEmptyExplanation(vacuum.hasSelfEmptyingFeature),
+    getPetHairExplanation(vacuum.suctionPowerInPascals > PET_HAIR_SUCKING_POWER_THRESHOLD),
+    getMappingExplanation(vacuum.mappingTechnology as VacuumMappingTechnology),
+    getMultiFloorMappingExplanation(vacuum.hasMultiFloorMappingFeature),
+    getMopExplanation(vacuum.hasMoppingFeature),
   ];
 
-  if (vacuum.virtualWalls) {
+  if (vacuum.hasVirtualWallsFeature) {
     specsList.push(getVirtualWallsExplanation());
   }
-  if (vacuum.appControl) {
+  if (vacuum.hasAppControl) {
     specsList.push(getAppControlExplanation());
   }
 

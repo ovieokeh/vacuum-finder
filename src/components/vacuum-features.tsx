@@ -19,17 +19,16 @@ export const VacuumFeatures = ({
   exclude?: (keyof Vacuum)[];
   limit?: number;
 }) => {
-  const featureKeyMapping: Record<keyof Vacuum, { icon: ReactNode; text: string }> = {
-    ["batteryLifeMins"]: { icon: <FaBatteryHalf />, text: `${vacuum.batteryLifeMins} min` },
-    ["suctionPowerPa"]: { icon: <GiVacuumCleaner />, text: `${vacuum.suctionPowerPa} Pa` },
-    ["noiseLevelDb"]: { icon: <BsFillVolumeUpFill />, text: `${vacuum.noiseLevelDb} dB` },
+  const featureKeyMapping: Partial<Record<keyof Vacuum, { icon: ReactNode; text: string }>> = {
+    ["batteryLifeInMinutes"]: { icon: <FaBatteryHalf />, text: `${vacuum.batteryLifeInMinutes} min` },
+    ["suctionPowerInPascals"]: { icon: <GiVacuumCleaner />, text: `${vacuum.suctionPowerInPascals} Pa` },
+    ["noiseLevelInDecibels"]: { icon: <BsFillVolumeUpFill />, text: `${vacuum.noiseLevelInDecibels} dB` },
     ["mappingTechnology"]: { icon: <MdSensors />, text: vacuum.mappingTechnology },
-    ["multiFloorMapping"]: { icon: <MdLayers />, text: "Multi-floor" },
-    ["virtualWalls"]: { icon: <MdSensors />, text: "Virtual walls" },
-    ["mopFunction"]: { icon: <GiWaterDrop />, text: "Mop" },
-    ["selfEmptying"]: { icon: <FaTrashAlt />, text: "Self-empty" },
-    ["appControl"]: { icon: <FaMobileAlt />, text: "App Control" },
-    ["petHair"]: { icon: <FaDog />, text: "Pet-friendly" },
+    ["hasMultiFloorMappingFeature"]: { icon: <MdLayers />, text: "Multi-floor" },
+    ["hasVirtualWallsFeature"]: { icon: <MdSensors />, text: "Virtual walls" },
+    ["hasMoppingFeature"]: { icon: <GiWaterDrop />, text: "Mop" },
+    ["hasSelfEmptyingFeature"]: { icon: <FaTrashAlt />, text: "Self-empty" },
+    ["hasAppControl"]: { icon: <FaMobileAlt />, text: "App Control" },
   };
 
   let keys = Object.keys(featureKeyMapping) as (keyof Vacuum)[];
@@ -41,8 +40,9 @@ export const VacuumFeatures = ({
   return (
     <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
       {keys.map((key) => {
-        if (featureKeyMapping[key as keyof Vacuum] && !exclude.includes(key as keyof Vacuum)) {
-          const { icon, text } = featureKeyMapping[key as keyof Vacuum];
+        const feature = featureKeyMapping[key as keyof Vacuum];
+        if (feature && !exclude.includes(key as keyof Vacuum)) {
+          const { icon, text } = feature;
           return (
             <div key={key} className="flex items-center gap-1">
               {icon}
@@ -52,6 +52,12 @@ export const VacuumFeatures = ({
         }
         return null;
       })}
+      {vacuum.suctionPowerInPascals > 3000 ? (
+        <div key="hasPetHairOptimized" className="flex items-center gap-1">
+          <FaDog />
+          <span>Pet-friendly</span>
+        </div>
+      ) : null}
     </div>
   );
 };

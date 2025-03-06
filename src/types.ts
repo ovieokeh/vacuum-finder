@@ -1,28 +1,47 @@
 import { BsCurrencyDollar, BsCurrencyEuro } from "react-icons/bs";
 import { FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
 
+export interface AffiliateLink {
+  id: string;
+  vacuumId: string;
+  region: Region;
+  currency: Currency;
+  price: number;
+  site: string;
+  url: string;
+}
+
 export enum VacuumMappingTechnology {
   Laser = "Laser",
   Camera = "Camera",
 }
-export interface Vacuum {
+export interface VacuumBase {
   id: string;
-  name: string;
-  image: string;
+  imageUrl: string;
   brand: string;
   model: string;
-  price: number;
-  batteryLifeMins: number;
-  suctionPowerPa: number;
-  noiseLevelDb: number | null;
-  mappingTechnology: VacuumMappingTechnology;
-  multiFloorMapping: boolean | null;
-  virtualWalls: boolean | null;
-  mopFunction: boolean | null;
-  selfEmptying: boolean | null;
-  appControl: boolean | null;
-  petHair: boolean | null;
-  [key: string]: unknown;
+  mappingTechnology: string;
+  batteryLifeInMinutes: number;
+  suctionPowerInPascals: number;
+  noiseLevelInDecibels: number;
+  dustbinCapacityInLiters: number;
+  hasMoppingFeature: boolean;
+  hasSelfEmptyingFeature: boolean;
+  hasZoneCleaningFeature: boolean;
+  hasMultiFloorMappingFeature: boolean;
+  hasCarpetBoostFeature: boolean;
+  hasVirtualWallsFeature: boolean;
+  hasSmartHomeIntegration: boolean;
+  hasVoiceControl: boolean;
+  hasAppControl: boolean;
+  hasRemoteControl: boolean;
+  hasManualControl: boolean;
+  otherFeatures: string[];
+  // [key: string]: string | number | boolean | string[] | AffiliateLink[];
+}
+
+export interface Vacuum extends VacuumBase {
+  affiliateLinks: AffiliateLink[];
 }
 
 export enum FloorType {
@@ -38,6 +57,8 @@ export interface VacuumsFilter {
   numRooms: number;
   numPets: number;
   mopFunction: boolean;
+  region: Region;
+  currency: Currency;
 }
 
 export enum Region {
@@ -65,11 +86,3 @@ export const CurrencySymbolMapping = {
   [Currency.USD]: "$",
   [Currency.EUR]: "€",
 };
-
-export interface AffiliateLink {
-  id: string;
-  vacuumId: string;
-  region: Region;
-  site: string;
-  link: string;
-}

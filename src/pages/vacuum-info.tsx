@@ -17,6 +17,7 @@ export function VacuumInfoPage() {
 
   const { vacuumQuery } = useDatabase(vacuumId);
   const vacuum = vacuumQuery.data;
+  const name = `${vacuum?.brand} ${vacuum?.model}`;
 
   const filters = useAppSelector((state) => state.vacuumsFilters);
 
@@ -27,9 +28,9 @@ export function VacuumInfoPage() {
   return (
     <>
       <Helmet>
-        <title>{`${vacuum?.name} - Robot Vacuum Buyer Tool & Guide`}</title>
+        <title>{`${name} - Robot Vacuum Buyer Tool & Guide`}</title>
       </Helmet>
-      <Modal title={vacuum?.name ?? ""} isOpen close={handleClose} panelClassName="min-w-[80%]">
+      <Modal title={name ?? ""} isOpen close={handleClose} panelClassName="min-w-[80%]">
         <div className="flex flex-col flex-grow gap-4">
           {vacuum ? (
             <>

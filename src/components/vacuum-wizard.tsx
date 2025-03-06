@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { VacuumForm, VacuumFormInterface } from "./vacuum-form";
 import { VacuumResults } from "./vacuum-results";
-import { FloorType } from "../types";
+import { Currency, FloorType, Region } from "../types";
 import { useDatabase } from "../database/hooks";
 import { useSiteConfig } from "../providers/site-config";
 import { useAppForm } from "./form";
@@ -15,7 +15,7 @@ import { replaceState } from "../redux/vacuum-filters-reducer";
 
 export function VacuumWizard({ className = "" }: { className?: string }) {
   const windowWidth = useWindowWidth();
-  const { navHeight } = useSiteConfig();
+  const { navHeight, region, currency } = useSiteConfig();
   const { filterVacuumsMutation } = useDatabase();
   const filtersContainerRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +29,8 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
       numRooms: 3,
       numPets: 0,
       mopFunction: false,
+      region,
+      currency,
     },
     validators: {
       onChange: z.object({
@@ -38,6 +40,8 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
         numRooms: z.number().int().min(1),
         numPets: z.number().int().min(0),
         mopFunction: z.boolean(),
+        region: z.nativeEnum(Region),
+        currency: z.nativeEnum(Currency),
       }),
     },
     onSubmit: ({ value }) => {
@@ -52,9 +56,24 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
 
   const filters = useStore(form.store, (state) => state.values);
 
+  const handleSubmit = form.handleSubmit;
   useEffect(() => {
-    form.handleSubmit();
-  }, [form]);
+    handleSubmit();
+  }, [handleSubmit]);
+
+  const setFieldValue = form.setFieldValue;
+  useEffect(() => {
+    setFieldValue("currency", currency);
+    setTimeout(() => {
+      handleSubmit();
+    }, 0);
+  }, [currency, setFieldValue, handleSubmit]);
+
+  // sync form with redux
+  const vacuumFilters = useStore(form.store, (s) => s.values);
+  useEffect(() => {
+    dispatch(replaceState({ value: vacuumFilters }));
+  }, [dispatch, vacuumFilters]);
 
   const filtersContainerWidth = filtersContainerRef.current?.clientWidth ?? 300;
   const vacuumResultsWidth = Math.min(windowWidth - (filtersContainerWidth + 64), 868);
@@ -78,8 +97,6 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
       </div>
 
       <div className="md:border md:border-border md:border-l-0 md:w-3/4 md:h-full overflow-y-scroll md:overflow-auto py-4 pb-24 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0">
-        <h2 className="text-lg font-bold text-secondary mb-4">Recommended Vacuums</h2>
-
         <VacuumResults
           containerWidth={vacuumResultsWidth}
           filters={filters}

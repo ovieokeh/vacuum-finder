@@ -1,13 +1,15 @@
 import React from "react";
 import { flexRender, Table, Row, Cell, Header, HeaderGroup } from "@tanstack/react-table";
 import { VirtualItem, Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import clsx from "clsx";
 
 interface TableContainerProps<T> {
   table: Table<T>;
   handleRowClick: (row: T) => void;
 }
 
-export function TableContainer<T extends Record<string, unknown>>({ table, handleRowClick }: TableContainerProps<T>) {
+export function TableContainer<T extends Record<string, any>>({ table, handleRowClick }: TableContainerProps<T>) {
   const visibleColumns = table.getVisibleLeafColumns();
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -108,7 +110,7 @@ function TableHeadRow<T extends Record<string, unknown>>({
   const virtualColumns = columnVirtualizer.getVirtualItems();
 
   return (
-    <tr className="flex w-full border-b border-border">
+    <tr className="grow flex w-full border-b border-border">
       {virtualPaddingLeft ? <th className="flex" style={{ width: virtualPaddingLeft }} /> : null}
 
       {virtualColumns.map((virtualColumn) => {
@@ -129,17 +131,22 @@ function TableHeadCell<T extends Record<string, unknown>>({ header }: TableHeadC
   const canSort = header.column.getCanSort();
   const sortHandler = header.column.getToggleSortingHandler();
   const isSorted = header.column.getIsSorted() as string;
-  const sortIndicator = { asc: " 🔼", desc: " 🔽" }[isSorted] ?? null;
+  const sortIndicator = canSort
+    ? {
+        asc: <FaSortUp className="opacity-50 inline size-3" />,
+        desc: <FaSortDown className="opacity-50 inline size-3" />,
+      }[isSorted] ?? <FaSort className="opacity-50 inline size-3" />
+    : null;
 
   return (
     <th
       key={header.id}
-      className="flex items-center border-r border-border last:border-none"
+      className="grow flex items-center border-r border-border last:border-none"
       style={{ width: header.getSize() }}
     >
       <div
         onClick={canSort ? sortHandler : undefined}
-        className={canSort ? "cursor-pointer select-none px-3 py-2" : "px-3 py-2"}
+        className={clsx("px-3 py-2", canSort ? "flex items-center gap-2 cursor-pointer select-none" : "")}
       >
         {flexRender(header.column.columnDef.header, header.getContext())}
         {sortIndicator}
@@ -261,10 +268,10 @@ function TableBodyCell<T extends Record<string, unknown>>({ cell }: TableBodyCel
   return (
     <td
       key={cell.id}
-      className="flex items-center border-r border-border last:border-none"
+      className="grow flex items-center border-r border-border last:border-none"
       style={{ width: cell.column.getSize() }}
     >
-      <div className="px-3 py-2">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
+      <div className="grow px-3 py-2">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
     </td>
   );
 }
