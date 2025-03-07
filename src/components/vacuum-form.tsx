@@ -56,6 +56,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       batteryLifeInMinutes: 180,
       suctionPowerInPascals: 3000,
       noiseLevelInDecibels: 60,
+      waterTankCapacityInLiters: 1,
       dustbinCapacityInLiters: 2,
       hasMoppingFeature: true,
       hasSelfEmptyingFeature: true,
@@ -81,6 +82,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
         batteryLifeInMinutes: z.number().int().min(1),
         suctionPowerInPascals: z.number().int().min(1),
         noiseLevelInDecibels: z.number().int().min(1),
+        waterTankCapacityInLiters: z.number().int().min(0),
         dustbinCapacityInLiters: z.number().int().min(1),
         hasMoppingFeature: z.boolean(),
         hasSelfEmptyingFeature: z.boolean(),
@@ -326,6 +328,18 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                   type="number"
                   label="Noise Level (dB)"
                   value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <form.AppField
+              name="waterTankCapacityInLiters"
+              children={(field) => (
+                <field.FormTextField
+                  type="number"
+                  label="Water Tank Capacity (L)"
+                  value={field.state.value ?? 0}
                   onChange={(value) => field.setValue(value)}
                 />
               )}

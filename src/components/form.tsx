@@ -59,6 +59,8 @@ const FormTextField = <T extends string | number>({
             "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
           }
           onChange={(e) => onChange(type === "number" ? (+e.target.value as T) : (e.target.value as T))}
+          min={type === "number" ? 0 : undefined}
+          step={type === "number" ? ".01" : undefined}
           {...rest}
         />
       </div>

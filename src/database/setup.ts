@@ -4,7 +4,7 @@ import { mockAffiliateLinks, mockVacuums } from "./mock";
 
 export const setupDatabase = () => {
   try {
-    if (process.env.RESET_DATABASE) {
+    if (process.env.RESET_DATABASE === "true") {
       db.exec("DROP TABLE IF EXISTS vacuums;");
       db.exec("DROP TABLE IF EXISTS affiliate_links;");
     }
@@ -19,7 +19,8 @@ export const setupDatabase = () => {
           batteryLifeInMinutes INTEGER NOT NULL,
           suctionPowerInPascals INTEGER NOT NULL,
           noiseLevelInDecibels INTEGER NOT NULL,
-          dustbinCapacityInLiters INTEGER NULLABLE,
+          waterTankCapacityInLiters INTEGER NOT NULL,
+          dustbinCapacityInLiters INTEGER NOT NULL,
           hasMoppingFeature BOOLEAN DEFAULT 0,
           hasSelfEmptyingFeature BOOLEAN DEFAULT 0,
           hasZoneCleaningFeature BOOLEAN DEFAULT 0,
@@ -71,6 +72,7 @@ export const populateMockData = () => {
           batteryLifeInMinutes,
           suctionPowerInPascals,
           noiseLevelInDecibels,
+          waterTankCapacityInLiters,
           dustbinCapacityInLiters,
           hasMoppingFeature,
           hasSelfEmptyingFeature,
@@ -85,7 +87,7 @@ export const populateMockData = () => {
           hasManualControl,
           otherFeatures,
           addedBy
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         `);
 
     db.transaction(() => {
@@ -100,6 +102,7 @@ export const populateMockData = () => {
             vacuum.batteryLifeInMinutes,
             vacuum.suctionPowerInPascals,
             vacuum.noiseLevelInDecibels,
+            vacuum.waterTankCapacityInLiters,
             vacuum.dustbinCapacityInLiters,
             vacuum.hasMoppingFeature ? 1 : 0,
             vacuum.hasSelfEmptyingFeature ? 1 : 0,

@@ -22,6 +22,7 @@ export interface VacuumBase {
   batteryLifeInMinutes: number;
   suctionPowerInPascals: number;
   noiseLevelInDecibels: number;
+  waterTankCapacityInLiters: number;
   dustbinCapacityInLiters: number;
   hasMoppingFeature: boolean;
   hasSelfEmptyingFeature: boolean;

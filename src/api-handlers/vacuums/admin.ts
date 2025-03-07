@@ -48,6 +48,7 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
     batteryLifeInMinutes,
     suctionPowerInPascals,
     noiseLevelInDecibels,
+    waterTankCapacityInLiters,
     dustbinCapacityInLiters,
     hasMoppingFeature,
     hasSelfEmptyingFeature,
@@ -75,6 +76,7 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
         batteryLifeInMinutes,
         suctionPowerInPascals,
         noiseLevelInDecibels,
+        waterTankCapacityInLiters,
         dustbinCapacityInLiters,
         hasMoppingFeature,
         hasSelfEmptyingFeature,
@@ -89,7 +91,7 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
         hasManualControl,
         otherFeatures,
         addedBy
-      ) VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ) VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `);
 
     const id = randomUUID();
@@ -103,6 +105,7 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
       batteryLifeInMinutes,
       suctionPowerInPascals,
       noiseLevelInDecibels,
+      waterTankCapacityInLiters,
       dustbinCapacityInLiters,
       hasMoppingFeature ? 1 : 0,
       hasSelfEmptyingFeature ? 1 : 0,
