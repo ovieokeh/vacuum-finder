@@ -97,11 +97,7 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
       </div>
 
       <div className="md:border md:border-border md:border-l-0 md:w-3/4 md:h-full overflow-y-scroll md:overflow-auto py-4 pb-24 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0">
-        <VacuumResults
-          containerWidth={vacuumResultsWidth}
-          filters={filters}
-          results={filterVacuumsMutation.data ?? []}
-        />
+        <VacuumResults containerWidth={vacuumResultsWidth} filters={filters} results={filterVacuumsMutation.data} />
       </div>
     </div>
   );

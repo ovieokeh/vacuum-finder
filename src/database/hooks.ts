@@ -115,9 +115,15 @@ export function useDeleteVacuumMutation({ onSuccess }: { onSuccess?: () => void 
   return deleteVacuumMutation;
 }
 export function useFilterVacuumsMutation({ onSuccess }: { onSuccess?: () => void }) {
-  const filterVacuumsMutation = useMutation<Vacuum[], Error, VacuumsFilter>({
+  const filterVacuumsMutation = useMutation<
+    {
+      data: Vacuum[];
+    },
+    Error,
+    VacuumsFilter
+  >({
     mutationFn: async (filterData: VacuumsFilter) => {
-      const response = await fetch("/api/search-vacuums", {
+      const response = await fetch("/api/filter-vacuums", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(filterData),
@@ -131,3 +137,32 @@ export function useFilterVacuumsMutation({ onSuccess }: { onSuccess?: () => void
   });
   return filterVacuumsMutation;
 }
+
+export const useVacuumBrandsQuery = () => {
+  const vacuumBrandsQuery = useQuery<{ brands: string[] }>({
+    queryKey: ["vacuum-brands"],
+    queryFn: async () => {
+      const response = await fetch("/api/vacuum-brands");
+      if (!response.ok) throw new Error("Failed to fetch vacuum brands");
+      return response.json();
+    },
+  });
+
+  return vacuumBrandsQuery;
+};
+
+export const useSearchVacuumsQuery = ({ brand, model }: { brand?: string; model?: string }) => {
+  const searchVacuumsQuery = useQuery<{
+    data: Vacuum[];
+  }>({
+    queryKey: ["search-vacuums"],
+    queryFn: async () => {
+      const response = await fetch(`/api/search-vacuums?brand=${brand}&model=${model}`);
+      if (!response.ok) throw new Error("Failed to fetch search vacuums");
+      return response.json();
+    },
+    enabled: Boolean(brand) && Boolean(model),
+  });
+
+  return searchVacuumsQuery;
+};

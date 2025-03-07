@@ -9,6 +9,10 @@ import {
   ListboxOption,
   ListboxOptions,
   Switch,
+  Combobox,
+  ComboboxOptions,
+  ComboboxOption,
+  ComboboxInput,
 } from "@headlessui/react";
 import { GoChevronDown } from "react-icons/go";
 import {
@@ -20,7 +24,7 @@ import {
   createFormHookContexts,
 } from "@tanstack/react-form";
 import clsx from "clsx";
-import { ComponentType, PropsWithChildren } from "react";
+import { ComponentType, PropsWithChildren, useState } from "react";
 import ImageUpload from "./image-upload";
 import { twMerge } from "tailwind-merge";
 
@@ -149,6 +153,67 @@ const FormSelectField = <T extends string>({
   );
 };
 
+const FormComboboxField = <T extends string>({
+  label,
+  options = [],
+  selectedOption,
+  onChange,
+}: {
+  label?: string;
+  options: T[];
+  selectedOption: T;
+  onChange: (value: T) => void;
+}) => {
+  const [query, setQuery] = useState(selectedOption as string);
+
+  const filteredOptions =
+    query === ""
+      ? options
+      : options.filter((option) => {
+          return option.toLowerCase().includes(query.toLowerCase());
+        });
+
+  return (
+    <Combobox<T>
+      value={selectedOption}
+      onChange={(value) => {
+        onChange((value ?? query) as T);
+      }}
+      onClose={() => {
+        onChange(query as unknown as T);
+        setQuery("");
+      }}
+    >
+      {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
+
+      <ComboboxInput
+        className={
+          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
+        }
+        aria-label={label}
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      <ComboboxOptions anchor="bottom start" className="w-[300px] border bg-background empty:invisible p-2 rounded">
+        {query.length > 0 && (
+          <ComboboxOption value={query} className="px-2 py-4 data-[focus]:bg-background-alt">
+            Create <span className="font-bold">"{query}"</span>
+          </ComboboxOption>
+        )}
+        {filteredOptions.map((option, index) => (
+          <ComboboxOption
+            key={option + index}
+            value={option}
+            className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt"
+          >
+            {option}
+          </ComboboxOption>
+        ))}
+      </ComboboxOptions>
+    </Combobox>
+  );
+};
+
 const FormSubmitButton = ({
   type = "submit",
   className,
@@ -189,6 +254,7 @@ export const formInit = {
     FormTextField,
     FormToggleField,
     FormSelectField,
+    FormComboboxField,
     FormImageUploadField,
   },
   formComponents: {

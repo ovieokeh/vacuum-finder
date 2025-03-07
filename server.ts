@@ -5,7 +5,13 @@ import { ViteDevServer } from "vite";
 import { config } from "dotenv";
 
 import { addVacuumHandler, deleteVacuumHandler, updateVacuumHandler } from "./src/api-handlers/vacuums/admin";
-import { getVacuum, listVacuums, searchVacuums } from "./src/api-handlers/vacuums/public";
+import {
+  getVacuum,
+  listVacuums,
+  filterVacuums,
+  searchVacuums,
+  listVacuumBrands,
+} from "./src/api-handlers/vacuums/public";
 import { geolocateHandler } from "./src/api-handlers/utils/geolocate";
 
 config();
@@ -55,7 +61,9 @@ async function startServer() {
   app.delete("/api/vacuums/:id", deleteVacuumHandler as any);
   app.get("/api/vacuums", listVacuums);
   app.get("/api/vacuums/:id", getVacuum);
-  app.post("/api/search-vacuums", searchVacuums);
+  app.post("/api/filter-vacuums", filterVacuums);
+  app.get("/api/search-vacuums", searchVacuums);
+  app.get("/api/vacuum-brands", listVacuumBrands);
 
   // Utils endpoints
   app.get("/api/geolocate", geolocateHandler);

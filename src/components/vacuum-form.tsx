@@ -1,14 +1,22 @@
 import { useEffect } from "react";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useSiteConfig } from "../providers/site-config";
-import { useAddVacuumMutation, useDeleteVacuumMutation, useUpdateVacuumMutation } from "../database/hooks";
+import {
+  useAddVacuumMutation,
+  useDeleteVacuumMutation,
+  useSearchVacuumsQuery,
+  useUpdateVacuumMutation,
+  useVacuumBrandsQuery,
+} from "../database/hooks";
 import { useAppForm } from "./form";
 import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumBase, VacuumMappingTechnology } from "../types";
 import { ConfirmButton } from "./confirm-button";
 import { FaMinus, FaTrash } from "react-icons/fa";
 import { AffiliateLinkInstructions } from "./affiliate-instructions";
+import { useStore } from "@tanstack/react-form";
+import { LuInfo } from "react-icons/lu";
 
 interface AdminVacuumFormProps {
   vacuum?: Vacuum;
@@ -47,6 +55,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       navigate("/admin");
     },
   });
+
+  const brandsQuery = useVacuumBrandsQuery();
 
   const form = useAppForm({
     defaultValues: {
@@ -137,6 +147,17 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       });
     }
   }, [reset, vacuum]);
+
+  const brandAndModel = useStore(form.store, (state) => ({
+    brand: state.values.brand,
+    model: state.values.model,
+  }));
+
+  const searchVacuumQuery = useSearchVacuumsQuery({
+    brand: brandAndModel?.brand,
+    model: brandAndModel?.model,
+  });
+  const similarVacuums = searchVacuumQuery.data;
 
   return (
     <form
@@ -269,9 +290,10 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
             <form.AppField
               name="brand"
               children={(field) => (
-                <field.FormTextField
+                <field.FormComboboxField
                   label="Brand"
-                  value={field.state.value}
+                  selectedOption={field.state.value}
+                  options={brandsQuery?.data?.brands || []}
                   onChange={(value) => field.setValue(value)}
                 />
               )}
@@ -280,11 +302,35 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
             <form.AppField
               name="model"
               children={(field) => (
-                <field.FormTextField
-                  label="Model"
-                  value={field.state.value}
-                  onChange={(value) => field.setValue(value)}
-                />
+                <>
+                  <field.FormTextField
+                    label="Model"
+                    value={field.state.value}
+                    onChange={(value) => field.setValue(value)}
+                  />
+
+                  {similarVacuums?.data ? (
+                    <div className="bg-background-alt p-4 rounded-lg">
+                      <p className="flex gap-2 items-center">
+                        <LuInfo className="w-4 h-4" />
+                        It seems a vacuum with the same brand and model already exists:
+                      </p>
+                      <ul>
+                        {similarVacuums.data.map((vacuum) => (
+                          <li key={vacuum.id}>
+                            <Link
+                              to={`/vacuums/${vacuum.id}`}
+                              className="text-blue-700 dark:text-blue-300"
+                              target="_blank"
+                            >
+                              {vacuum.brand} {vacuum.model}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </>
               )}
             />
 

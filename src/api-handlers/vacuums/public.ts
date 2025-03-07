@@ -6,9 +6,31 @@ export const listVacuums = async (req: Request, res: Response) => {
   const { data: user } = await supabase.auth.getUser(req.headers.authorization as string);
   const { owned } = req.query;
 
+  const page = parseInt(req.query.page as string, 10) || 1;
+  const limit = parseInt(req.query.limit as string, 10) || 10;
+  const offset = (page - 1) * limit;
+
   try {
-    // LEFT JOIN to include affiliate link details even if a vacuum has none.
-    let query = `
+    const baseQuery = `
+      FROM vacuums v
+      LEFT JOIN affiliate_links al ON al.vacuumId = v.id
+    `;
+    let whereClause = "";
+    const queryParams: any[] = [];
+
+    // If "owned" is true, filter by user email
+    if (owned === "true" && user.user) {
+      whereClause = `WHERE v.addedBy = ?`;
+      queryParams.push(user.user.email);
+    }
+
+    // 2a) Count how many total vacuums match
+    const countQuery = `SELECT COUNT(DISTINCT v.id) as total ${baseQuery} ${whereClause}`;
+    const countResult = db.prepare(countQuery).get(...queryParams) as any;
+    const total = countResult?.total || 0;
+
+    // 3) Get vacuum rows with limit/offset
+    const mainQuery = `
       SELECT 
         v.*,
         al.id AS affiliateLinkId,
@@ -17,24 +39,18 @@ export const listVacuums = async (req: Request, res: Response) => {
         al.price,
         al.site,
         al.url
-      FROM vacuums v
-      LEFT JOIN affiliate_links al ON al.vacuumId = v.id
+      ${baseQuery}
+      ${whereClause}
+      LIMIT ? OFFSET ?
     `;
+    // append limit and offset to the query params
+    const rows = db.prepare(mainQuery).all(...queryParams, limit, offset);
 
-    let rows: unknown[] = [];
-    if (owned === "true" && user.user) {
-      query += ` WHERE v.addedBy = ?`;
-      rows = db.prepare(query).all(user.user.email);
-    } else {
-      rows = db.prepare(query).all();
-    }
-
-    // Group rows by vacuum id and nest affiliate link details in an 'affiliateLinks' array.
+    // 4) Group rows by vacuum id and nest affiliate link details
     const vacuumMap: { [id: string]: any } = {};
     rows.forEach((row: any) => {
       const vacuumId = row.id;
       if (!vacuumMap[vacuumId]) {
-        // Initialize vacuum and remove affiliate link columns.
         vacuumMap[vacuumId] = { ...row, affiliateLinks: [] };
         delete vacuumMap[vacuumId].affiliateLinkId;
         delete vacuumMap[vacuumId].region;
@@ -43,7 +59,6 @@ export const listVacuums = async (req: Request, res: Response) => {
         delete vacuumMap[vacuumId].site;
         delete vacuumMap[vacuumId].url;
       }
-      // If affiliate link data exists, push it into the affiliateLinks array.
       if (row.affiliateLinkId) {
         vacuumMap[vacuumId].affiliateLinks.push({
           id: row.affiliateLinkId,
@@ -58,7 +73,7 @@ export const listVacuums = async (req: Request, res: Response) => {
 
     const vacuums = Object.values(vacuumMap);
 
-    // Convert numeric booleans (0/1) to true/false.
+    // 5) Convert numeric booleans (0/1) to true/false
     vacuums.forEach((vacuum: any) => {
       Object.keys(vacuum).forEach((key) => {
         if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
@@ -70,13 +85,19 @@ export const listVacuums = async (req: Request, res: Response) => {
       });
     });
 
-    res.json(vacuums);
+    // 6) Return paginated response
+    res.json({
+      data: vacuums,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error("Error listing vacuums:", error);
     res.status(500).json({ error: (error as any).message });
   }
 };
-
 export const getVacuum = async (req: Request, res: Response) => {
   try {
     const query = `
@@ -99,9 +120,7 @@ export const getVacuum = async (req: Request, res: Response) => {
       return;
     }
 
-    // Since a vacuum may have multiple affiliate links, group them.
     const vacuum: any = { ...rows[0], affiliateLinks: [] };
-    // Remove affiliate link fields from the vacuum.
     delete vacuum.affiliateLinkId;
     delete vacuum.region;
     delete vacuum.currency;
@@ -122,7 +141,6 @@ export const getVacuum = async (req: Request, res: Response) => {
       }
     });
 
-    // Convert numeric booleans (0/1) to true/false.
     Object.keys(vacuum).forEach((key) => {
       if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
         vacuum[key] = !!vacuum[key];
@@ -140,16 +158,38 @@ export const getVacuum = async (req: Request, res: Response) => {
 };
 
 export const searchVacuums = async (req: Request, res: Response) => {
-  try {
-    const { budget, mopFunction: mopFunctionBool, currency } = req.body;
-    const mopFunction = mopFunctionBool ? 1 : null;
+  const { model, brand } = req.query;
 
-    // This query uses a LEFT JOIN to include affiliate link details only if they match the currency and price criteria.
-    // It returns a row for each vacuum and its matching affiliate link (if any). If there’s no matching affiliate link,
-    // the affiliate link columns will be null. The WHERE clause ensures:
-    // - The mop feature filter is applied.
-    // - Vacuums are returned if they have at least one matching affiliate link OR if they have no affiliate links at all.
-    const query = `
+  console.log("Searching vacuums with model:", model, "and brand:", brand);
+
+  // Parse pagination params
+  const page = parseInt(req.query.page as string, 10) || 1;
+  const limit = parseInt(req.query.limit as string, 10) || 10;
+  const offset = (page - 1) * limit;
+
+  try {
+    // Build WHERE conditions
+    // We’ll handle the “IS NULL or LIKE” logic for each param
+    // For total counting, we do a separate query:
+    const baseWhere = `
+      WHERE (? IS NULL OR v.model LIKE ?)
+      AND (? IS NULL OR v.brand LIKE ?)
+    `;
+    // Prepare the query params
+    const queryParams = [model || null, model ? `%${model}%` : null, brand || null, brand ? `%${brand}%` : null];
+
+    // 1) Count how many total vacuums match
+    const countQuery = `
+      SELECT COUNT(DISTINCT v.id) as total
+      FROM vacuums v
+      LEFT JOIN affiliate_links al ON al.vacuumId = v.id
+      ${baseWhere}
+    `;
+    const countResult = db.prepare(countQuery).get(...queryParams) as any;
+    const total = countResult?.total || 0;
+
+    // 2) Select actual rows with limit/offset
+    const mainQuery = `
       SELECT 
         v.*,
         al.id AS affiliateLinkId,
@@ -159,28 +199,18 @@ export const searchVacuums = async (req: Request, res: Response) => {
         al.site,
         al.url
       FROM vacuums v
-      LEFT JOIN affiliate_links al 
-        ON al.vacuumId = v.id 
-        AND al.currency = ?
-        AND al.price <= ?
-      WHERE (? IS NULL OR v.hasMoppingFeature = ?)
-      AND (
-        al.id IS NOT NULL
-        OR NOT EXISTS (
-          SELECT 1 FROM affiliate_links WHERE vacuumId = v.id
-        )
-      )
+      LEFT JOIN affiliate_links al ON al.vacuumId = v.id
+      ${baseWhere}
+      LIMIT ? OFFSET ?
     `;
+    // Add limit/offset to the end of query params
+    const rows = db.prepare(mainQuery).all(...queryParams, limit, offset);
 
-    const stmt = db.prepare(query);
-    const rows = stmt.all(currency, budget, mopFunction, mopFunction);
-
-    // Group rows by vacuum id and nest affiliate link details in an 'affiliateLinks' array.
+    // Group results
     const vacuumMap: { [key: string]: any } = {};
     rows.forEach((row: any) => {
       const vacuumId = row.id;
       if (!vacuumMap[vacuumId]) {
-        // Initialize the vacuum object and remove affiliate link fields.
         vacuumMap[vacuumId] = { ...row, affiliateLinks: [] };
         delete vacuumMap[vacuumId].affiliateLinkId;
         delete vacuumMap[vacuumId].region;
@@ -189,7 +219,6 @@ export const searchVacuums = async (req: Request, res: Response) => {
         delete vacuumMap[vacuumId].site;
         delete vacuumMap[vacuumId].url;
       }
-      // If this row has affiliate link data, add it to the array.
       if (row.affiliateLinkId) {
         vacuumMap[vacuumId].affiliateLinks.push({
           id: row.affiliateLinkId,
@@ -204,7 +233,7 @@ export const searchVacuums = async (req: Request, res: Response) => {
 
     const vacuums = Object.values(vacuumMap);
 
-    // Convert numeric booleans (0/1) to true/false
+    // Convert numeric booleans
     vacuums.forEach((vacuum: any) => {
       Object.keys(vacuum).forEach((key) => {
         if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
@@ -216,9 +245,147 @@ export const searchVacuums = async (req: Request, res: Response) => {
       });
     });
 
-    res.json(vacuums);
+    // Return with pagination meta
+    res.json({
+      data: vacuums,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error("Error searching vacuums:", error);
+    res.status(500).json({ error: (error as any).message });
+  }
+};
+
+export const filterVacuums = async (req: Request, res: Response) => {
+  try {
+    const { budget, mopFunction: mopFunctionBool, currency } = req.body;
+    const mopFunction = mopFunctionBool ? 1 : null;
+
+    // Parse pagination params
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const offset = (page - 1) * limit;
+
+    // We’ll add mop & affiliate link filtering in both the total count query and the main query
+    const baseWhere = `
+      WHERE (? IS NULL OR v.hasMoppingFeature = ?)
+      AND (
+        al.id IS NOT NULL
+        OR NOT EXISTS (
+          SELECT 1 FROM affiliate_links WHERE vacuumId = v.id
+        )
+      )
+    `;
+
+    const whereParams = [mopFunction, mopFunction];
+
+    // 1) Count total
+    const countQuery = `
+      SELECT COUNT(DISTINCT v.id) as total
+      FROM vacuums v
+      LEFT JOIN affiliate_links al 
+        ON al.vacuumId = v.id 
+        AND al.currency = ?
+        AND al.price <= ?
+      ${baseWhere}
+    `;
+    const countResult = db.prepare(countQuery).get(currency, budget, ...whereParams) as any;
+    const total = countResult?.total || 0;
+
+    // 2) Fetch data with limit/offset
+    const mainQuery = `
+      SELECT 
+        v.*,
+        al.id AS affiliateLinkId,
+        al.region,
+        al.currency,
+        al.price,
+        al.site,
+        al.url
+      FROM vacuums v
+      LEFT JOIN affiliate_links al 
+        ON al.vacuumId = v.id 
+        AND al.currency = ?
+        AND al.price <= ?
+      ${baseWhere}
+      LIMIT ? OFFSET ?
+    `;
+    const rows = db.prepare(mainQuery).all(currency, budget, ...whereParams, limit, offset);
+
+    // Group rows by vacuum id
+    const vacuumMap: { [key: string]: any } = {};
+    rows.forEach((row: any) => {
+      const vacuumId = row.id;
+      if (!vacuumMap[vacuumId]) {
+        vacuumMap[vacuumId] = { ...row, affiliateLinks: [] };
+        delete vacuumMap[vacuumId].affiliateLinkId;
+        delete vacuumMap[vacuumId].region;
+        delete vacuumMap[vacuumId].currency;
+        delete vacuumMap[vacuumId].price;
+        delete vacuumMap[vacuumId].site;
+        delete vacuumMap[vacuumId].url;
+      }
+      if (row.affiliateLinkId) {
+        vacuumMap[vacuumId].affiliateLinks.push({
+          id: row.affiliateLinkId,
+          region: row.region,
+          currency: row.currency,
+          price: row.price,
+          site: row.site,
+          url: row.url,
+        });
+      }
+    });
+
+    const vacuums = Object.values(vacuumMap);
+
+    // Convert numeric booleans
+    vacuums.forEach((vacuum: any) => {
+      Object.keys(vacuum).forEach((key) => {
+        if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
+          vacuum[key] = !!vacuum[key];
+        }
+        if (key === "otherFeatures") {
+          vacuum[key] = JSON.parse(vacuum[key]);
+        }
+      });
+    });
+
+    // Respond with pagination
+    res.json({
+      data: vacuums,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    console.error("Error filtering vacuums:", error);
+    res.status(500).json({ error: (error as any).message });
+  }
+};
+
+export const listVacuumBrands = async (req: Request, res: Response) => {
+  try {
+    // Fetch distinct brands in alphabetical order
+    const query = `
+      SELECT DISTINCT brand
+      FROM vacuums
+      WHERE brand IS NOT NULL
+      ORDER BY brand ASC
+    `;
+    const rows = db.prepare(query).all();
+
+    // rows might look like [{ brand: 'BrandA' }, { brand: 'BrandB' }, ...]
+    // Map them to an array of brand strings
+    const brands = rows.map((row) => (row as any).brand);
+
+    res.json({ brands });
+  } catch (error) {
+    console.error("Error fetching vacuum brands:", error);
     res.status(500).json({ error: (error as any).message });
   }
 };

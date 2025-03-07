@@ -12,7 +12,9 @@ interface VacuumResultsProps {
   filters?: VacuumsFilter;
   navigateRoot?: string;
   emptyView?: React.ReactNode;
-  results?: Vacuum[];
+  results?: {
+    data: Vacuum[];
+  };
 }
 
 const relativeWidth = (width: number, percent: number) => {
@@ -20,7 +22,7 @@ const relativeWidth = (width: number, percent: number) => {
 };
 
 export function VacuumResults({
-  results = [],
+  results = { data: [] },
   filters,
   navigateRoot = "/vacuums",
   emptyView = (
@@ -109,7 +111,7 @@ export function VacuumResults({
           enableSorting: false,
         },
       ],
-      data: results,
+      data: results?.data,
       getCoreRowModel: getCoreRowModel(),
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
@@ -119,7 +121,7 @@ export function VacuumResults({
 
   return (
     <>
-      {!results || results?.length === 0 ? (
+      {!results || results?.data?.length === 0 ? (
         emptyView
       ) : (
         <>
@@ -141,7 +143,7 @@ export function VacuumResults({
 const VacuumMobileList = ({ results, navigateRoot }: VacuumResultsProps) => {
   return (
     <ul className="space-y-4">
-      {results?.map((vacuum) => (
+      {results?.data?.map((vacuum) => (
         <li key={vacuum.id} className="flex flex-col gap-4 p-4 border border-border rounded-lg shadow">
           <Link to={`${navigateRoot}/${vacuum.id}`}>
             <VacuumInfo vacuum={vacuum} />
