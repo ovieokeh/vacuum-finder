@@ -1,39 +1,45 @@
 import { Request, Response } from "express";
 
-import { db } from "../../database";
-import { AffiliateLink } from "../../types";
+import { db, supabase } from "../../database";
+import { AffiliateLinkBase } from "../../types";
+import { randomUUID } from "crypto";
 
 // Add a new vacuum
-export const addVacuumHandler = (req: Request, res: Response) => {
+export const addVacuumHandler = async (req: Request, res: Response) => {
+  const { data: user } = await supabase.auth.getUser(req.headers.authorization as string);
+
+  if (!user?.user) {
+    return res.status(401).json({ error: "Unauthorized." });
+  }
+
   const {
-    details: {
-      imageUrl,
-      brand,
-      model,
-      mappingTechnology,
-      batteryLifeInMinutes,
-      suctionPowerInPascals,
-      noiseLevelInDecibels,
-      dustbinCapacityInLiters,
-      hasMoppingFeature,
-      hasSelfEmptyingFeature,
-      hasZoneCleaningFeature,
-      hasMultiFloorMappingFeature,
-      hasCarpetBoostFeature,
-      hasVirtualWallsFeature,
-      hasSmartHomeIntegration,
-      hasVoiceControl,
-      hasAppControl,
-      hasRemoteControl,
-      hasManualControl,
-      otherFeatures,
-    },
+    imageUrl,
+    brand,
+    model,
+    mappingTechnology,
+    batteryLifeInMinutes,
+    suctionPowerInPascals,
+    noiseLevelInDecibels,
+    dustbinCapacityInLiters,
+    hasMoppingFeature,
+    hasSelfEmptyingFeature,
+    hasZoneCleaningFeature,
+    hasMultiFloorMappingFeature,
+    hasCarpetBoostFeature,
+    hasVirtualWallsFeature,
+    hasSmartHomeIntegration,
+    hasVoiceControl,
+    hasAppControl,
+    hasRemoteControl,
+    hasManualControl,
+    otherFeatures,
     affiliateLinks,
   } = req.body;
 
   try {
     const stmt = db.prepare(`
       INSERT INTO vacuums (
+      id,
         imageUrl,
         brand,
         model,
@@ -53,11 +59,13 @@ export const addVacuumHandler = (req: Request, res: Response) => {
         hasAppControl,
         hasRemoteControl,
         hasManualControl,
-        otherFeatures
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        otherFeatures,
+        addedBy
+      ) VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `);
 
     const result = stmt.run(
+      randomUUID(),
       imageUrl,
       brand,
       model,
@@ -66,40 +74,45 @@ export const addVacuumHandler = (req: Request, res: Response) => {
       suctionPowerInPascals,
       noiseLevelInDecibels,
       dustbinCapacityInLiters,
-      hasMoppingFeature,
-      hasSelfEmptyingFeature,
-      hasZoneCleaningFeature,
-      hasMultiFloorMappingFeature,
-      hasCarpetBoostFeature,
-      hasVirtualWallsFeature,
-      hasSmartHomeIntegration,
-      hasVoiceControl,
-      hasAppControl,
-      hasRemoteControl,
-      hasManualControl,
-      otherFeatures
+      hasMoppingFeature ? 1 : 0,
+      hasSelfEmptyingFeature ? 1 : 0,
+      hasZoneCleaningFeature ? 1 : 0,
+      hasMultiFloorMappingFeature ? 1 : 0,
+      hasCarpetBoostFeature ? 1 : 0,
+      hasVirtualWallsFeature ? 1 : 0,
+      hasSmartHomeIntegration ? 1 : 0,
+      hasVoiceControl ? 1 : 0,
+      hasAppControl ? 1 : 0,
+      hasRemoteControl ? 1 : 0,
+      hasManualControl ? 1 : 0,
+      otherFeatures ? JSON.stringify(otherFeatures) : null,
+      user.user.email
     );
 
     if (affiliateLinks.length > 0) {
       const affiliateStmt = db.prepare(`
         INSERT INTO affiliate_links (
+          id,
           vacuumId,
           region,
           currency,
           price,
           site,
-          url
-        ) VALUES (?,?,?,?,?,?)
+          url,
+          addedBy
+        ) VALUES (?,?,?,?,?,?,?)
       `);
 
-      affiliateLinks.forEach((affiliateLink: AffiliateLink) => {
+      affiliateLinks.forEach((affiliateLink: AffiliateLinkBase) => {
         affiliateStmt.run(
+          randomUUID(),
           result.lastInsertRowid,
           affiliateLink.region,
           affiliateLink.currency,
           affiliateLink.price,
           affiliateLink.site,
-          affiliateLink.url
+          affiliateLink.url,
+          user.user.email
         );
       });
     }
@@ -111,7 +124,13 @@ export const addVacuumHandler = (req: Request, res: Response) => {
 };
 
 // Delete a vacuum by id
-export const deleteVacuumHandler = (req: Request, res: Response) => {
+export const deleteVacuumHandler = async (req: Request, res: Response) => {
+  const user = await supabase.auth.getUser(req.headers.authorization as string);
+
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized." });
+  }
+
   const { id } = req.params;
 
   try {
@@ -129,7 +148,13 @@ export const deleteVacuumHandler = (req: Request, res: Response) => {
 };
 
 // Update a vacuum by id
-export const updateVacuumHandler = (req: Request, res: Response) => {
+export const updateVacuumHandler = async (req: Request, res: Response) => {
+  const user = await supabase.auth.getUser(req.headers.authorization as string);
+
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized." });
+  }
+
   const { data } = req.body;
 
   if (!data) {

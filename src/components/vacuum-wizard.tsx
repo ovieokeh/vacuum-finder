@@ -1,9 +1,8 @@
 import { z } from "zod";
 
-import { VacuumForm, VacuumFormInterface } from "./vacuum-form";
+import { VacuumSearchForm, VacuumSearchFormInterface } from "./vacuum-search-form";
 import { VacuumResults } from "./vacuum-results";
 import { Currency, FloorType, Region } from "../types";
-import { useDatabase } from "../database/hooks";
 import { useSiteConfig } from "../providers/site-config";
 import { useAppForm } from "./form";
 import { useEffect, useRef } from "react";
@@ -12,11 +11,12 @@ import { useWindowWidth } from "../hooks/use-window-width";
 import { twMerge } from "tailwind-merge";
 import { useAppDispatch } from "../redux";
 import { replaceState } from "../redux/vacuum-filters-reducer";
+import { useFilterVacuumsMutation } from "../database/hooks";
 
 export function VacuumWizard({ className = "" }: { className?: string }) {
   const windowWidth = useWindowWidth();
   const { navHeight, region, currency } = useSiteConfig();
-  const { filterVacuumsMutation } = useDatabase();
+  const filterVacuumsMutation = useFilterVacuumsMutation({});
   const filtersContainerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useAppDispatch();
@@ -93,7 +93,7 @@ export function VacuumWizard({ className = "" }: { className?: string }) {
           <h2 className="text-lg font-bold text-secondary">Refine your search</h2>
         </div>
 
-        <VacuumForm form={form as unknown as VacuumFormInterface} />
+        <VacuumSearchForm form={form as unknown as VacuumSearchFormInterface} />
       </div>
 
       <div className="md:border md:border-border md:border-l-0 md:w-3/4 md:h-full overflow-y-scroll md:overflow-auto py-4 pb-24 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0">

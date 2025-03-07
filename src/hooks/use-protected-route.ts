@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router-dom";
 
 import { useSiteConfig } from "../providers/site-config";
+import { useEffect } from "react";
 
 export const useProtectedRoute = () => {
-  const { user } = useSiteConfig();
+  const { isLoaded, user } = useSiteConfig();
   const navigate = useNavigate();
 
-  if (!user) {
-    navigate("/admin/auth");
-    return null;
-  }
+  useEffect(() => {
+    if (!user?.id && isLoaded) {
+      navigate("/admin/auth");
+    }
+  }, [user?.id, isLoaded, navigate]);
 
   return user;
 };

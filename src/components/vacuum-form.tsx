@@ -1,230 +1,367 @@
-import { useMemo, useState } from "react";
-import { BiRuler, BiWallet } from "react-icons/bi";
-import { LuDoorOpen } from "react-icons/lu";
-import { MdPets } from "react-icons/md";
-import { GiSoap, GiVacuumCleaner } from "react-icons/gi";
+import { useEffect } from "react";
+import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 
-import { CurrencySymbolMapping, FloorType, VacuumsFilter } from "../types";
-import { AppFieldExtendedReactFormApi, formInit } from "./form";
-import { Button } from "@headlessui/react";
-import { AnyFormApi, FormValidateOrFn, useStore } from "@tanstack/react-form";
 import { useSiteConfig } from "../providers/site-config";
-import { CiEdit } from "react-icons/ci";
-import { Modal } from "./modal";
-import { IoFilterOutline } from "react-icons/io5";
+import { useAddVacuumMutation, useDeleteVacuumMutation, useUpdateVacuumMutation } from "../database/hooks";
+import { useAppForm } from "./form";
+import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumBase, VacuumMappingTechnology } from "../types";
+import { ConfirmButton } from "./confirm-button";
 
-export type VacuumFormInterface = AppFieldExtendedReactFormApi<
-  VacuumsFilter,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  typeof formInit.fieldComponents,
-  typeof formInit.formComponents
->;
-
-interface VacuumFormProps {
-  form: VacuumFormInterface;
+interface AdminVacuumFormProps {
+  vacuum?: Vacuum;
 }
+export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
+  const navigate = useNavigate();
 
-export function VacuumForm({ form }: VacuumFormProps) {
-  const simpleFilters = useMemo(
-    () => (
-      <>
-        <form.AppField
-          name="floorType"
-          children={(field) => (
-            <field.FormSelectField
-              label="Floor Type"
-              icon={<GiVacuumCleaner className="w-4 h-4 text-primary" />}
-              options={Object.values(FloorType)}
-              selectedOption={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
-        />
+  const { userToken } = useSiteConfig();
+  const addVacuumMutation = useAddVacuumMutation({
+    onSuccess: () => {
+      navigate("/admin");
+    },
+  });
+  const updateVacuumMutation = useUpdateVacuumMutation({
+    onSuccess: () => {
+      navigate("/admin");
+    },
+  });
+  const deleteVacuumMutation = useDeleteVacuumMutation({
+    onSuccess: () => {
+      navigate("/admin");
+    },
+  });
 
-        <form.AppField
-          name="budget"
-          children={(field) => (
-            <field.FormTextField
-              type="number"
-              label="Budget"
-              icon={<BiWallet className="w-4 h-4 text-primary" />}
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-            />
-          )}
-        />
+  const { reset, handleSubmit, AppForm, AppField, ...formRest } = useAppForm({
+    defaultValues: {
+      imageUrl: "https://placehold.co/600x400",
+      brand: "Dreame",
+      model: "L10s Pro Ultra Heat",
+      mappingTechnology: VacuumMappingTechnology.Laser,
+      batteryLifeInMinutes: 180,
+      suctionPowerInPascals: 3000,
+      noiseLevelInDecibels: 60,
+      dustbinCapacityInLiters: 2,
+      hasMoppingFeature: true,
+      hasSelfEmptyingFeature: true,
+      hasZoneCleaningFeature: true,
+      hasMultiFloorMappingFeature: true,
+      hasCarpetBoostFeature: true,
+      hasVirtualWallsFeature: true,
+      hasSmartHomeIntegration: true,
+      hasVoiceControl: true,
+      hasAppControl: true,
+      hasRemoteControl: true,
+      hasManualControl: true,
+      otherFeatures: [],
+      affiliateLinks: [] as Partial<AffiliateLinkBase>[],
+      ...((vacuum as Partial<VacuumBase>) || {}),
+    },
+    validators: {
+      onSubmit: z.object({
+        imageUrl: z.string().url(),
+        brand: z.string().min(2),
+        model: z.string().min(2),
+        mappingTechnology: z.nativeEnum(VacuumMappingTechnology),
+        batteryLifeInMinutes: z.number().int().min(1),
+        suctionPowerInPascals: z.number().int().min(1),
+        noiseLevelInDecibels: z.number().int().min(1),
+        dustbinCapacityInLiters: z.number().int().min(1),
+        hasMoppingFeature: z.boolean(),
+        hasSelfEmptyingFeature: z.boolean(),
+        hasZoneCleaningFeature: z.boolean(),
+        hasMultiFloorMappingFeature: z.boolean(),
+        hasCarpetBoostFeature: z.boolean(),
+        hasVirtualWallsFeature: z.boolean(),
+        hasSmartHomeIntegration: z.boolean(),
+        hasVoiceControl: z.boolean(),
+        hasAppControl: z.boolean(),
+        hasRemoteControl: z.boolean(),
+        hasManualControl: z.boolean(),
+        otherFeatures: z.array(z.string()),
+        affiliateLinks: z.array(
+          z.object({
+            region: z.nativeEnum(Region),
+            currency: z.nativeEnum(Currency),
+            price: z.number().min(1),
+            site: z.string().min(2),
+            url: z.string().url(),
+          })
+        ),
+      }),
+    },
+    onSubmit: ({ value }) => {
+      if (vacuum?.id) {
+        updateVacuumMutation.mutate({
+          id: vacuum.id,
+          data: value as VacuumBase,
+          userToken,
+        });
+      } else {
+        addVacuumMutation.mutate({
+          ...(value as VacuumBase),
+          userToken,
+        });
+      }
+    },
+  });
 
-        <form.AppField
-          name="houseSizeSqM"
-          children={(field) => (
-            <field.FormTextField
-              type="number"
-              label="Living area (sqm)"
-              icon={<BiRuler className="w-4 h-4 text-primary" />}
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-            />
-          )}
-        />
-
-        <form.AppField
-          name="numRooms"
-          children={(field) => (
-            <field.FormTextField
-              type="number"
-              label="Number of Rooms"
-              icon={<LuDoorOpen className="w-4 h-4 text-primary" />}
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-            />
-          )}
-        />
-
-        <form.AppField
-          name="numPets"
-          children={(field) => (
-            <field.FormTextField
-              type="number"
-              label="Number of pets"
-              icon={<MdPets className="w-4 h-4 text-primary" />}
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-            />
-          )}
-        />
-
-        <form.AppField
-          name="mopFunction"
-          children={(field) => (
-            <field.FormToggleField
-              label="Mop feature"
-              icon={<GiSoap className="w-4 h-4 text-primary" />}
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
-        />
-      </>
-    ),
-    [form]
-  );
-
-  const desktopFilters = (
-    <div className="space-y-6 hidden md:block">
-      {simpleFilters}
-      <form.AppForm>
-        <form.FormSubmitButton>Find Vacuums</form.FormSubmitButton>
-      </form.AppForm>
-    </div>
-  );
-
-  const mobileFilters = (
-    <MobileFiltersDialog className="block md:hidden" form={form}>
-      <div className="flex flex-col gap-4">{simpleFilters}</div>
-    </MobileFiltersDialog>
-  );
+  useEffect(() => {
+    if (vacuum?.id) {
+      const { ...rest } = vacuum;
+      const affiliateLinks = rest.affiliateLinks || [];
+      reset({
+        ...vacuum,
+        affiliateLinks: affiliateLinks.map((link) => link),
+      });
+    }
+  }, [reset, vacuum]);
 
   return (
     <form
       className="p-4 flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
-        form.handleSubmit();
+        handleSubmit();
       }}
     >
-      {desktopFilters}
-      {mobileFilters}
+      <AppForm>
+        <AppField
+          name="imageUrl"
+          children={(field) => (
+            <field.FormTextField
+              label="Image URL"
+              value={field.state.value}
+              onChange={(value) => field.setValue(value)}
+            />
+          )}
+        />
+
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12">
+          <div className="md:w-1/2 flex flex-col gap-2">
+            <AppField
+              name="brand"
+              children={(field) => (
+                <field.FormTextField
+                  label="Brand"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="model"
+              children={(field) => (
+                <field.FormTextField
+                  label="Model"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="mappingTechnology"
+              children={(field) => (
+                <field.FormSelectField
+                  label="Mapping Technology"
+                  options={Object.values(VacuumMappingTechnology)}
+                  selectedOption={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="batteryLifeInMinutes"
+              children={(field) => (
+                <field.FormTextField
+                  type="number"
+                  label="Battery Life (minutes)"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="suctionPowerInPascals"
+              children={(field) => (
+                <field.FormTextField
+                  type="number"
+                  label="Suction Power (Pa)"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="noiseLevelInDecibels"
+              children={(field) => (
+                <field.FormTextField
+                  type="number"
+                  label="Noise Level (dB)"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="dustbinCapacityInLiters"
+              children={(field) => (
+                <field.FormTextField
+                  type="number"
+                  label="Dustbin Capacity (L)"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+          </div>
+
+          <div className="md:w-1/2 flex flex-col gap-2">
+            <AppField
+              name="hasMoppingFeature"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Mopping Feature"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasSelfEmptyingFeature"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Self Emptying Feature"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasZoneCleaningFeature"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Zone Cleaning Feature"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasMultiFloorMappingFeature"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Multi Floor Mapping Feature"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasCarpetBoostFeature"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Carpet Boost Feature"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasVirtualWallsFeature"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Virtual Walls Feature"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasAppControl"
+              children={(field) => (
+                <field.FormToggleField
+                  label="App Control"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasSmartHomeIntegration"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Smart Home Integration"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasVoiceControl"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Voice Control"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasRemoteControl"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Remote Control"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <AppField
+              name="hasManualControl"
+              children={(field) => (
+                <field.FormToggleField
+                  label="Manual Control"
+                  checked={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          {vacuum?.id ? (
+            <ConfirmButton
+              onClick={() => {
+                deleteVacuumMutation.mutateAsync({
+                  id: vacuum.id,
+                  userToken,
+                });
+              }}
+              confirmText="Delete Vacuum"
+            >
+              Delete
+            </ConfirmButton>
+          ) : null}
+          <formRest.FormSubmitButton>Save</formRest.FormSubmitButton>
+        </div>
+      </AppForm>
     </form>
   );
 }
-
-const MobileFiltersDialog = ({
-  className = "",
-  form,
-  children,
-}: {
-  className?: string;
-  form: AnyFormApi;
-  children: React.ReactNode;
-}) => {
-  const { currency } = useSiteConfig();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const formValues = useStore(form.store, (s) => s.values as VacuumsFilter);
-
-  const filtersDisplay = Object.entries(formValues).reduce((acc, filter) => {
-    const filterName = filter[0];
-    let filterValue = filter[1];
-
-    switch (filterName) {
-      case "floorType":
-        filterValue += " floor";
-        break;
-      case "budget":
-        filterValue = `${CurrencySymbolMapping[currency]}${filterValue}`;
-        break;
-      case "houseSizeSqM":
-        filterValue += "sqm";
-        break;
-      case "numRooms":
-        filterValue += " rooms";
-        break;
-      case "numPets":
-        filterValue += " pets";
-        break;
-      case "mopFunction": {
-        const transformedValue = filterValue ? "with mop" : "without mop";
-        filterValue = transformedValue;
-        break;
-      }
-      default:
-        break;
-    }
-
-    return acc + `${acc.length ? ", " : ""}${filterValue}`;
-  }, "");
-
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
-
-  return (
-    <div className={className}>
-      <p className="text-lg font-semibold flex items-center gap-2">
-        <IoFilterOutline className="inline w-5 h-5" />
-        Filters
-      </p>
-      <Button onClick={open} className="mt-2 px-2! py-2! text-start outline-0! focus:outline-0! opacity-70 text-xs">
-        {filtersDisplay} <CiEdit className="inline w-5 h-5" />
-      </Button>
-
-      <Modal
-        title="Refine your vacuum search"
-        isOpen={isOpen}
-        close={close}
-        panelClassName="md:h-screen justify-between"
-        childrenClassName="space-y-6"
-      >
-        {children}
-
-        <Button
-          className="ml-auto bg-background/90!"
-          type="button"
-          onClick={() => {
-            close();
-            form.handleSubmit();
-          }}
-        >
-          Find Vacuums
-        </Button>
-      </Modal>
-    </div>
-  );
-};

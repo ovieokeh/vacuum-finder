@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import {
+  // useEffect,
+  useState,
+} from "react";
 import { Region } from "../types";
 
 interface UserLocation {
@@ -23,7 +26,7 @@ interface UserLocation {
 }
 
 export const useUserLocation = () => {
-  const [userLocation, setUserLocation] = useState<UserLocation>(() => {
+  const [userLocation] = useState<UserLocation>(() => {
     if (typeof window === "undefined") {
       return { language: "en", country_code: "US", country_name: "United States" };
     }
@@ -34,22 +37,22 @@ export const useUserLocation = () => {
     return { language: userLanguage, country: userCountry };
   });
 
-  const getLocationByIP = async () => {
-    try {
-      const url = `/api/geolocate`;
-      const response = await fetch(url);
-      const data = await response.json();
-      setUserLocation(data);
-    } catch (error) {
-      console.error("Failed to fetch user location by IP", error);
-    }
-  };
+  // const getLocationByIP = async () => {
+  //   try {
+  //     const url = `/api/geolocate`;
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+  //     setUserLocation(data);
+  //   } catch (error) {
+  //     console.error("Failed to fetch user location by IP", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      getLocationByIP();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     getLocationByIP();
+  //   }
+  // }, []);
 
   const region = userLocation.time_zone?.split("/")[0] || "America";
   const typedRegion = (Region[region as keyof typeof Region] as Region) || Region.America;

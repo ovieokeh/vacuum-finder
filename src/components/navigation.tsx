@@ -35,7 +35,7 @@ export const Navigation = () => {
             Guides
           </Link>
           {user?.id ? (
-            <Link to="/admin/dashboard" className="text-text hover:text-text/90">
+            <Link to="/admin" className="text-text hover:text-text/90">
               Dashboard
             </Link>
           ) : null}

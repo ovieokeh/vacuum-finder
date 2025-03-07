@@ -10,10 +10,10 @@ export const PrivacyPolicyPage = () => {
         <meta name="description" content="Read the privacy policy for the Vacuum Finder website." />
       </Helmet>
       <div className="flex flex-col min-h-screen bg-background">
-        <PageHeader title="Privacy Policy" subtitle="Last Updated: March 5, 2025" />
+        <PageHeader title="Privacy Policy" subtitle="Last Updated: March 5, 2025" showBreadcrumbs />
 
         {/* Main Content */}
-        <main className="flex-grow mx-auto max-w-7xl px-6 py-8 md:py-12 text-sm md:text-base leading-6 space-y-6">
+        <main className="flex-grow mx-auto max-w-[1200px] px-6 py-8 md:py-12 text-sm md:text-base leading-6 space-y-6">
           <section>
             <h2 className="text-xl font-semibold mb-2">1. Introduction</h2>
             <p>

@@ -1,15 +1,19 @@
 import React from "react";
-import { flexRender, Table, Row, Cell, Header, HeaderGroup } from "@tanstack/react-table";
+import { flexRender, Table, Row, Cell, Header, HeaderGroup, useReactTable, TableOptions } from "@tanstack/react-table";
 import { VirtualItem, Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import clsx from "clsx";
 
 interface TableContainerProps<T> {
-  table: Table<T>;
+  tableOptions: TableOptions<T>;
   handleRowClick: (row: T) => void;
 }
 
-export function TableContainer<T extends Record<string, any>>({ table, handleRowClick }: TableContainerProps<T>) {
+export function TableContainer<T extends Record<string, any>>({
+  tableOptions,
+  handleRowClick,
+}: TableContainerProps<T>) {
+  const table = useReactTable(tableOptions);
   const visibleColumns = table.getVisibleLeafColumns();
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
 

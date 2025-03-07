@@ -22,15 +22,15 @@ import {
 import clsx from "clsx";
 import { ComponentType, PropsWithChildren } from "react";
 
-const FormTextField = ({
+const FormTextField = <T extends string | number>({
   type = "text",
   label,
   icon,
   onChange,
   ...rest
 }: {
-  value: string | number;
-  onChange: (value: string | number) => void;
+  value: T;
+  onChange: (value: T) => void;
   type?: string;
   label?: string;
   icon?: React.ReactNode;
@@ -48,7 +48,7 @@ const FormTextField = ({
         className={
           "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
         }
-        onChange={(e) => onChange(type === "number" ? +e.target.value : e.target.value)}
+        onChange={(e) => onChange(type === "number" ? (+e.target.value as T) : (e.target.value as T))}
         {...rest}
       />
     </Field>
@@ -117,7 +117,7 @@ const FormSelectField = <T extends string>({
           </Label>
         )}
         <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-background! border! border-border!">
-          {selectedOption}
+          {selectedOption ?? <span className="text-text/80 text-sm">Select an option</span>}
           <GoChevronDown className="w-4 h-4" />
         </ListboxButton>
         <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">

@@ -4,13 +4,21 @@ import { Currency, Region } from "../types";
 import { useUserLocation } from "../hooks/use-user-location";
 import { createClient, User } from "@supabase/supabase-js";
 
-export const supabaseFrontend = createClient(
-  "https://cevxzvsqlweccdszjadm.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldnh6dnNxbHdlY2Nkc3pqYWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNzA1NjksImV4cCI6MjA1Njg0NjU2OX0.hdzjvJu1pekfhZbFI4rdvWqZi6llKsc9cNAkglkqToI"
-);
+let supabaseUrl = "";
+if (typeof import.meta !== "undefined") {
+  supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+}
+let supabaseKey = "";
+if (typeof import.meta !== "undefined") {
+  supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
+}
+
+export const supabaseFrontend = createClient(supabaseUrl, supabaseKey);
 
 interface SiteConfigContextProps {
+  isLoaded: boolean;
   user: User | undefined;
+  userToken: string | undefined;
   navHeight: number;
   language: string;
   region: Region;
@@ -32,19 +40,27 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   const [currency, setCurrency] = useState<Currency>(() => (region === Region.Europe ? Currency.EUR : Currency.USD));
   const [navHeight, setNavHeight] = useState<number>(0);
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [userToken, setUserToken] = useState<string | undefined>(undefined);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     // sync user from local storage
-    supabaseFrontend.auth.getSession().then(({ data, error }) => {
-      if (error || !data) {
-        console.error("Error getting user:", error?.message);
-        return;
-      }
+    supabaseFrontend.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (error || !data) {
+          console.error("Error getting user:", error?.message);
+          return;
+        }
 
-      const { session } = data;
+        const { session } = data;
 
-      setUser(session?.user);
-    });
+        setUser(session?.user);
+        setUserToken(session?.access_token);
+      })
+      .finally(() => {
+        setIsLoaded(true);
+      });
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -56,6 +72,7 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setUser(data.session.user);
+    setUserToken(data.session.access_token);
     return undefined;
   };
 
@@ -75,7 +92,9 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   return (
     <SiteConfigContext.Provider
       value={{
+        isLoaded,
         user,
+        userToken,
         navHeight,
         language,
         region,

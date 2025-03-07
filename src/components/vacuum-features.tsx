@@ -15,7 +15,7 @@ export const VacuumFeatures = ({
   vacuum,
   exclude = [],
   limit,
-}: VacuumResultProps & {
+}: Omit<VacuumResultProps, "filters"> & {
   exclude?: (keyof Vacuum)[];
   limit?: number;
 }) => {

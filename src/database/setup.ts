@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { db } from ".";
 import { mockAffiliateLinks, mockVacuums } from "./mock";
 
@@ -30,7 +31,10 @@ export const setupDatabase = () => {
           hasAppControl BOOLEAN DEFAULT 0,
           hasRemoteControl BOOLEAN DEFAULT 0,
           hasManualControl BOOLEAN DEFAULT 0,
-          otherFeatures TEXT DEFAULT NULL
+          otherFeatures TEXT DEFAULT NULL,
+          addedBy TEXT DEFAULT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
   `);
 
@@ -43,6 +47,9 @@ export const setupDatabase = () => {
           price REAL NOT NULL,
           site TEXT NOT NULL,
           url TEXT NOT NULL,
+          addedBy TEXT DEFAULT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (vacuumId) REFERENCES vacuums(id) ON DELETE CASCADE
       );
   `);
@@ -76,8 +83,9 @@ export const populateMockData = () => {
           hasAppControl,
           hasRemoteControl,
           hasManualControl,
-          otherFeatures
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+          otherFeatures,
+          addedBy
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         `);
 
     db.transaction(() => {
@@ -104,7 +112,8 @@ export const populateMockData = () => {
             vacuum.hasAppControl ? 1 : 0,
             vacuum.hasRemoteControl ? 1 : 0,
             vacuum.hasManualControl ? 1 : 0,
-            JSON.stringify(vacuum.otherFeatures)
+            JSON.stringify(vacuum.otherFeatures),
+            "System"
           );
         } catch (error) {
           console.info("Error populating mock vacuum data:", (error as any).message);
@@ -121,21 +130,23 @@ export const populateMockData = () => {
           currency,
           price,
           site,
-          url
-      ) VALUES (?,?,?,?,?,?,?)
+          url,
+          addedBy
+      ) VALUES (?,?,?,?,?,?,?,?)
     `);
 
     db.transaction(() => {
       for (const affiliateLink of mockAffiliateLinks) {
         try {
           insertAffiliateLink.run(
-            affiliateLink.id,
+            randomUUID(),
             affiliateLink.vacuumId,
             affiliateLink.region,
             affiliateLink.currency,
             affiliateLink.price,
             affiliateLink.site,
-            affiliateLink.url
+            affiliateLink.url,
+            "System"
           );
         } catch (error) {
           console.info("Error populating mock affiliate data:", (error as any).message);

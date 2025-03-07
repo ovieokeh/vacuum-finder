@@ -1,24 +1,33 @@
 import { Request, Response } from "express";
 
-import { db } from "../../database";
+import { db, supabase } from "../../database";
+import { randomUUID } from "crypto";
 
 // Add a new vacuum affiliate link
-export const addVacuumAffiliateLink = (req: Request, res: Response) => {
+export const addVacuumAffiliateLink = async (req: Request, res: Response) => {
   const { vacuumId, region, currency, price, site, url } = req.body;
+
+  const { data: userData } = await supabase.auth.getUser(req.headers.authorization as string);
+
+  if (!userData?.user) {
+    return res.status(401).json({ error: "Unauthorized." });
+  }
 
   try {
     const stmt = db.prepare(`
       INSERT INTO affiliate_links (
+        id,
         vacuumId,
         region,
         currency,
         price,
         site,
-        url
+        url,
+        addedBy
       ) VALUES (?,?,?,?,?,?)
     `);
 
-    const result = stmt.run(vacuumId, region, currency, price, site, url);
+    const result = stmt.run(randomUUID(), vacuumId, region, currency, price, site, url, userData.user.email);
 
     res.json(result);
   } catch (error: any) {
@@ -27,8 +36,13 @@ export const addVacuumAffiliateLink = (req: Request, res: Response) => {
 };
 
 // Delete a vacuum affiliate link by id
-export const deleteVacuumAffiliateLink = (req: Request, res: Response) => {
+export const deleteVacuumAffiliateLink = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { data: userData } = await supabase.auth.getUser(req.headers.authorization as string);
+
+  if (!userData.user) {
+    return res.status(401).json({ error: "Unauthorized." });
+  }
 
   try {
     const stmt = db.prepare(`DELETE FROM affiliate_links WHERE id = ?`);
@@ -45,8 +59,14 @@ export const deleteVacuumAffiliateLink = (req: Request, res: Response) => {
 };
 
 // Update a vacuum affiliate link by id
-export const updateVacuumAffiliateLink = (req: Request, res: Response) => {
+export const updateVacuumAffiliateLink = async (req: Request, res: Response) => {
   const { data } = req.body;
+
+  const { data: userData } = await supabase.auth.getUser(req.headers.authorization as string);
+
+  if (!userData) {
+    return res.status(401).json({ error: "Unauthorized." });
+  }
 
   if (!data) {
     return res.status(400).json({ error: "Missing data." });

@@ -1,9 +1,8 @@
 import { BsCurrencyDollar, BsCurrencyEuro } from "react-icons/bs";
 import { FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
 
-export interface AffiliateLink {
-  id: string;
-  vacuumId: string;
+export interface AffiliateLinkBase {
+  vacuumId?: string;
   region: Region;
   currency: Currency;
   price: number;
@@ -16,7 +15,6 @@ export enum VacuumMappingTechnology {
   Camera = "Camera",
 }
 export interface VacuumBase {
-  id: string;
   imageUrl: string;
   brand: string;
   model: string;
@@ -40,9 +38,11 @@ export interface VacuumBase {
   // [key: string]: string | number | boolean | string[] | AffiliateLink[];
 }
 
-export interface Vacuum extends VacuumBase {
-  affiliateLinks: AffiliateLink[];
-}
+export type WithId<T> = T & { id: string };
+
+export type Vacuum = WithId<VacuumBase> & {
+  affiliateLinks?: WithId<AffiliateLinkBase>[];
+};
 
 export enum FloorType {
   Carpet = "Carpet",

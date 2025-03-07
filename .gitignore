@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 .env
+.env.production
 database.db
 database.db-shm
 database.db-wal

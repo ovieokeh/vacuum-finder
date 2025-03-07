@@ -3,11 +3,11 @@ import { invariant } from "es-toolkit";
 import { CiCircleInfo } from "react-icons/ci";
 import { Helmet } from "react-helmet";
 
-import { useDatabase } from "../../database/hooks";
 import { Modal } from "../../components/modal";
 import { VacuumSpecExplanations } from "../../components/vacuum-spec-explanations";
 import { VacuumInfo } from "../../components/vacuum-info";
 import { useAppSelector } from "../../redux";
+import { useVacuumQuery } from "../../database/hooks";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();
@@ -15,7 +15,7 @@ export function VacuumInfoPage() {
 
   const navigate = useNavigate();
 
-  const { vacuumQuery } = useDatabase(vacuumId);
+  const vacuumQuery = useVacuumQuery(vacuumId);
   const vacuum = vacuumQuery.data;
   const name = `${vacuum?.brand} ${vacuum?.model}`;
 
@@ -34,7 +34,7 @@ export function VacuumInfoPage() {
         <div className="flex flex-col flex-grow gap-4">
           {vacuum ? (
             <>
-              <VacuumInfo vacuum={vacuum} filters={filters} imageClassName="w-full h-64 md:size-52 mx-auto grow" />
+              <VacuumInfo vacuum={vacuum} imageClassName="w-full h-64 md:size-52 mx-auto grow" />
               <VacuumSpecExplanations vacuum={vacuum} filters={filters} />
             </>
           ) : (

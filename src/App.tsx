@@ -11,11 +11,12 @@ import { VacuumSearchPage } from "./pages/vacuum-search";
 import { VacuumInfoPage } from "./pages/vacuum-search/[vacuumId]";
 import { PrivacyPolicyPage } from "./pages/privacy-policy";
 import { TermsOfServicePage } from "./pages/terms-of-service";
-import { reduxStore } from "./redux";
-import "./index.css";
-import { AdminPage } from "./pages/admin";
 import { AdminAuthPage } from "./pages/admin/auth";
 import { AdminDashboardPage } from "./pages/admin/dashboard";
+import { AdminVacuumAddPage } from "./pages/admin/vacuum-add";
+import { AdminVacuumEditPage } from "./pages/admin/vacuum-[vacuumId]";
+import { reduxStore } from "./redux";
+import "./index.css";
 
 const queryClient = new QueryClient();
 
@@ -44,9 +45,11 @@ export default function App() {
               <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="terms-of-service" element={<TermsOfServicePage />} />
 
-              <Route path="admin" element={<AdminPage />}>
-                <Route path="auth" element={<AdminAuthPage />} />
-                <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="admin/auth" element={<AdminAuthPage />} />
+
+              <Route path="admin/vacuum/add" element={<AdminVacuumAddPage />} />
+              <Route path="admin" element={<AdminDashboardPage />}>
+                <Route path="vacuum/:vacuumId" element={<AdminVacuumEditPage />} />
               </Route>
             </Routes>
           </div>

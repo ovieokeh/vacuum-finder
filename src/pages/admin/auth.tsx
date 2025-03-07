@@ -25,7 +25,7 @@ export function AdminAuthPage() {
       }
 
       // If no error, navigate to admin dashboard
-      navigate("/admin/dashboard");
+      navigate("/admin");
     } catch (err: any) {
       setErrorMessage(err.message || "An unexpected error occurred.");
     }
@@ -68,6 +68,7 @@ export function AdminAuthPage() {
               <input
                 id="password"
                 type="password"
+                autoComplete="current-password"
                 className="w-full px-3 py-2 border border-border rounded bg-background text-text focus:outline-none focus:ring-2 focus:ring-text/50"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 
-import { db } from "../../database";
+import { db, supabase } from "../../database";
 
-export const listVacuums = async (_req: Request, res: Response) => {
+export const listVacuums = async (req: Request, res: Response) => {
+  const { data: user } = await supabase.auth.getUser(req.headers.authorization as string);
+  const { owned } = req.query;
+
   try {
     // LEFT JOIN to include affiliate link details even if a vacuum has none.
-    const query = `
+    let query = `
       SELECT 
         v.*,
         al.id AS affiliateLinkId,
@@ -17,7 +20,14 @@ export const listVacuums = async (_req: Request, res: Response) => {
       FROM vacuums v
       LEFT JOIN affiliate_links al ON al.vacuumId = v.id
     `;
-    const rows = db.prepare(query).all();
+
+    let rows: unknown[] = [];
+    if (owned === "true" && user.user) {
+      query += ` WHERE v.addedBy = ?`;
+      rows = db.prepare(query).all(user.user.email);
+    } else {
+      rows = db.prepare(query).all();
+    }
 
     // Group rows by vacuum id and nest affiliate link details in an 'affiliateLinks' array.
     const vacuumMap: { [id: string]: any } = {};

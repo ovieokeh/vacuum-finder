@@ -1,4 +1,4 @@
-import { AffiliateLink, Currency, Region, Vacuum, VacuumMappingTechnology } from "../types";
+import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumMappingTechnology } from "../types";
 
 export const mockVacuums: Vacuum[] = [
   {
@@ -219,9 +219,8 @@ export const mockVacuums: Vacuum[] = [
   },
 ];
 
-export const mockAffiliateLinks: AffiliateLink[] = [
+export const mockAffiliateLinks: AffiliateLinkBase[] = [
   {
-    id: "6789024j9y0-n829hf",
     vacuumId: "roborock_s8_maxv_ultra",
     region: Region.America,
     currency: Currency.USD,
@@ -230,7 +229,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/roborock-s8-maxv-ultra",
   },
   {
-    id: "6789024j9y0-6yg46y",
     vacuumId: "roborock_s8_maxv_ultra",
     region: Region.Europe,
     currency: Currency.EUR,
@@ -239,7 +237,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/roborock-s8-maxv-ultra",
   },
   {
-    id: "6789024j9y0-po93ss",
     vacuumId: "irobot_roomba_j9_combo_plus",
     region: Region.America,
     currency: Currency.USD,
@@ -248,7 +245,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/irobot-roomba-j9-combo-plus",
   },
   {
-    id: "6789024j9y0-3erty78",
     vacuumId: "irobot_roomba_j9_combo_plus",
     region: Region.Europe,
     currency: Currency.EUR,
@@ -257,7 +253,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/irobot-roomba-j9-combo-plus",
   },
   {
-    id: "6789024j9y0-mlkjnju",
     vacuumId: "dreame_x40",
     region: Region.America,
     currency: Currency.USD,
@@ -266,7 +261,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/dreame-x40",
   },
   {
-    id: "6789024j9y0-qazxdss",
     vacuumId: "dreame_x40",
     region: Region.Europe,
     currency: Currency.EUR,
@@ -275,7 +269,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/dreame-x40",
   },
   {
-    id: "6789024j9y0-yhnbrfv",
     vacuumId: "eufy_x10_pro_omni",
     region: Region.America,
     currency: Currency.USD,
@@ -284,7 +277,6 @@ export const mockAffiliateLinks: AffiliateLink[] = [
     url: "https://www.amazon.com/eufy-x10-pro-omni",
   },
   {
-    id: "6789024j9y0-bhjnhg",
     vacuumId: "eufy_x10_pro_omni",
     region: Region.Europe,
     currency: Currency.EUR,

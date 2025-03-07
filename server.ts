@@ -38,9 +38,8 @@ async function startServer() {
   }
 
   app.use(express.json());
-
   // API endpoints…
-  app.post("/api/vacuums", addVacuumHandler);
+  app.post("/api/vacuums", addVacuumHandler as any);
   app.put("/api/vacuums/:id", updateVacuumHandler as any);
   app.delete("/api/vacuums/:id", deleteVacuumHandler as any);
   app.get("/api/vacuums", listVacuums);

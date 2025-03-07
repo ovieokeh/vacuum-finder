@@ -1,9 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Vacuum, VacuumsFilter } from "../types";
 
-export function useDatabase(vacuumId?: string) {
-  const queryClient = useQueryClient();
-  // Fetch all vacuums.
+export function useVacuumsQuery() {
   const vacuumsQuery = useQuery<Vacuum[]>({
     queryKey: ["vacuums"],
     queryFn: async () => {
@@ -13,19 +11,109 @@ export function useDatabase(vacuumId?: string) {
     },
   });
 
-  // Fetch a single vacuum by id.
-  // This query is always called, but disabled if no vacuumId is provided.
+  return vacuumsQuery;
+}
+export function useVacuumQuery(vacuumId: string) {
   const vacuumQuery = useQuery<Vacuum>({
     queryKey: ["vacuums", vacuumId],
     queryFn: async () => {
       const response = await fetch(`/api/vacuums/${vacuumId}`);
-      if (!response.ok) throw new Error("Failed to fetch vacuum");
+      if (!response.ok) {
+        throw new Error("Failed to fetch vacuum");
+      }
       return response.json();
     },
     enabled: Boolean(vacuumId),
+    throwOnError: (error) => {
+      console.log("errorroror", error);
+      if (error.message === "Failed to fetch vacuum") {
+        return false;
+      }
+      return true;
+    },
   });
 
-  // Filter vacuums based on user preferences.
+  return vacuumQuery;
+}
+export function useAddVacuumMutation({ onSuccess }: { onSuccess?: () => void }) {
+  const queryClient = useQueryClient();
+
+  const addVacuumMutation = useMutation<Vacuum, Error, Partial<Vacuum> & { userToken?: string }>({
+    mutationFn: async (data) => {
+      const response = await fetch("/api/vacuums", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: data.userToken ?? "" },
+        body: JSON.stringify({
+          ...data,
+          userToken: undefined,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to add vacuum");
+      return response.json();
+    },
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["vacuums"] });
+    },
+  });
+
+  return addVacuumMutation;
+}
+export function useUpdateVacuumMutation({ onSuccess }: { onSuccess?: () => void }) {
+  const queryClient = useQueryClient();
+
+  const updateVacuumMutation = useMutation<Vacuum, Error, { id: string; data: Partial<Vacuum>; userToken?: string }>({
+    mutationFn: async ({ id, data, userToken }) => {
+      const response = await fetch(`/api/vacuums/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: userToken ?? "" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to update vacuum");
+      return response.json();
+    },
+    onSuccess: (vacuum) => {
+      queryClient.invalidateQueries({ queryKey: ["vacuums"] });
+      if (vacuum.id) {
+        queryClient.invalidateQueries({ queryKey: ["vacuums", vacuum.id] });
+      }
+
+      onSuccess?.();
+    },
+  });
+
+  return updateVacuumMutation;
+}
+export function useDeleteVacuumMutation({ onSuccess }: { onSuccess?: () => void }) {
+  const queryClient = useQueryClient();
+
+  const deleteVacuumMutation = useMutation<
+    { message: string },
+    Error,
+    {
+      id: string;
+      userToken?: string;
+    }
+  >({
+    mutationFn: async ({ id, userToken }) => {
+      const response = await fetch(`/api/vacuums/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: userToken ?? "" },
+      });
+      if (!response.ok) throw new Error("Failed to delete vacuum");
+      return response.json();
+    },
+    onSuccess: (_data, { id }) => {
+      queryClient.removeQueries({ queryKey: ["vacuums", id] });
+      queryClient.invalidateQueries({ queryKey: ["vacuums"] });
+      queryClient.invalidateQueries({ queryKey: ["user-vacuums"] });
+      onSuccess?.();
+    },
+  });
+
+  return deleteVacuumMutation;
+}
+export function useFilterVacuumsMutation({ onSuccess }: { onSuccess?: () => void }) {
   const filterVacuumsMutation = useMutation<Vacuum[], Error, VacuumsFilter>({
     mutationFn: async (filterData: VacuumsFilter) => {
       const response = await fetch("/api/search-vacuums", {
@@ -36,62 +124,9 @@ export function useDatabase(vacuumId?: string) {
       if (!response.ok) throw new Error("Failed to filter vacuums");
       return response.json();
     },
-  });
-  const addVacuumMutation = useMutation<Vacuum, Error, Vacuum>({
-    mutationFn: async (newVacuum: Vacuum) => {
-      const response = await fetch("/api/vacuums", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newVacuum),
-      });
-      if (!response.ok) throw new Error("Failed to add vacuum");
-      return response.json();
-    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vacuums"] });
+      onSuccess?.();
     },
   });
-
-  // Mutation: update an existing vacuum.
-  // Expects an object with vacuum id and a partial update payload.
-  const updateVacuumMutation = useMutation<Vacuum, Error, { id: string; data: Partial<Vacuum> }>({
-    mutationFn: async ({ id, data }) => {
-      const response = await fetch(`/api/vacuums/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update vacuum");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vacuums"] });
-      if (vacuumId) {
-        queryClient.invalidateQueries({ queryKey: ["vacuums", vacuumId] });
-      }
-    },
-  });
-
-  // Mutation: delete a vacuum.
-  const deleteVacuumMutation = useMutation<{ message: string }, Error, string>({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/vacuums/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete vacuum");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vacuums"] });
-    },
-  });
-
-  return {
-    vacuumsQuery,
-    vacuumQuery,
-    filterVacuumsMutation,
-    addVacuumMutation,
-    updateVacuumMutation,
-    deleteVacuumMutation,
-  };
+  return filterVacuumsMutation;
 }

@@ -1,22 +1,16 @@
 import { twMerge } from "tailwind-merge";
 
-import { CurrencySymbolMapping, Vacuum, VacuumsFilter } from "../types";
+import { CurrencySymbolMapping, Vacuum } from "../types";
 import { useSiteConfig } from "../providers/site-config";
 import { VacuumFeatures } from "./vacuum-features";
 import { getCheapestPrice } from "../shared-utils/price";
 
 interface VacuumResultProps {
   vacuum: Vacuum;
-  filters: VacuumsFilter;
+  imageClassName?: string;
 }
 
-export const VacuumInfo = ({
-  vacuum,
-  filters,
-  imageClassName = "",
-}: VacuumResultProps & {
-  imageClassName?: string;
-}) => {
+export const VacuumInfo = ({ vacuum, imageClassName = "" }: VacuumResultProps) => {
   const { currency } = useSiteConfig();
 
   const price = getCheapestPrice(vacuum, currency);
@@ -45,7 +39,7 @@ export const VacuumInfo = ({
         <div>
           <p className="text-sm font-semibold">Features</p>
           <div className="p-1">
-            <VacuumFeatures vacuum={vacuum} filters={filters} />
+            <VacuumFeatures vacuum={vacuum} />
           </div>
         </div>
       </div>

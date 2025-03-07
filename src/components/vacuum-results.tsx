@@ -1,12 +1,6 @@
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  TableOptions,
-  useReactTable,
-} from "@tanstack/react-table";
+import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, TableOptions } from "@tanstack/react-table";
 
 import { CurrencySymbolMapping, Vacuum, VacuumsFilter } from "../types";
 import { TableContainer } from "./table";
@@ -15,10 +9,13 @@ import { VacuumFeatures } from "./vacuum-features";
 import { getCheapestPrice } from "../shared-utils/price";
 import { MdInfoOutline } from "react-icons/md";
 import { Popover } from "./popover";
+import { useSiteConfig } from "../providers/site-config";
 
 interface VacuumResultsProps {
-  filters: VacuumsFilter;
-  results: Vacuum[];
+  filters?: VacuumsFilter;
+  navigateRoot?: string;
+  emptyView?: React.ReactNode;
+  results?: Vacuum[];
 }
 
 const relativeWidth = (width: number, percent: number) => {
@@ -26,13 +23,22 @@ const relativeWidth = (width: number, percent: number) => {
 };
 
 export function VacuumResults({
-  results,
+  results = [],
   filters,
+  navigateRoot = "/vacuum-search",
+  emptyView = (
+    <div className="flex justify-center items-center h-64">
+      <p>No results found. Adjust filters and try again.</p>
+    </div>
+  ),
   containerWidth,
 }: VacuumResultsProps & {
   containerWidth: number;
 }) {
+  const siteConfig = useSiteConfig();
   const navigate = useNavigate();
+
+  const currency = filters?.currency ?? siteConfig.currency;
 
   const tableOptions: TableOptions<Vacuum> = useMemo(
     () => ({
@@ -53,9 +59,9 @@ export function VacuumResults({
           accessorKey: "price",
           size: relativeWidth(containerWidth, 11),
           cell: (value) => {
-            const cheapestPrice = getCheapestPrice(value.row.original, filters.currency);
+            const cheapestPrice = getCheapestPrice(value.row.original, currency);
             return cheapestPrice === 0 ? (
-              <span className="text-center block w-full">n/a</span>
+              <span className="block w-full">n/a</span>
             ) : cheapestPrice === -1 ? (
               <Popover
                 className="grow flex justify-center"
@@ -66,7 +72,7 @@ export function VacuumResults({
                 <p className="text-text/90">Try changing your selected currency at the top of the page.</p>
               </Popover>
             ) : (
-              `${CurrencySymbolMapping[filters.currency]}${cheapestPrice}`
+              <p className="block w-full">{`${CurrencySymbolMapping[currency]}${cheapestPrice}`}</p>
             );
           },
           enableSorting: true,
@@ -104,7 +110,6 @@ export function VacuumResults({
           size: relativeWidth(containerWidth, 23),
           cell: (value) => (
             <VacuumFeatures
-              filters={filters}
               vacuum={value.row.original}
               exclude={["batteryLifeInMinutes", "suctionPowerInPascals", "noiseLevelInDecibels"]}
               limit={3}
@@ -118,25 +123,23 @@ export function VacuumResults({
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
     }),
-    [results, filters, containerWidth]
+    [results, currency, containerWidth]
   );
-
-  const table = useReactTable(tableOptions);
 
   return (
     <>
-      {results.length === 0 ? (
-        <p>No results found. Adjust filters and try again.</p>
+      {!results || results?.length === 0 ? (
+        emptyView
       ) : (
         <>
           <div className="hidden md:block">
             <TableContainer<Vacuum>
-              table={table}
-              handleRowClick={(vacuum) => navigate(`/vacuum-search/${vacuum.id}`)}
+              tableOptions={tableOptions}
+              handleRowClick={(vacuum) => navigate(`${navigateRoot}/${vacuum.id}`)}
             />
           </div>
           <div className="md:hidden">
-            <VacuumMobileList results={results} filters={filters} />
+            <VacuumMobileList results={results} filters={filters} navigateRoot={navigateRoot} />
           </div>
         </>
       )}
@@ -144,13 +147,13 @@ export function VacuumResults({
   );
 }
 
-const VacuumMobileList = ({ results, filters }: VacuumResultsProps) => {
+const VacuumMobileList = ({ results, navigateRoot }: VacuumResultsProps) => {
   return (
     <ul className="space-y-4">
-      {results.map((vacuum) => (
+      {results?.map((vacuum) => (
         <li key={vacuum.id} className="flex flex-col gap-4 p-4 border border-border rounded-lg shadow">
-          <Link to={`/vacuum-search/${vacuum.id}`}>
-            <VacuumInfo vacuum={vacuum} filters={filters} />
+          <Link to={`${navigateRoot}/${vacuum.id}`}>
+            <VacuumInfo vacuum={vacuum} />
           </Link>
         </li>
       ))}

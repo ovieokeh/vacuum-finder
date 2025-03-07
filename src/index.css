@@ -2,6 +2,10 @@
 
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+}
+
 :root {
   --color-background: #ffffff;
   --color-background-alt: #f9f9f9;
