@@ -1,217 +1,118 @@
 import { Vacuum, VacuumMappingTechnology, VacuumsFilter } from "../types";
 
-const COLOR_CLASSES = {
-  success: "text-green-700 bg-green-50 border-green-200 dark:bg-green-900/50 dark:text-green-50",
-  warning: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-50",
-  error: "text-red-700 bg-red-50 border-red-200",
-  info: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-900/50 dark:text-blue-50",
-  neutral: "text-text/90 dark:text-text/60 bg-gray-50 border-gray-200 dark:bg-gray-900/50",
-};
-
-interface SpecItem {
-  label: string;
-  description: string;
-  colorClass: string;
-}
-
-function makeSpecItem(label: string, description: string, type: keyof typeof COLOR_CLASSES = "neutral"): SpecItem {
-  return {
-    label,
-    description,
-    colorClass: COLOR_CLASSES[type],
-  };
-}
-
 interface VacuumSpecExplanationsProps {
   vacuum: Vacuum;
   filters: VacuumsFilter;
 }
+
 export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanationsProps) => {
-  const getBatteryLifeExplanation = (mins: number) => {
+  // Create a conversational summary for each feature
+
+  const batterySummary = (() => {
+    const mins = vacuum.batteryLifeInMinutes;
     if (mins < 60) {
-      return makeSpecItem(
-        `Battery: ${mins} min`,
-        "Fine for smaller homes, but may need more frequent charging if you have several rooms.",
-        "warning"
-      );
-    } else if (mins < 120) {
-      return makeSpecItem(`Battery: ${mins} min`, "Good for medium-sized homes with a few rooms.", "success");
+      return `The battery lasts only ${mins} minutes, which might be limiting for a larger home.`;
+    } else if (mins >= 60 && mins < 120) {
+      return `A battery life of ${mins} minutes should be fine for most medium-sized spaces.`;
     } else {
-      return makeSpecItem(
-        `Battery: ${mins} min`,
-        "Extended run time—ideal for larger homes or multiple passes in one go.",
-        "success"
-      );
+      return `An impressive battery life of ${mins} minutes makes it well-suited for larger areas.`;
     }
-  };
+  })();
 
-  const getSuctionExplanation = (pa: number) => {
+  const suctionSummary = (() => {
+    const pa = vacuum.suctionPowerInPascals;
     if (pa < 2000) {
-      return makeSpecItem(
-        `Suction: ${pa} Pa`,
-        "Decent for light messes, may struggle with thick carpets or embedded dirt.",
-        "warning"
-      );
-    } else if (pa < 3000) {
-      return makeSpecItem(
-        `Suction: ${pa} Pa`,
-        "Handles everyday dust, debris, and moderate pet hair quite well.",
-        "success"
-      );
+      return `With only ${pa} Pascals of suction, it may struggle with stubborn dirt or thick carpets.`;
+    } else if (pa >= 2000 && pa < 3000) {
+      return `Its ${pa} Pascals of suction power is adequate for everyday cleaning.`;
     } else {
-      return makeSpecItem(
-        `Suction: ${pa} Pa`,
-        "Powerful enough for heavy dirt, thick rugs, and stubborn pet hair.",
-        "success"
-      );
+      return `A powerful suction of ${pa} Pascals means it’s great at handling pet hair and deep cleaning.`;
     }
-  };
+  })();
 
-  const getNoiseExplanation = (db: number | null) => {
-    if (db === null) {
-      return makeSpecItem(
-        "Noise Level",
-        "Noise level not specified. Check the product details for more info.",
-        "neutral"
-      );
-    }
-
+  const noiseSummary = (() => {
+    const db = vacuum.noiseLevelInDecibels;
+    if (db === null) return "";
     if (db < 60) {
-      return makeSpecItem(`Noise: ${db} dB`, "Very quiet. You may barely notice it in the next room.", "success");
-    } else if (db <= 70) {
-      return makeSpecItem(`Noise: ${db} dB`, "Moderate noise; audible but not overly disruptive.", "warning");
+      return `Operating at only ${db} dB, it runs very quietly.`;
+    } else if (db >= 60 && db <= 70) {
+      return `At ${db} dB, the noise level is moderate and should be tolerable.`;
     } else {
-      return makeSpecItem(`Noise: ${db} dB`, "A bit loud. Best scheduled when you’re out or in another area.", "error");
+      return `A noise level of ${db} dB might be a bit distracting during use.`;
     }
-  };
+  })();
 
-  const getMappingExplanation = (tech: VacuumMappingTechnology) => {
+  const mappingSummary = (() => {
+    const tech = vacuum.mappingTechnology as VacuumMappingTechnology;
     if (tech === VacuumMappingTechnology.Laser) {
-      return makeSpecItem("Mapping: Laser", "Uses laser-based scanning for accurate, systematic cleaning.", "info");
+      return `Its laser mapping system ensures precise navigation.`;
     }
-    return makeSpecItem(
-      "Mapping: Camera",
-      "Navigates via camera; may vary in low light but avoids most obstacles.",
-      "info"
-    );
-  };
+    return `Using camera-based mapping, it navigates well though it might have trouble in low light.`;
+  })();
 
-  const getMultiFloorMappingExplanation = (multiFloor: boolean | null) => {
-    if (typeof multiFloor === "boolean") {
-      return makeSpecItem(
-        "Multi-floor Mapping",
-        multiFloor
-          ? "Stores multiple floor plans—great if you have a multi-story home."
-          : "Single-floor mapping only; may need to re-map if you have multiple levels.",
-        "info"
-      );
-    }
-    return makeSpecItem(
-      "Multi-floor Mapping",
-      "May or may not support multi-floor mapping. Check details for more info.",
-      "info"
-    );
-  };
+  const multiFloorSummary = vacuum.hasMultiFloorMappingFeature
+    ? `It supports multi-floor mapping, which is great for multi-story homes.`
+    : "";
 
-  const getMopExplanation = (hasMop: boolean | null) => {
-    if (typeof hasMop === "boolean") {
-      return makeSpecItem(
-        "Mop Function",
-        hasMop
-          ? "Has a mop function—great for hard floors and light spills."
-          : "No mop function—best for carpets and dry cleaning.",
-        "info"
-      );
-    }
-    return makeSpecItem("Mop Function", "May or may not have a mop function. Check details for more info.", "info");
-  };
+  const mopSummary = vacuum.hasMoppingFeature
+    ? `The built-in mop function is a nice bonus for hard floors and light spills.`
+    : "";
 
-  const getSelfEmptyExplanation = (selfEmpty: boolean | null) => {
-    if (typeof selfEmpty === "boolean") {
-      if (!selfEmpty) {
-        return makeSpecItem("Self-emptying", "Dustbin must be emptied manually after each cleaning.", "warning");
+  const selfEmptySummary = (() => {
+    if (typeof vacuum.hasSelfEmptyingFeature === "boolean") {
+      if (vacuum.hasSelfEmptyingFeature) {
+        return filters.numPets > 0
+          ? `The self-emptying feature is especially useful if you have pets.`
+          : `Its self-emptying dustbin reduces maintenance.`;
+      } else {
+        return filters.numPets > 0
+          ? `Without self-emptying, you’ll need to manually clear the dustbin—which might be a hassle if you have pets.`
+          : `The dustbin requires manual emptying.`;
       }
-      if (filters.numPets > 0) {
-        return makeSpecItem(
-          "Self-emptying",
-          "Automatically empties dustbin—less hassle, especially with pets.",
-          "success"
-        );
-      }
-      return makeSpecItem("Self-emptying", "Dustbin empties itself, so you rarely have to do it manually.", "success");
     }
-    return makeSpecItem("Self-emptying", "May or may not have self-emptying. Check details for more info.", "info");
-  };
+    return "";
+  })();
 
-  const getAppControlExplanation = () =>
-    makeSpecItem("App Control", "Control + schedule cleanings from your phone—convenient for busy schedules.", "info");
+  const appControlSummary = vacuum.hasAppControl ? `App control adds convenience for scheduling and adjustments.` : "";
 
-  const getPetHairExplanation = (petHair: boolean | null) => {
-    if (typeof petHair === "boolean") {
-      if (!petHair) {
-        return makeSpecItem(
-          "Pet Hair Friendly",
-          "Not specifically designed for pet hair, but still effective at cleaning.",
-          "warning"
-        );
-      }
-      if (filters.numPets > 0) {
-        return makeSpecItem(
-          "Pet Hair Friendly",
-          `Optimized for pet hair. With ${filters.numPets} pet(s), it keeps shedding under control.`,
-          "success"
-        );
-      }
-      return makeSpecItem(
-        "Pet Hair Friendly",
-        "Even without pets, it’s great at picking up fine fur and dander.",
-        "success"
-      );
+  const virtualWallsSummary = vacuum.hasVirtualWallsFeature
+    ? `Virtual walls let you restrict cleaning areas as needed.`
+    : "";
+
+  const petHairSummary = (() => {
+    // Use suction power as a proxy for pet hair performance.
+    if (filters.numPets > 0) {
+      return vacuum.suctionPowerInPascals >= 3000
+        ? `Its strong suction makes it well-equipped for handling pet hair.`
+        : `It might not be ideal for pet hair if you have several pets.`;
     }
-    return makeSpecItem(
-      "Pet Hair Friendly",
-      "May or may not be optimized for pet hair. Check details for more info.",
-      "info"
-    );
-  };
+    return "";
+  })();
 
-  const getVirtualWallsExplanation = () =>
-    makeSpecItem(
-      "Virtual Walls",
-      "Set up invisible barriers to keep the vacuum out of certain areas or rooms.",
-      "info"
-    );
-
-  const PET_HAIR_SUCKING_POWER_THRESHOLD = 3000;
-  const specsList = [
-    getBatteryLifeExplanation(vacuum.batteryLifeInMinutes),
-    getSuctionExplanation(vacuum.suctionPowerInPascals),
-    getNoiseExplanation(vacuum.noiseLevelInDecibels),
-    getSelfEmptyExplanation(vacuum.hasSelfEmptyingFeature),
-    getPetHairExplanation(vacuum.suctionPowerInPascals > PET_HAIR_SUCKING_POWER_THRESHOLD),
-    getMappingExplanation(vacuum.mappingTechnology as VacuumMappingTechnology),
-    getMultiFloorMappingExplanation(vacuum.hasMultiFloorMappingFeature),
-    getMopExplanation(vacuum.hasMoppingFeature),
-  ];
-
-  if (vacuum.hasVirtualWallsFeature) {
-    specsList.push(getVirtualWallsExplanation());
-  }
-  if (vacuum.hasAppControl) {
-    specsList.push(getAppControlExplanation());
-  }
+  // Combine only non-empty summaries into a list
+  const summaries = [
+    batterySummary,
+    suctionSummary,
+    noiseSummary,
+    mappingSummary,
+    multiFloorSummary,
+    mopSummary,
+    selfEmptySummary,
+    petHairSummary,
+    appControlSummary,
+    virtualWallsSummary,
+  ].filter((s) => s && s.length > 0);
 
   return (
-    <div className="mt-4 space-y-4">
-      <h4 className="font-semibold text-base text-text/90">What do the features mean?</h4>
-      <div className="space-y-3">
-        {specsList.map((item, idx) => (
-          <div key={idx} className={`flex flex-col p-3 border-l-4 rounded ${item.colorClass}`}>
-            <span className="font-medium">{item.label}</span>
-            <span className="text-sm">{item.description}</span>
-          </div>
-        ))}
-      </div>
+    <div className="mt-4">
+      <h4 className="text-lg font-semibold mb-2">Feature Explanations</h4>
+      {summaries.map((sentence, idx) => (
+        <p key={idx} className="mb-2 text-sm text-text">
+          {sentence}
+        </p>
+      ))}
     </div>
   );
 };
+
+export default VacuumSpecExplanations;
