@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -61,8 +61,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const form = useAppForm({
     defaultValues: {
       imageUrl: "https://cevxzvsqlweccdszjadm.supabase.co/storage/v1/object/public/product-images//empty.jpg",
-      brand: "Dreame",
-      model: "L10s Pro Ultra Heat",
+      brand: "",
+      model: "",
       mappingTechnology: VacuumMappingTechnology.Laser,
       batteryLifeInMinutes: 180,
       suctionPowerInPascals: 3000,
@@ -148,16 +148,17 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     }
   }, [reset, vacuum]);
 
-  const brandAndModel = useStore(form.store, (state) => ({
-    brand: state.values.brand,
-    model: state.values.model,
-  }));
+  const brand = useStore(form.store, (state) => state.values.brand);
+  const model = useStore(form.store, (state) => state.values.model);
 
   const searchVacuumQuery = useSearchVacuumsQuery({
-    brand: brandAndModel?.brand,
-    model: brandAndModel?.model,
+    brand,
+    model,
   });
-  const similarVacuums = searchVacuumQuery.data;
+  const similarVacuums = useMemo(
+    () => (brand && model ? searchVacuumQuery.data : null),
+    [brand, model, searchVacuumQuery.data]
+  );
 
   return (
     <form
@@ -309,11 +310,11 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                     onChange={(value) => field.setValue(value)}
                   />
 
-                  {similarVacuums?.data ? (
+                  {similarVacuums?.data?.length ? (
                     <div className="bg-background-alt p-4 rounded-lg">
                       <p className="flex gap-2 items-center">
                         <LuInfo className="w-4 h-4" />
-                        It seems a vacuum with the same brand and model already exists:
+                        It seems a vacuum with a similar brand and model already exists:
                       </p>
                       <ul>
                         {similarVacuums.data.map((vacuum) => (

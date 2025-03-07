@@ -170,18 +170,25 @@ const FormComboboxField = <T extends string>({
     query === ""
       ? options
       : options.filter((option) => {
-          return option.toLowerCase().includes(query.toLowerCase());
+          return option?.toLowerCase().includes(query?.toLowerCase());
         });
+
+  const handleUpdate = (value: T) => {
+    console.log("slag", value);
+    if (value) {
+      setQuery(value as string);
+    }
+    onChange((value as T) ?? query);
+  };
 
   return (
     <Combobox<T>
       value={selectedOption}
-      onChange={(value) => {
-        onChange((value ?? query) as T);
-      }}
+      onChange={handleUpdate}
       onClose={() => {
-        onChange(query as unknown as T);
-        setQuery("");
+        if (selectedOption !== query) {
+          handleUpdate((query as T) ?? selectedOption);
+        }
       }}
     >
       {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
@@ -191,12 +198,16 @@ const FormComboboxField = <T extends string>({
           "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
         }
         aria-label={label}
-        value={query}
+        value={query ?? ""}
         onChange={(event) => setQuery(event.target.value)}
       />
       <ComboboxOptions anchor="bottom start" className="w-[300px] border bg-background empty:invisible p-2 rounded">
-        {query.length > 0 && (
-          <ComboboxOption value={query} className="px-2 py-4 data-[focus]:bg-background-alt">
+        {!!query && query.length > 0 && (
+          <ComboboxOption
+            value={query}
+            className="px-2 py-4 data-[focus]:bg-background-alt"
+            onSelect={() => handleUpdate(query as T)}
+          >
             Create <span className="font-bold">"{query}"</span>
           </ComboboxOption>
         )}
@@ -205,6 +216,7 @@ const FormComboboxField = <T extends string>({
             key={option + index}
             value={option}
             className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt"
+            onSelect={() => handleUpdate(option as T)}
           >
             {option}
           </ComboboxOption>

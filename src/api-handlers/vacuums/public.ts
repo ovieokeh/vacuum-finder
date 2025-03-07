@@ -176,7 +176,7 @@ export const searchVacuums = async (req: Request, res: Response) => {
       AND (? IS NULL OR v.brand LIKE ?)
     `;
     // Prepare the query params
-    const queryParams = [model || null, model ? `%${model}%` : null, brand || null, brand ? `%${brand}%` : null];
+    const queryParams = [model || null, model ? `%${model}%` : null, brand || null, brand ? `${brand}` : null];
 
     // 1) Count how many total vacuums match
     const countQuery = `

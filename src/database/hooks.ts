@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Vacuum, VacuumsFilter } from "../types";
+import { useEffect } from "react";
 
 export function useVacuumsQuery() {
   const vacuumsQuery = useQuery<Vacuum[]>({
@@ -158,11 +159,19 @@ export const useSearchVacuumsQuery = ({ brand, model }: { brand?: string; model?
     queryKey: ["search-vacuums"],
     queryFn: async () => {
       const response = await fetch(`/api/search-vacuums?brand=${brand}&model=${model}`);
-      if (!response.ok) throw new Error("Failed to fetch search vacuums");
+      if (!response.ok) {
+        return { data: [] };
+      }
       return response.json();
     },
     enabled: Boolean(brand) && Boolean(model),
   });
+
+  useEffect(() => {
+    if (brand && model) {
+      searchVacuumsQuery.refetch();
+    }
+  }, [brand, model, searchVacuumsQuery]);
 
   return searchVacuumsQuery;
 };
