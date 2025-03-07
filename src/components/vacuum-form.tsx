@@ -8,6 +8,7 @@ import { useAppForm } from "./form";
 import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumBase, VacuumMappingTechnology } from "../types";
 import { ConfirmButton } from "./confirm-button";
 import { FaMinus, FaTrash } from "react-icons/fa";
+import { AffiliateLinkInstructions } from "./affiliate-instructions";
 
 interface AdminVacuumFormProps {
   vacuum?: Vacuum;
@@ -49,7 +50,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
   const form = useAppForm({
     defaultValues: {
-      imageUrl: "https://placehold.co/600x400",
+      imageUrl: "https://cevxzvsqlweccdszjadm.supabase.co/storage/v1/object/public/product-images//empty.jpg",
       brand: "Dreame",
       model: "L10s Pro Ultra Heat",
       mappingTechnology: VacuumMappingTechnology.Laser,
@@ -139,7 +140,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
   return (
     <form
-      className="pb-2 md:p-4 flex flex-col gap-10"
+      className="pb-2 md:p-4 md:px-0 flex flex-col gap-10"
       onSubmit={(e) => {
         e.preventDefault();
         handleSubmit();
@@ -170,6 +171,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                   <div className="flex flex-col gap-2 bg-background p-4">
                     <div className="text-lg font-semibold">Affiliate Links</div>
 
+                    <AffiliateLinkInstructions />
+
                     {field.state.value.map((link, index) => {
                       return (
                         <div key={index} className="flex flex-col gap-1 bg-background-alt p-2 rounded-lg text-sm!">
@@ -179,7 +182,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                               <field.FormSelectField
                                 label="Region"
                                 options={Object.values(Region)}
-                                selectedOption={field.state.value ?? Region.America}
+                                selectedOption={field.state.value ?? Region.Global}
                                 onChange={(value) => field.setValue(value)}
                               />
                             )}
@@ -247,7 +250,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                       className="bg-background-alt! border! border-border! px-4 py-2 rounded-md cursor-pointer"
                       onClick={() =>
                         field.pushValue({
-                          region: Region.America,
+                          region: Region.Global,
                           currency: Currency.USD,
                           price: 300,
                           site: "Amazon",

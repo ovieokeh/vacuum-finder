@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { db, supabase } from "../../database";
 import { randomUUID } from "crypto";
 
+export const TRACKING_LINK = `?&linkCode=ll1&tag=nerdyfingers-20&linkId=8680f15187ccdf80bf14d5a40477f7aa&language=en_US&ref_=as_li_ss_tl`;
+
 // Add a new vacuum affiliate link
 export const addVacuumAffiliateLink = async (req: Request, res: Response) => {
   const { vacuumId, region, currency, price, site, url } = req.body;
@@ -12,6 +14,8 @@ export const addVacuumAffiliateLink = async (req: Request, res: Response) => {
   if (!userData?.user) {
     return res.status(401).json({ error: "Unauthorized." });
   }
+
+  const urlWithTrackingLink = `${url}${TRACKING_LINK}`;
 
   try {
     const stmt = db.prepare(`
@@ -27,7 +31,16 @@ export const addVacuumAffiliateLink = async (req: Request, res: Response) => {
       ) VALUES (?,?,?,?,?,?)
     `);
 
-    const result = stmt.run(randomUUID(), vacuumId, region, currency, price, site, url, userData.user.email);
+    const result = stmt.run(
+      randomUUID(),
+      vacuumId,
+      region,
+      currency,
+      price,
+      site,
+      urlWithTrackingLink,
+      userData.user.email
+    );
 
     res.json(result);
   } catch (error: any) {
@@ -85,6 +98,10 @@ export const updateVacuumAffiliateLink = async (req: Request, res: Response) => 
       SET ${keys.map((key) => `${key} = ?`).join(", ")}
       WHERE id = ?
     `);
+
+    if (values.includes("url")) {
+      values[values.indexOf("url")] = `${values[values.indexOf("url")]}${TRACKING_LINK}`;
+    }
 
     const result = stmt.run(...values, data.id);
 

@@ -1,5 +1,5 @@
 import { BsCurrencyDollar, BsCurrencyEuro } from "react-icons/bs";
-import { FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
+import { FaGlobe, FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
 
 export interface AffiliateLinkBase {
   vacuumId?: string;
@@ -63,16 +63,20 @@ export interface VacuumsFilter {
 }
 
 export enum Region {
+  Global = "Global",
   America = "America",
   Europe = "Europe",
   Asia = "Asia",
   Africa = "Africa",
+  Australia = "Australia",
 }
 export const RegionIconMapping = {
+  [Region.Global]: FaGlobe,
   [Region.America]: FaGlobeAmericas,
   [Region.Europe]: FaGlobeEurope,
   [Region.Asia]: FaGlobeAsia,
   [Region.Africa]: FaGlobeAfrica,
+  [Region.Australia]: FaGlobe,
 };
 
 export enum Currency {

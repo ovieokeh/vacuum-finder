@@ -1,16 +1,12 @@
-// ImageUpload.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { supabaseFrontend } from "../providers/site-config";
 
 interface ImageUploadProps {
   bucket?: string;
-  // Show a preview of the uploaded image after success
   currentUrl?: string;
   label?: React.ReactNode;
   showPreview?: boolean;
-  // Called with the public URL upon successful upload
   onUpload?: (url: string) => void;
-  // Additional styling, if desired
   className?: string;
 }
 
@@ -86,7 +82,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <label
-      className={`w-full min-h-[18rem] max-w-[34rem] md:min-w-[22rem] md:min-h-[22rem] flex flex-col items-center gap-2 p-2 text-text rounded shadow cursor-pointer hover:bg-background-alt ${className}`}
+      className={`w-full min-h-[18rem] md:min-w-[22rem] md:min-h-[22rem] flex flex-col items-center gap-2 p-2 text-text rounded shadow cursor-pointer hover:bg-background-alt ${className}`}
     >
       {/* Preview section */}
       {showPreview && isUploading ? (
@@ -99,7 +95,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         <img
           src={previewUrl}
           alt="Uploaded Preview"
-          className="object-contain w-auto h-[20rem] rounded shadow bg-background"
+          className="object-contain w-auto max-h-[22rem] rounded shadow bg-background"
         />
       ) : (
         <span className="text-sm text-text/90">{label ?? "No image uploaded"}</span>

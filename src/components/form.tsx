@@ -85,13 +85,13 @@ const FormToggleField = ({
         checked={checked}
         onChange={(e) => onChange(e)}
         className={clsx(
-          `border-border! group relative flex w-10 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
+          `border-border! group relative flex w-10 h-5.5 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
           checked ? "bg-blue-100!" : "bg-background/70!"
         )}
       >
         <span
           aria-hidden="true"
-          className="pointer-events-none inline-block size-4 translate-x-0 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-5.5"
+          className="pointer-events-none inline-block size-4 translate-y-0.5 translate-x-0.5 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-5"
           style={{
             backgroundColor: checked ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
           }}

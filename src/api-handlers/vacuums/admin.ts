@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { db, supabase } from "../../database";
 import { AffiliateLinkBase } from "../../types";
 import { randomUUID } from "crypto";
+import { TRACKING_LINK } from "../affiliate-links/admin";
 
 const insertAffiliateLinks = (affiliateLinks: AffiliateLinkBase[], vacuumId: string, addedBy?: string) => {
   const affiliateStmt = db.prepare(`
@@ -19,6 +20,8 @@ const insertAffiliateLinks = (affiliateLinks: AffiliateLinkBase[], vacuumId: str
   `);
 
   affiliateLinks.forEach((affiliateLink: AffiliateLinkBase) => {
+    const urlWithTrackingLink = `${affiliateLink.url}${TRACKING_LINK}`;
+
     affiliateStmt.run(
       randomUUID(),
       vacuumId,
@@ -26,7 +29,7 @@ const insertAffiliateLinks = (affiliateLinks: AffiliateLinkBase[], vacuumId: str
       affiliateLink.currency,
       affiliateLink.price,
       affiliateLink.site,
-      affiliateLink.url,
+      urlWithTrackingLink,
       addedBy
     );
   });
