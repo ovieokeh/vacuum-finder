@@ -24,7 +24,7 @@ import {
   createFormHookContexts,
 } from "@tanstack/react-form";
 import clsx from "clsx";
-import { ComponentType, PropsWithChildren, useState } from "react";
+import { ComponentType, PropsWithChildren, useEffect, useState } from "react";
 import ImageUpload from "./image-upload";
 import { twMerge } from "tailwind-merge";
 
@@ -45,6 +45,24 @@ const FormTextField = <T extends string | number>({
   labelIcon?: React.ReactNode;
   inputContainerClassName?: string;
 }) => {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (type !== "number") {
+      onChange(e.target.value as T);
+      return;
+    }
+
+    const value = e.target.value;
+    if (!value) {
+      onChange(value as T);
+      return;
+    }
+
+    if (isNaN(+value)) {
+      return;
+    }
+
+    onChange(value as T);
+  };
   return (
     <Field className="space-y-2">
       {label && (
@@ -58,14 +76,12 @@ const FormTextField = <T extends string | number>({
         {icon}
 
         <Input
-          type={type}
+          {...rest}
+          type="text"
           className={
             "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
           }
-          onChange={(e) => onChange(type === "number" ? (+e.target.value as T) : (e.target.value as T))}
-          min={type === "number" ? 0 : undefined}
-          step={type === "number" ? ".01" : undefined}
-          {...rest}
+          onChange={handleOnChange}
         />
       </div>
     </Field>
@@ -166,6 +182,10 @@ const FormComboboxField = <T extends string>({
 }) => {
   const [query, setQuery] = useState(selectedOption as string);
 
+  useEffect(() => {
+    setQuery(selectedOption as string);
+  }, [selectedOption]);
+
   const filteredOptions =
     query === ""
       ? options
@@ -173,22 +193,17 @@ const FormComboboxField = <T extends string>({
           return option?.toLowerCase().includes(query?.toLowerCase());
         });
 
-  const handleUpdate = (value: T) => {
-    console.log("slag", value);
-    if (value) {
-      setQuery(value as string);
-    }
-    onChange((value as T) ?? query);
-  };
-
   return (
     <Combobox<T>
       value={selectedOption}
-      onChange={handleUpdate}
-      onClose={() => {
-        if (selectedOption !== query) {
-          handleUpdate((query as T) ?? selectedOption);
+      onChange={(newValue) => {
+        console.log("Changed: ", newValue);
+        if (!newValue) {
+          return;
         }
+
+        setQuery(newValue as string);
+        onChange(newValue as T);
       }}
     >
       {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
@@ -198,7 +213,7 @@ const FormComboboxField = <T extends string>({
           "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
         }
         aria-label={label}
-        value={query ?? ""}
+        displayValue={(value) => value as string}
         onChange={(event) => setQuery(event.target.value)}
       />
       <ComboboxOptions anchor="bottom start" className="w-[300px] border bg-background empty:invisible p-2 rounded">
@@ -206,7 +221,9 @@ const FormComboboxField = <T extends string>({
           <ComboboxOption
             value={query}
             className="px-2 py-4 data-[focus]:bg-background-alt"
-            onSelect={() => handleUpdate(query as T)}
+            onSelect={() => {
+              onChange(query as T);
+            }}
           >
             Create <span className="font-bold">"{query}"</span>
           </ComboboxOption>
@@ -216,7 +233,6 @@ const FormComboboxField = <T extends string>({
             key={option + index}
             value={option}
             className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt"
-            onSelect={() => handleUpdate(option as T)}
           >
             {option}
           </ComboboxOption>

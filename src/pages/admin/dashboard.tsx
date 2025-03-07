@@ -15,7 +15,7 @@ export function AdminDashboardPage() {
   const { userToken, currency, logout } = useSiteConfig();
   const windowWidth = useWindowWidth();
 
-  const vacuumsQuery = useQuery<Vacuum[]>({
+  const vacuumsQuery = useQuery<{ data: Vacuum[] }>({
     queryKey: ["user-vacuums"],
     queryFn: async () => {
       const response = await fetch("/api/vacuums?owned=true", {

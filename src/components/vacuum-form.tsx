@@ -93,8 +93,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
         batteryLifeInMinutes: z.number().int().min(1),
         suctionPowerInPascals: z.number().int().min(1),
         noiseLevelInDecibels: z.number().int().min(1),
-        waterTankCapacityInLiters: z.number().int().min(0),
-        dustbinCapacityInLiters: z.number().int().min(1),
+        waterTankCapacityInLiters: z.string().transform((value) => parseFloat(value.toString())),
+        dustbinCapacityInLiters: z.string().transform((value) => parseFloat(value.toString())),
         hasMoppingFeature: z.boolean(),
         hasSelfEmptyingFeature: z.boolean(),
         hasZoneCleaningFeature: z.boolean(),
@@ -111,7 +111,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
           z.object({
             region: z.nativeEnum(Region),
             currency: z.nativeEnum(Currency),
-            price: z.number().min(1),
+            price: z.any().transform((value) => parseFloat(value.toString())),
             site: z.string().min(2),
             url: z.string().url(),
           })
@@ -310,7 +310,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                     onChange={(value) => field.setValue(value)}
                   />
 
-                  {similarVacuums?.data?.length ? (
+                  {!vacuum?.id && similarVacuums?.data?.length ? (
                     <div className="bg-background-alt p-4 rounded-lg">
                       <p className="flex gap-2 items-center">
                         <LuInfo className="w-4 h-4" />
