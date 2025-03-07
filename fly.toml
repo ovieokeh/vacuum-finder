@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for robot-vacuum-quiz on 2025-03-05T18:08:01+01:00
+# fly.toml app configuration file generated for robot-vacuum-finder on 2025-03-07T08:13:17+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'robot-vacuum-quiz'
+app = 'robot-vacuum-finder'
 primary_region = 'ams'
 
 [build]

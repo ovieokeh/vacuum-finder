@@ -50,7 +50,7 @@ const copy = {
 
 const tryLink = (
   <Link
-    to="/vacuum-search"
+    to="/vacuums"
     className="px-6 py-3 rounded border border-accent! text-background dark:text-black bg-accent! hover:bg-accent/50! font-semibold"
   >
     Try it Now

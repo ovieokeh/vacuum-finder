@@ -6,11 +6,13 @@ import { createClient, User } from "@supabase/supabase-js";
 
 let supabaseUrl = "";
 if (typeof import.meta !== "undefined") {
-  supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+  supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) ?? "https://cevxzvsqlweccdszjadm.supabase.co";
 }
 let supabaseKey = "";
 if (typeof import.meta !== "undefined") {
-  supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
+  supabaseKey =
+    (import.meta.env.VITE_SUPABASE_KEY as string) ??
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldnh6dnNxbHdlY2Nkc3pqYWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNzA1NjksImV4cCI6MjA1Njg0NjU2OX0.hdzjvJu1pekfhZbFI4rdvWqZi6llKsc9cNAkglkqToI";
 }
 
 export const supabaseFrontend = createClient(supabaseUrl, supabaseKey);

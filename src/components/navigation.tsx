@@ -25,11 +25,11 @@ export const Navigation = () => {
       <div className="flex items-center gap-4 md:gap-6">
         <Link to="/" className="text-text!">
           <span className="hidden md:block">Robot Vacuum Finder</span>
-          <span className="md:hidden">RVT</span>
+          <span className="md:hidden">Home</span>
         </Link>
 
         <div className="flex gap-4">
-          <Link to="/vacuum-search" className="text-text hover:text-text/90">
+          <Link to="/vacuums" className="text-text hover:text-text/90">
             Finder
           </Link>
           <Link to="/guides" className="text-text hover:text-text/90">

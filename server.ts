@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import express from "express";
+import express, { Request, Response } from "express";
 import { populateMockData, setupDatabase } from "./src/database/setup";
 import { ViteDevServer } from "vite";
 import { config } from "dotenv";
@@ -9,6 +9,12 @@ import { getVacuum, listVacuums, searchVacuums } from "./src/api-handlers/vacuum
 import { geolocateHandler } from "./src/api-handlers/utils/geolocate";
 
 config();
+
+const serveSitemaps = async (req: Request, res: Response) => {
+  const sitemap = await fs.readFile("./dist/sitemap.xml", "utf-8");
+  res.header("Content-Type", "application/xml");
+  res.send(sitemap);
+};
 
 async function startServer() {
   const isProduction = process.env.NODE_ENV === "production";
@@ -36,6 +42,8 @@ async function startServer() {
     app.use(compression());
     app.use(base, sirv("./dist/client", { extensions: [] }));
   }
+  // sitemaps
+  app.get("/sitemap.xml", serveSitemaps);
 
   app.use(express.json());
   // API endpoints…

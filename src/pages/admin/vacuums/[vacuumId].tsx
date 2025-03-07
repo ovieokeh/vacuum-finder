@@ -2,10 +2,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { invariant } from "es-toolkit";
 import { Helmet } from "react-helmet";
 
-import { Modal } from "../../components/modal";
-import { AdminVacuumForm } from "../../components/vacuum-form";
-import { useVacuumQuery } from "../../database/hooks";
-import { useProtectedRoute } from "../../hooks/use-protected-route";
+import { Modal } from "../../../components/modal";
+import { AdminVacuumForm } from "../../../components/vacuum-form";
+import { useVacuumQuery } from "../../../database/hooks";
+import { useProtectedRoute } from "../../../hooks/use-protected-route";
 
 export function AdminVacuumEditPage() {
   useProtectedRoute();

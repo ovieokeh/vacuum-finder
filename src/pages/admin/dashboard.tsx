@@ -53,7 +53,7 @@ export function AdminDashboardPage() {
 
         <div className="flex flex-col gap-2">
           <Link
-            to="/admin/vacuum/add"
+            to="/admin/vacuums/add"
             className="block w-fit bg-background-alt text-text border border-border py-2 px-4 rounded"
           >
             Add a new vacuum
@@ -61,7 +61,7 @@ export function AdminDashboardPage() {
           <VacuumResults
             results={vacuums}
             containerWidth={windowWidth}
-            navigateRoot="/admin/vacuum"
+            navigateRoot="/admin/vacuums"
             emptyView={
               <div className="py-2 text-text/90 italic">
                 You don't have any vacuum entries yet. Add a new vacuum with the button above

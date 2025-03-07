@@ -7,14 +7,14 @@ import { SiteConfigProvider } from "./providers/site-config";
 import { Navigation } from "./components/navigation";
 import { HomePage } from "./pages/home";
 import { GuidesPage } from "./pages/guides";
-import { VacuumSearchPage } from "./pages/vacuum-search";
-import { VacuumInfoPage } from "./pages/vacuum-search/[vacuumId]";
+import { VacuumSearchPage } from "./pages/vacuums";
+import { VacuumInfoPage } from "./pages/vacuums/[vacuumId]";
 import { PrivacyPolicyPage } from "./pages/privacy-policy";
 import { TermsOfServicePage } from "./pages/terms-of-service";
 import { AdminAuthPage } from "./pages/admin/auth";
 import { AdminDashboardPage } from "./pages/admin/dashboard";
-import { AdminVacuumAddPage } from "./pages/admin/vacuum-add";
-import { AdminVacuumEditPage } from "./pages/admin/vacuum-[vacuumId]";
+import { AdminVacuumAddPage } from "./pages/admin/vacuums/add";
+import { AdminVacuumEditPage } from "./pages/admin/vacuums/[vacuumId]";
 import { reduxStore } from "./redux";
 import "./index.css";
 import { useEffect, useRef } from "react";
@@ -52,7 +52,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="guides" element={<GuidesPage />} />
-                <Route path="vacuum-search" element={<VacuumSearchPage />}>
+                <Route path="vacuums" element={<VacuumSearchPage />}>
                   <Route path=":vacuumId" element={<VacuumInfoPage />} />
                 </Route>
                 <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
@@ -60,9 +60,9 @@ export default function App() {
 
                 <Route path="admin/auth" element={<AdminAuthPage />} />
 
-                <Route path="admin/vacuum/add" element={<AdminVacuumAddPage />} />
+                <Route path="admin/vacuums/add" element={<AdminVacuumAddPage />} />
                 <Route path="admin" element={<AdminDashboardPage />}>
-                  <Route path="vacuum/:vacuumId" element={<AdminVacuumEditPage />} />
+                  <Route path="vacuums/:vacuumId" element={<AdminVacuumEditPage />} />
                 </Route>
               </Routes>
             </div>

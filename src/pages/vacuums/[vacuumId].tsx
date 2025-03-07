@@ -22,7 +22,7 @@ export function VacuumInfoPage() {
   const filters = useAppSelector((state) => state.vacuumsFilters);
 
   const handleClose = () => {
-    navigate("/vacuum-search");
+    navigate("/vacuums");
   };
 
   return (

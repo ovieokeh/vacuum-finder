@@ -22,7 +22,7 @@ const relativeWidth = (width: number, percent: number) => {
 export function VacuumResults({
   results = [],
   filters,
-  navigateRoot = "/vacuum-search",
+  navigateRoot = "/vacuums",
   emptyView = (
     <div className="flex justify-center items-center h-64">
       <p>No results found. Adjust filters and try again.</p>
