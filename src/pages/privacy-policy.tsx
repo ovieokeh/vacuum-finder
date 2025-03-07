@@ -6,7 +6,7 @@ export const PrivacyPolicyPage = () => {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - Robot Vacuum Buyer Tool</title>
+        <title>Privacy Policy - Robot Vacuum Finder</title>
         <meta name="description" content="Read the privacy policy for the Vacuum Finder website." />
       </Helmet>
       <div className="flex flex-col min-h-screen bg-background">

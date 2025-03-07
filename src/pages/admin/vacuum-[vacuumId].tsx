@@ -5,8 +5,11 @@ import { Helmet } from "react-helmet";
 import { Modal } from "../../components/modal";
 import { AdminVacuumForm } from "../../components/vacuum-form";
 import { useVacuumQuery } from "../../database/hooks";
+import { useProtectedRoute } from "../../hooks/use-protected-route";
 
 export function AdminVacuumEditPage() {
+  useProtectedRoute();
+
   const { vacuumId } = useParams();
   invariant(vacuumId, "Expected vacuumId to be defined");
   const navigate = useNavigate();

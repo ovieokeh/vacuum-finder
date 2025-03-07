@@ -21,16 +21,16 @@ export const Navigation = () => {
   const CurrentCurrencyIcon = CurrencyIconMapping[currency];
 
   return (
-    <div className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
+    <div className="z-20 max-w-[1200px] mx-auto p-4 grow flex justify-between items-center shadow sticky" ref={navRef}>
       <div className="flex items-center gap-4 md:gap-6">
         <Link to="/" className="text-text!">
-          <span className="hidden md:block">Robot Vacuum Buyer Tool</span>
-          <span className="md:hidden">RVBT</span>
+          <span className="hidden md:block">Robot Vacuum Finder</span>
+          <span className="md:hidden">RVT</span>
         </Link>
 
         <div className="flex gap-4">
           <Link to="/vacuum-search" className="text-text hover:text-text/90">
-            Tool
+            Finder
           </Link>
           <Link to="/guides" className="text-text hover:text-text/90">
             Guides

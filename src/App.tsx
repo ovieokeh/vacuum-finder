@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { Helmet } from "react-helmet";
@@ -17,44 +17,58 @@ import { AdminVacuumAddPage } from "./pages/admin/vacuum-add";
 import { AdminVacuumEditPage } from "./pages/admin/vacuum-[vacuumId]";
 import { reduxStore } from "./redux";
 import "./index.css";
+import { useEffect, useRef } from "react";
 
 const queryClient = new QueryClient();
 
 export default function App() {
+  const location = useLocation();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // scroll restoration
+  useEffect(() => {
+    console.log("scrolling to top", location.pathname);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
   return (
-    <Provider store={reduxStore}>
-      <QueryClientProvider client={queryClient}>
-        <SiteConfigProvider>
-          <Helmet>
-            <meta charSet="utf-8" />
-            <title>Robot Vacuum Buyer Tool & Guide</title>
-            <meta
-              name="description"
-              content="Find the best robot vacuum for your needs with our buyer tool. Compare robot vacuums by features, price, and more."
-            />
-          </Helmet>
-          <Navigation />
+    <>
+      <Provider store={reduxStore}>
+        <QueryClientProvider client={queryClient}>
+          <SiteConfigProvider>
+            <Helmet>
+              <meta charSet="utf-8" />
+              <title>Robot Vacuum Finder & Guide</title>
+              <meta
+                name="description"
+                content="Find the best robot vacuum for your needs with our vacuum finder tool. Compare robot vacuums by features, price, and more."
+              />
+            </Helmet>
+            <Navigation />
 
-          <div className="h-[calc(100%-4rem)] overflow-y-scroll">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="guides" element={<GuidesPage />} />
-              <Route path="vacuum-search" element={<VacuumSearchPage />}>
-                <Route path=":vacuumId" element={<VacuumInfoPage />} />
-              </Route>
-              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="terms-of-service" element={<TermsOfServicePage />} />
+            <div className="mt-0 h-[calc(100%-4rem)] overflow-y-scroll" ref={scrollRef}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="guides" element={<GuidesPage />} />
+                <Route path="vacuum-search" element={<VacuumSearchPage />}>
+                  <Route path=":vacuumId" element={<VacuumInfoPage />} />
+                </Route>
+                <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="terms-of-service" element={<TermsOfServicePage />} />
 
-              <Route path="admin/auth" element={<AdminAuthPage />} />
+                <Route path="admin/auth" element={<AdminAuthPage />} />
 
-              <Route path="admin/vacuum/add" element={<AdminVacuumAddPage />} />
-              <Route path="admin" element={<AdminDashboardPage />}>
-                <Route path="vacuum/:vacuumId" element={<AdminVacuumEditPage />} />
-              </Route>
-            </Routes>
-          </div>
-        </SiteConfigProvider>
-      </QueryClientProvider>
-    </Provider>
+                <Route path="admin/vacuum/add" element={<AdminVacuumAddPage />} />
+                <Route path="admin" element={<AdminDashboardPage />}>
+                  <Route path="vacuum/:vacuumId" element={<AdminVacuumEditPage />} />
+                </Route>
+              </Routes>
+            </div>
+          </SiteConfigProvider>
+        </QueryClientProvider>
+      </Provider>
+    </>
   );
 }

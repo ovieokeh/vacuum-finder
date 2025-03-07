@@ -1,7 +1,10 @@
 import { PageHeader } from "../../components/page-header";
 import { AdminVacuumForm } from "../../components/vacuum-form";
+import { useProtectedRoute } from "../../hooks/use-protected-route";
 
 export function AdminVacuumAddPage() {
+  useProtectedRoute();
+
   return (
     <div>
       <PageHeader

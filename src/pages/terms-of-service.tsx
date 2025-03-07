@@ -6,7 +6,7 @@ export const TermsOfServicePage = () => {
   return (
     <>
       <Helmet>
-        <title>Terms of Service - Robot Vacuum Buyer Tool</title>
+        <title>Terms of Service - Robot Vacuum Finder</title>
         <meta name="description" content="Read the terms of service for the Vacuum Finder website." />
       </Helmet>
       <div className="flex flex-col min-h-screen bg-background">
