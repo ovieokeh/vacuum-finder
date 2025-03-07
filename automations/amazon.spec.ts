@@ -55,10 +55,14 @@ const brands = ["eufy"];
 const getOutputFile = async () => {
   const previousProductDetailsString = await readFile("productDetails.json", "utf-8");
   const parsedProductDetails = previousProductDetailsString ? JSON.parse(previousProductDetailsString) : [];
+
+  console.log("parsedProductDetails", parsedProductDetails.length);
   return parsedProductDetails;
 };
 
 test("amazon scraper", async ({ page }) => {
+  const parsedProductDetails = await getOutputFile();
+
   const scrape = async () => {
     page.on("console", async (msg) => {
       const msgArgs = msg.args();
@@ -92,9 +96,9 @@ test("amazon scraper", async ({ page }) => {
     await brandLink.click();
     await page.waitForURL(/s\?k=robot\+vacuums/);
 
-    const searchResults = await page.locator('.a-section div[data-cy="title-recipe"] .a-link-normal').all();
-    const parsedProductDetails = await getOutputFile();
-    const current = searchResults[parsedProductDetails.length];
+    const searchResults = (await page.locator('.a-section div[data-cy="title-recipe"] .a-link-normal').all()) ?? [];
+    const randomClampedCurrentIndex = Math.floor(searchResults.length * Math.random());
+    const current = searchResults[randomClampedCurrentIndex];
 
     if (current) {
       await current.click();
@@ -117,6 +121,10 @@ test("amazon scraper", async ({ page }) => {
       const detailValue = await value?.innerText();
 
       if (!detailValue) continue;
+
+      if (parsedProductDetails.find((product) => product[detailKey.trim().toLowerCase()] === detailValue.trim())) {
+        return scrape();
+      }
 
       productDetails[detailKey.trim().toLowerCase()] = detailValue.trim();
 

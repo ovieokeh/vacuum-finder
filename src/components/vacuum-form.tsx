@@ -114,7 +114,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 (vacuum) => vacuum.brand === form.getFieldValue("brand") && vacuum.model === value
               );
 
-              if (existingVacuum) {
+              if (existingVacuum && !vacuum?.id) {
                 return {
                   key,
                   error: "Vacuum with this brand and model already exists",

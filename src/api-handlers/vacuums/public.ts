@@ -308,12 +308,11 @@ export const filterVacuums = async (req: Request, res: Response) => {
       FROM vacuums v
       LEFT JOIN affiliate_links al 
         ON al.vacuumId = v.id 
-        AND al.currency = ?
         AND al.price <= ?
       ${baseWhere}
       LIMIT ? OFFSET ?
     `;
-    const rows = db.prepare(mainQuery).all(currency, budget, ...whereParams, limit, offset);
+    const rows = db.prepare(mainQuery).all(budget, ...whereParams, limit, offset);
 
     // Group rows by vacuum id
     const vacuumMap: { [key: string]: any } = {};
