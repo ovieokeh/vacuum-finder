@@ -134,7 +134,7 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
 
   return (
     <form
-      className="p-4 flex flex-col gap-4"
+      className="px-4 py-2 md:p-4 flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
@@ -197,11 +197,11 @@ const MobileFiltersDialog = ({
 
   return (
     <div className={className}>
-      <p className="text-lg font-semibold flex items-center gap-2">
+      <p className="text-sm font-semibold flex items-center gap-2">
         <IoFilterOutline className="inline w-5 h-5" />
         Filters
       </p>
-      <Button onClick={open} className="mt-2 px-2! py-2! text-start outline-0! focus:outline-0! opacity-70 text-xs">
+      <Button onClick={open} className="px-0! py-2! text-start outline-0! focus:outline-0! opacity-70 text-sm!">
         {filtersDisplay} <CiEdit className="inline w-5 h-5" />
       </Button>
 
@@ -209,7 +209,7 @@ const MobileFiltersDialog = ({
         title="Refine your vacuum search"
         isOpen={isOpen}
         close={close}
-        panelClassName="md:h-screen justify-between"
+        panelClassName="justify-between"
         childrenClassName="space-y-6"
       >
         {children}

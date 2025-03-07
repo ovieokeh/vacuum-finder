@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { PageHeader } from "../../components/page-header";
 import { useSiteConfig } from "../../providers/site-config";
+import { Footer } from "../../components/footer";
 
 export function AdminAuthPage() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export function AdminAuthPage() {
       {/* Main content (form) */}
       <main className="flex-grow px-6 py-8 sm:py-12">
         <div className="max-w-[1280px] px-4 mx-auto">
-          <form onSubmit={handleLogin} className="bg-background-alt sm:p-8 rounded border border-border space-y-4">
+          <form onSubmit={handleLogin} className="bg-background-alt p-8 rounded border border-border space-y-4">
             {errorMessage && <div className="text-sm text-red-500">{errorMessage}</div>}
 
             <div>
@@ -87,10 +88,7 @@ export function AdminAuthPage() {
         </div>
       </main>
 
-      {/* Footer (optional) */}
-      <footer className="px-6 py-4 bg-background-alt border-t border-border text-sm text-center text-text/90">
-        &copy; {new Date().getFullYear()} Vacuum Finder – Admin Portal
-      </footer>
+      <Footer />
     </div>
   );
 }

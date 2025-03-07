@@ -45,6 +45,9 @@ async function startServer() {
   // sitemaps
   app.get("/sitemap.xml", serveSitemaps);
 
+  // serve favicon
+  app.use("/favicon.svg", express.static("./public/favicon.svg"));
+
   app.use(express.json());
   // API endpoints…
   app.post("/api/vacuums", addVacuumHandler as any);
@@ -89,7 +92,9 @@ async function startServer() {
 
   app.listen(port, () => {
     setupDatabase();
-    populateMockData();
+    if (!isProduction) {
+      populateMockData();
+    }
     console.log(`Server started at http://localhost:${port}`);
   });
 }

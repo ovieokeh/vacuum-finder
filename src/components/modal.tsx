@@ -24,7 +24,7 @@ export const Modal = ({
         <div className="flex min-h-full items-center justify-center md:p-4">
           <DialogPanel
             className={twMerge(
-              "w-full md:max-h-[90svh] flex flex-col md:max-w-md md:rounded-lg bg-background-alt p-4 md:pt-0 space-y-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0",
+              "w-full h-screen md:max-h-[90svh] flex flex-col md:max-w-md md:rounded-lg bg-background-alt p-4 md:pt-0 space-y-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0",
               panelClassName
             )}
             transition
