@@ -28,6 +28,20 @@ import { ComponentType, PropsWithChildren, useEffect, useState } from "react";
 import ImageUpload from "./image-upload";
 import { twMerge } from "tailwind-merge";
 
+interface FormError {
+  key: string;
+  error: string;
+}
+
+const ErrorRenderer = ({ name, errors }: { name: string; errors: (FormError | undefined | null)[] }) => {
+  const error = errors.find((error) => error?.key === name)?.error;
+  if (!error) {
+    return null;
+  }
+
+  return <div className="text-red-500 text-sm">{error}</div>;
+};
+
 const FormTextField = <T extends string | number>({
   type = "text",
   icon,
@@ -35,6 +49,7 @@ const FormTextField = <T extends string | number>({
   labelIcon,
   inputContainerClassName,
   onChange,
+  formErrors = [],
   ...rest
 }: {
   value: T;
@@ -44,6 +59,8 @@ const FormTextField = <T extends string | number>({
   icon?: React.ReactNode;
   labelIcon?: React.ReactNode;
   inputContainerClassName?: string;
+  formErrors?: (FormError | undefined | null)[];
+  name: string;
 }) => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (type !== "number") {
@@ -63,6 +80,9 @@ const FormTextField = <T extends string | number>({
 
     onChange(value as T);
   };
+
+  const error = formErrors.find((error) => error?.key === rest.name)?.error;
+
   return (
     <Field className="space-y-2">
       {label && (
@@ -78,12 +98,15 @@ const FormTextField = <T extends string | number>({
         <Input
           {...rest}
           type="text"
-          className={
-            "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
-          }
+          className={twMerge(
+            "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
+            !!error && "border-red-500"
+          )}
           onChange={handleOnChange}
         />
       </div>
+
+      <ErrorRenderer name={rest.name} errors={formErrors} />
     </Field>
   );
 };
@@ -170,15 +193,19 @@ const FormSelectField = <T extends string>({
 };
 
 const FormComboboxField = <T extends string>({
+  name,
   label,
   options = [],
   selectedOption,
   onChange,
+  formErrors = [],
 }: {
   label?: string;
   options: T[];
   selectedOption: T;
   onChange: (value: T) => void;
+  formErrors?: (FormError | undefined | null)[];
+  name: string;
 }) => {
   const [query, setQuery] = useState(selectedOption as string);
 
@@ -192,6 +219,8 @@ const FormComboboxField = <T extends string>({
       : options.filter((option) => {
           return option?.toLowerCase().includes(query?.toLowerCase());
         });
+
+  const error = formErrors.find((error) => error?.key === name)?.error;
 
   return (
     <Combobox<T>
@@ -209,13 +238,17 @@ const FormComboboxField = <T extends string>({
       {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
 
       <ComboboxInput
-        className={
-          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
-        }
+        className={twMerge(
+          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
+          !!error && "border-red-500"
+        )}
         aria-label={label}
         displayValue={(value) => value as string}
         onChange={(event) => setQuery(event.target.value)}
       />
+
+      <ErrorRenderer name={name} errors={formErrors} />
+
       <ComboboxOptions anchor="bottom start" className="w-[300px] border bg-background empty:invisible p-2 rounded">
         {!!query && query.length > 0 && (
           <ComboboxOption

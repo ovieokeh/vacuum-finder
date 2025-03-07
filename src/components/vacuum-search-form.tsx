@@ -53,11 +53,13 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
           name="budget"
           children={(field) => (
             <field.FormTextField
+              name="budget"
               type="number"
               label="Budget"
               icon={<BiWallet className="w-4 h-4 text-primary" />}
               value={field.state.value}
               onChange={(value) => field.setValue(value as number)}
+              formErrors={form.getAllErrors().form.errors}
             />
           )}
         />
@@ -66,11 +68,13 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
           name="houseSizeSqM"
           children={(field) => (
             <field.FormTextField
+              name="houseSizeSqM"
               type="number"
               label="Living area (sqm)"
               icon={<BiRuler className="w-4 h-4 text-primary" />}
               value={field.state.value}
               onChange={(value) => field.setValue(value as number)}
+              formErrors={form.getAllErrors().form.errors}
             />
           )}
         />
@@ -79,11 +83,13 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
           name="numRooms"
           children={(field) => (
             <field.FormTextField
+              name="numRooms"
               type="number"
               label="Number of Rooms"
               icon={<LuDoorOpen className="w-4 h-4 text-primary" />}
               value={field.state.value}
               onChange={(value) => field.setValue(value as number)}
+              formErrors={form.getAllErrors().form.errors}
             />
           )}
         />
@@ -92,11 +98,13 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
           name="numPets"
           children={(field) => (
             <field.FormTextField
+              name="numPets"
               type="number"
               label="Number of pets"
               icon={<MdPets className="w-4 h-4 text-primary" />}
               value={field.state.value}
               onChange={(value) => field.setValue(value as number)}
+              formErrors={form.getAllErrors().form.errors}
             />
           )}
         />

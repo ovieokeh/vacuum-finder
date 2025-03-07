@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from "react";
-import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useSiteConfig } from "../providers/site-config";
@@ -85,38 +84,162 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       ...((vacuum as Partial<VacuumBase>) || {}),
     },
     validators: {
-      onSubmit: z.object({
-        imageUrl: z.string().url(),
-        brand: z.string().min(2),
-        model: z.string().min(2),
-        mappingTechnology: z.nativeEnum(VacuumMappingTechnology),
-        batteryLifeInMinutes: z.number().int().min(1),
-        suctionPowerInPascals: z.number().int().min(1),
-        noiseLevelInDecibels: z.number().int().min(1),
-        waterTankCapacityInLiters: z.string().transform((value) => parseFloat(value.toString())),
-        dustbinCapacityInLiters: z.string().transform((value) => parseFloat(value.toString())),
-        hasMoppingFeature: z.boolean(),
-        hasSelfEmptyingFeature: z.boolean(),
-        hasZoneCleaningFeature: z.boolean(),
-        hasMultiFloorMappingFeature: z.boolean(),
-        hasCarpetBoostFeature: z.boolean(),
-        hasVirtualWallsFeature: z.boolean(),
-        hasSmartHomeIntegration: z.boolean(),
-        hasVoiceControl: z.boolean(),
-        hasAppControl: z.boolean(),
-        hasRemoteControl: z.boolean(),
-        hasManualControl: z.boolean(),
-        otherFeatures: z.array(z.string()),
-        affiliateLinks: z.array(
-          z.object({
-            region: z.nativeEnum(Region),
-            currency: z.nativeEnum(Currency),
-            price: z.any().transform((value) => parseFloat(value.toString())),
-            site: z.string().min(2),
-            url: z.string().url(),
-          })
-        ),
-      }),
+      onSubmit: ({ value, ...rest }) => {
+        console.log("rest", rest);
+        // validate all fields
+
+        const entries = Object.entries(value);
+
+        for (const [key, value] of entries) {
+          switch (key) {
+            case "brand": {
+              if (!value) {
+                return {
+                  key,
+                  error: "Brand is required",
+                };
+              }
+              break;
+            }
+
+            case "model": {
+              if (!value) {
+                return {
+                  key,
+                  error: "Model is required",
+                };
+              }
+
+              const existingVacuum = searchVacuumQuery.data?.data.find(
+                (vacuum) => vacuum.brand === form.getFieldValue("brand") && vacuum.model === value
+              );
+
+              if (existingVacuum) {
+                return {
+                  key,
+                  error: "Vacuum with this brand and model already exists",
+                };
+              }
+              break;
+            }
+
+            case "mappingTechnology": {
+              if (!Object.values(VacuumMappingTechnology).includes(value as VacuumMappingTechnology)) {
+                return {
+                  key,
+                  error: "Invalid mapping technology",
+                };
+              }
+              break;
+            }
+
+            case "batteryLifeInMinutes": {
+              const parsedValue = parseFloat(value.toString());
+              if (isNaN(parsedValue) || parsedValue < 1) {
+                return {
+                  key,
+                  error: "Invalid battery life",
+                };
+              }
+              break;
+            }
+
+            case "suctionPowerInPascals": {
+              const parsedValue = parseFloat(value.toString());
+              if (isNaN(parsedValue) || parsedValue < 1) {
+                return {
+                  key,
+                  error: "Invalid suction power",
+                };
+              }
+              break;
+            }
+
+            case "noiseLevelInDecibels": {
+              const parsedValue = parseFloat(value.toString());
+              if (isNaN(parsedValue) || parsedValue < 1) {
+                return {
+                  key,
+                  error: "Invalid noise level",
+                };
+              }
+              break;
+            }
+
+            case "waterTankCapacityInLiters": {
+              const parsedValue = parseFloat(value.toString());
+              if (isNaN(parsedValue) || parsedValue < 0) {
+                return {
+                  key,
+                  error: "Invalid water tank capacity",
+                };
+              }
+              break;
+            }
+
+            case "dustbinCapacityInLiters": {
+              const parsedValue = parseFloat(value.toString());
+              if (isNaN(parsedValue) || parsedValue < 0) {
+                return {
+                  key,
+                  error: "Invalid dustbin capacity",
+                };
+              }
+              break;
+            }
+
+            case "otherFeatures": {
+              if ((value as string[]).some((feature) => !feature)) {
+                return {
+                  key,
+                  error: "Invalid feature",
+                };
+              }
+              break;
+            }
+
+            case "affiliateLinks": {
+              const parsedValue = value as Partial<AffiliateLinkBase>[];
+              if (parsedValue.some((link) => !link.url)) {
+                return {
+                  key,
+                  error: "Invalid URL",
+                };
+              }
+              if (parsedValue.some((link) => !link.site)) {
+                return {
+                  key,
+                  error: "Invalid site",
+                };
+              }
+              if (parsedValue.some((link) => !link.region)) {
+                return {
+                  key,
+                  error: "Invalid region",
+                };
+              }
+              if (parsedValue.some((link) => !link.currency)) {
+                return {
+                  key,
+                  error: "Invalid currency",
+                };
+              }
+              if (parsedValue.some((link) => !link.price)) {
+                return {
+                  key,
+                  error: "Invalid price",
+                };
+              }
+              break;
+            }
+
+            default:
+              break;
+          }
+        }
+
+        return null;
+      },
     },
     onSubmit: ({ value }) => {
       if (vacuum?.id) {
@@ -226,10 +349,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                             name={`affiliateLinks[${index}].price`}
                             children={(field) => (
                               <field.FormTextField
+                                name={`affiliateLinks[${index}].price`}
                                 type="number"
                                 label="Price"
                                 value={field.state.value ?? 300}
                                 onChange={(value) => field.setValue(value)}
+                                formErrors={form.getAllErrors().form.errors}
                               />
                             )}
                           />
@@ -238,9 +363,11 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                             name={`affiliateLinks[${index}].site`}
                             children={(field) => (
                               <field.FormTextField
+                                name={`affiliateLinks[${index}].site`}
                                 label="Site"
                                 value={field.state.value ?? "Amazon"}
                                 onChange={(value) => field.setValue(value)}
+                                formErrors={form.getAllErrors().form.errors}
                               />
                             )}
                           />
@@ -249,9 +376,11 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                             name={`affiliateLinks[${index}].url`}
                             children={(field) => (
                               <field.FormTextField
+                                name={`affiliateLinks[${index}].url`}
                                 label="URL"
                                 value={field.state.value ?? ""}
                                 onChange={(value) => field.setValue(value)}
+                                formErrors={form.getAllErrors().form.errors}
                               />
                             )}
                           />
@@ -292,10 +421,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               name="brand"
               children={(field) => (
                 <field.FormComboboxField
+                  name="brand"
                   label="Brand"
                   selectedOption={field.state.value}
                   options={brandsQuery?.data?.brands || []}
                   onChange={(value) => field.setValue(value)}
+                  formErrors={form.getAllErrors().form.errors}
                 />
               )}
             />
@@ -305,9 +436,11 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               children={(field) => (
                 <>
                   <field.FormTextField
+                    name="model"
                     label="Model"
                     value={field.state.value}
                     onChange={(value) => field.setValue(value)}
+                    formErrors={form.getAllErrors().form.errors}
                   />
 
                   {!vacuum?.id && similarVacuums?.data?.length ? (
@@ -351,10 +484,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               name="batteryLifeInMinutes"
               children={(field) => (
                 <field.FormTextField
+                  name="batteryLifeInMinutes"
                   type="number"
                   label="Battery Life (minutes)"
                   value={field.state.value}
                   onChange={(value) => field.setValue(value)}
+                  formErrors={form.getAllErrors().form.errors}
                 />
               )}
             />
@@ -363,10 +498,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               name="suctionPowerInPascals"
               children={(field) => (
                 <field.FormTextField
+                  name="suctionPowerInPascals"
                   type="number"
                   label="Suction Power (Pa)"
                   value={field.state.value}
                   onChange={(value) => field.setValue(value)}
+                  formErrors={form.getAllErrors().form.errors}
                 />
               )}
             />
@@ -375,10 +512,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               name="noiseLevelInDecibels"
               children={(field) => (
                 <field.FormTextField
+                  name="noiseLevelInDecibels"
                   type="number"
                   label="Noise Level (dB)"
                   value={field.state.value}
                   onChange={(value) => field.setValue(value)}
+                  formErrors={form.getAllErrors().form.errors}
                 />
               )}
             />
@@ -387,10 +526,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               name="waterTankCapacityInLiters"
               children={(field) => (
                 <field.FormTextField
+                  name="waterTankCapacityInLiters"
                   type="number"
                   label="Water Tank Capacity (L)"
                   value={field.state.value ?? 0}
                   onChange={(value) => field.setValue(value)}
+                  formErrors={form.getAllErrors().form.errors}
                 />
               )}
             />
@@ -399,10 +540,12 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               name="dustbinCapacityInLiters"
               children={(field) => (
                 <field.FormTextField
+                  name="dustbinCapacityInLiters"
                   type="number"
                   label="Dustbin Capacity (L)"
                   value={field.state.value}
                   onChange={(value) => field.setValue(value)}
+                  formErrors={form.getAllErrors().form.errors}
                 />
               )}
             />
@@ -414,7 +557,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 <div className="flex flex-col gap-2 py-4">
                   <div className="font-semibold">Other Features</div>
 
-                  {arrayField.state.value.map((feature, index) => {
+                  {arrayField.state.value.map((field, index) => {
                     return (
                       <form.AppField
                         key={`otherFeatures[${index}]`}
@@ -422,6 +565,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                         children={(field) => (
                           <div className="flex gap-2">
                             <field.FormTextField
+                              name="otherFeatures"
                               inputContainerClassName="flex-row-reverse"
                               icon={
                                 <button
@@ -434,6 +578,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                               }
                               value={field.state.value}
                               onChange={(value) => field.setValue(value)}
+                              formErrors={!field.state.value ? form.getAllErrors().form.errors : []}
                             />
                           </div>
                         )}
