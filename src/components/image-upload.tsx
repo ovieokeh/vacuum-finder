@@ -46,8 +46,21 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       setIsUploading(true);
 
       try {
+        const fileName = file.name;
+        const { data: existingFile } = await supabaseFrontend.storage.from(bucket).exists(fileName);
+
+        if (existingFile) {
+          const { data } = supabaseFrontend.storage.from(bucket).getPublicUrl(fileName);
+          console.log("File already exists", fileName, existingFile);
+          if (showPreview) {
+            setPreviewUrl(data.publicUrl);
+          }
+
+          onUpload?.(data.publicUrl);
+          return;
+        }
+
         // You could also rename the file or generate a random name
-        const fileName = `${Date.now()}-${file.name}`;
         const { error: uploadError } = await supabaseFrontend.storage.from(bucket).upload(fileName, file);
 
         if (uploadError) throw uploadError;
