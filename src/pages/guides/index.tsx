@@ -10,7 +10,7 @@ export function GuidesPage() {
         showBreadcrumbs
       />
 
-      <div className="md:mx-auto md:max-w-[1200px]"></div>
+      <div className="md:mx-auto md:max-w-[1240px] px-4"></div>
     </>
   );
 }

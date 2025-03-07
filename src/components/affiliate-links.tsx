@@ -60,6 +60,15 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
 
   return (
     <div>
+      <h2 className="text-xl font-bold">Purchase Links</h2>
+
+      <p className="text-text/90 mb-4">
+        Below are purchase links for the {vacuumName}. Click on a row to open the link in a new tab.
+        <p className="text-text/90 mb-4">
+          Read up on the features of the {vacuumName} below and compare it to other models you're interested in.
+        </p>
+      </p>
+
       {/* Filter controls */}
       <div className="flex flex-wrap gap-4 mb-4">
         <div className="grow">

@@ -48,7 +48,7 @@ export function AdminDashboardPage() {
         </Button>
       </PageHeader>
 
-      <div className="grow flex flex-col gap-4 md:mx-auto max-w-[1200px] w-full p-4">
+      <div className="grow flex flex-col gap-4 md:mx-auto max-w-[1240px] w-full p-4">
         <h2 className="text-2xl font-semibold">Your vacuum entries</h2>
 
         <div className="flex flex-col gap-2">

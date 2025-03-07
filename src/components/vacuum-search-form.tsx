@@ -414,13 +414,7 @@ const MobileFiltersDialog = ({
       <Button onClick={open} className="px-0! py-2! text-start outline-0! focus:outline-0! opacity-70 text-sm!">
         {filtersDisplay} <CiEdit className="inline w-5 h-5" />
       </Button>
-      <Modal
-        title="Refine your vacuum search"
-        isOpen={isOpen}
-        close={close}
-        panelClassName="justify-between"
-        childrenClassName="space-y-6"
-      >
+      <Modal title="Refine your vacuum search" isOpen={isOpen} close={close} childrenClassName="space-y-6">
         {children}
         <Button
           className="w-full bg-background border! border-border!"

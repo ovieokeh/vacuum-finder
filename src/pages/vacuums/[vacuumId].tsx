@@ -40,8 +40,8 @@ export function VacuumInfoPage() {
           {vacuum ? (
             <>
               <VacuumInfo vacuum={vacuum} imageClassName="w-full h-64 md:size-52 mx-auto grow" />
-              <VacuumSpecExplanations vacuum={vacuum} filters={filters} />
               <AffiliateLinksTable links={vacuum.affiliateLinks} vacuumName={name} />
+              <VacuumSpecExplanations vacuum={vacuum} filters={filters} />
             </>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4">
