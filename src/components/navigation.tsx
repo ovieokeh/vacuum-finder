@@ -4,6 +4,7 @@ import { useSiteConfig } from "../providers/site-config";
 import { Currency, CurrencyIconMapping, Region, RegionIconMapping } from "../types";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { IoGlobeOutline } from "react-icons/io5";
 
 export const Navigation = () => {
   const navRef = useRef<HTMLDivElement>(null);
@@ -16,15 +17,16 @@ export const Navigation = () => {
     }
   }, [setNavHeight]);
 
-  const CurrentRegionIcon = RegionIconMapping[region];
+  const CurrentRegionIcon = RegionIconMapping[region] ?? IoGlobeOutline;
   const CurrentCurrencyIcon = CurrencyIconMapping[currency];
 
   return (
-    <nav className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
+    <div className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
       <div className="flex items-center gap-4 md:gap-6">
+        <h2 className="font-semibold text-lg"></h2>
         <Link to="/" className="text-text!">
-          <h2 className="hidden md:block font-semibold text-lg">Robot Vacuum Buyer Tool</h2>
-          <h2 className="md:hidden font-semibold text-lg">RVBT</h2>
+          <span className="hidden md:block">Robot Vacuum Buyer Tool</span>
+          <span className="md:hidden">RVBT</span>
         </Link>
 
         <div className="flex gap-4">
@@ -82,6 +84,6 @@ export const Navigation = () => {
           </div>
         </Listbox>
       </div>
-    </nav>
+    </div>
   );
 };

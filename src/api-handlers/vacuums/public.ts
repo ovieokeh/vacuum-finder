@@ -64,6 +64,9 @@ export const listVacuums = async (req: Request, res: Response) => {
         if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
           vacuum[key] = !!vacuum[key];
         }
+        if (key === "otherFeatures") {
+          vacuum[key] = JSON.parse(vacuum[key]);
+        }
       });
     });
 
@@ -123,6 +126,9 @@ export const getVacuum = async (req: Request, res: Response) => {
     Object.keys(vacuum).forEach((key) => {
       if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
         vacuum[key] = !!vacuum[key];
+      }
+      if (key === "otherFeatures") {
+        vacuum[key] = JSON.parse(vacuum[key]);
       }
     });
 
@@ -203,6 +209,9 @@ export const searchVacuums = async (req: Request, res: Response) => {
       Object.keys(vacuum).forEach((key) => {
         if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
           vacuum[key] = !!vacuum[key];
+        }
+        if (key === "otherFeatures") {
+          vacuum[key] = JSON.parse(vacuum[key]);
         }
       });
     });

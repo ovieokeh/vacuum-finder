@@ -36,8 +36,6 @@ export function AdminDashboardPage() {
 
   const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
 
-  console.log("rendering AdminDashboardPage");
-
   return (
     <div className="flex flex-col min-h-screen bg-background text-text w-full">
       <PageHeader

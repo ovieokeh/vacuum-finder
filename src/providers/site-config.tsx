@@ -49,7 +49,8 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
       .getSession()
       .then(({ data, error }) => {
         if (error || !data) {
-          console.error("Error getting user:", error?.message);
+          setUser(undefined);
+          setUserToken(undefined);
           return;
         }
 
@@ -67,7 +68,6 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
     const { data, error } = await supabaseFrontend.auth.signInWithPassword({ email, password });
 
     if (error || !data) {
-      console.error("Error signing in:", error?.message);
       return { error: error?.message };
     }
 
@@ -82,11 +82,15 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    setLanguage(userLanguage);
+    if (userLanguage) {
+      setLanguage(userLanguage);
+    }
   }, [userLanguage]);
   useEffect(() => {
-    setRegion(userRegion);
-    setCurrency(userRegion === Region.Europe ? Currency.EUR : Currency.USD);
+    if (userRegion) {
+      setRegion(userRegion);
+      setCurrency(userRegion === Region.Europe ? Currency.EUR : Currency.USD);
+    }
   }, [userRegion]);
 
   return (

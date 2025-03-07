@@ -4,11 +4,39 @@ import { db, supabase } from "../../database";
 import { AffiliateLinkBase } from "../../types";
 import { randomUUID } from "crypto";
 
+const insertAffiliateLinks = (affiliateLinks: AffiliateLinkBase[], vacuumId: string, addedBy?: string) => {
+  const affiliateStmt = db.prepare(`
+    INSERT INTO affiliate_links (
+      id,
+      vacuumId,
+      region,
+      currency,
+      price,
+      site,
+      url,
+      addedBy
+    ) VALUES (?,?,?,?,?,?,?,?)
+  `);
+
+  affiliateLinks.forEach((affiliateLink: AffiliateLinkBase) => {
+    affiliateStmt.run(
+      randomUUID(),
+      vacuumId,
+      affiliateLink.region,
+      affiliateLink.currency,
+      affiliateLink.price,
+      affiliateLink.site,
+      affiliateLink.url,
+      addedBy
+    );
+  });
+};
+
 // Add a new vacuum
 export const addVacuumHandler = async (req: Request, res: Response) => {
-  const { data: user } = await supabase.auth.getUser(req.headers.authorization as string);
+  const { data: userData } = await supabase.auth.getUser(req.headers.authorization as string);
 
-  if (!user?.user) {
+  if (!userData?.user) {
     return res.status(401).json({ error: "Unauthorized." });
   }
 
@@ -86,35 +114,11 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
       hasRemoteControl ? 1 : 0,
       hasManualControl ? 1 : 0,
       otherFeatures ? JSON.stringify(otherFeatures) : null,
-      user.user.email
+      userData.user.email
     );
 
     if (affiliateLinks.length > 0) {
-      const affiliateStmt = db.prepare(`
-        INSERT INTO affiliate_links (
-          id,
-          vacuumId,
-          region,
-          currency,
-          price,
-          site,
-          url,
-          addedBy
-        ) VALUES (?,?,?,?,?,?,?)
-      `);
-
-      affiliateLinks.forEach((affiliateLink: AffiliateLinkBase) => {
-        affiliateStmt.run(
-          randomUUID(),
-          result.lastInsertRowid,
-          affiliateLink.region,
-          affiliateLink.currency,
-          affiliateLink.price,
-          affiliateLink.site,
-          affiliateLink.url,
-          user.user.email
-        );
-      });
+      insertAffiliateLinks(affiliateLinks, result.lastInsertRowid.toString(), userData.user.email);
     }
 
     res.json({ message: "Vacuum added successfully.", result });
@@ -149,9 +153,10 @@ export const deleteVacuumHandler = async (req: Request, res: Response) => {
 
 // Update a vacuum by id
 export const updateVacuumHandler = async (req: Request, res: Response) => {
-  const user = await supabase.auth.getUser(req.headers.authorization as string);
+  const { data: userData } = await supabase.auth.getUser(req.headers.authorization as string);
+  const vacuumId = req.params.id;
 
-  if (!user) {
+  if (!userData?.user) {
     return res.status(401).json({ error: "Unauthorized." });
   }
 
@@ -161,24 +166,42 @@ export const updateVacuumHandler = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Missing data." });
   }
 
-  if (!data.id) {
+  if (!vacuumId) {
     return res.status(400).json({ error: "Missing id." });
   }
 
-  const keys = Object.keys(data);
-  const values = Object.values(data);
+  const { affiliateLinks, ...dataWithoutAffiliateLinks } = data;
+
+  const keys = Object.keys(dataWithoutAffiliateLinks);
+  const values = Object.values(dataWithoutAffiliateLinks).map((value) => {
+    if (typeof value === "boolean") {
+      return value ? 1 : 0;
+    }
+
+    if (Array.isArray(value)) {
+      return JSON.stringify(value);
+    }
+    return value;
+  });
 
   try {
-    const stmt = db.prepare(`
-      UPDATE vacuums
-      SET ${keys.map((key) => `${key} = ?`).join(", ")}
-      WHERE id = ?
-    `);
+    if (keys.length) {
+      const stmt = db.prepare(`
+        UPDATE vacuums
+        SET ${keys.map((key) => `${key} = ?`).join(", ")}
+        WHERE id = ?
+      `);
 
-    const result = stmt.run(...values, data.id);
+      stmt.run(...values, vacuumId);
+    }
 
-    if (result.changes === 0) {
-      return res.status(404).json({ error: "Vacuum not found." });
+    if (affiliateLinks) {
+      // Delete existing affiliate links
+      const deleteStmt = db.prepare(`DELETE FROM affiliate_links WHERE vacuumId = ?`);
+      deleteStmt.run(vacuumId);
+
+      // Insert new affiliate links
+      insertAffiliateLinks(affiliateLinks, vacuumId, userData.user.email);
     }
 
     res.json({ message: "Vacuum updated successfully." });

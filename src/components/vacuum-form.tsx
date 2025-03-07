@@ -11,6 +11,21 @@ import { ConfirmButton } from "./confirm-button";
 interface AdminVacuumFormProps {
   vacuum?: Vacuum;
 }
+
+const extractDirtyFields = (original: VacuumBase, updated: VacuumBase) => {
+  const dirtyFields: Record<string, any> = {};
+
+  for (const key in updated) {
+    const originalValue = original[key as keyof VacuumBase];
+    const updatedValue = updated[key as keyof VacuumBase];
+
+    if (originalValue.toString().toLowerCase() !== updatedValue.toString().toLowerCase()) {
+      dirtyFields[key] = updatedValue;
+    }
+  }
+
+  return dirtyFields;
+};
 export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const navigate = useNavigate();
 
@@ -31,7 +46,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     },
   });
 
-  const { reset, handleSubmit, AppForm, AppField, ...formRest } = useAppForm({
+  const form = useAppForm({
     defaultValues: {
       imageUrl: "https://placehold.co/600x400",
       brand: "Dreame",
@@ -91,9 +106,10 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     },
     onSubmit: ({ value }) => {
       if (vacuum?.id) {
+        const dirtyFields = extractDirtyFields(vacuum, value as VacuumBase);
         updateVacuumMutation.mutate({
           id: vacuum.id,
-          data: value as VacuumBase,
+          data: dirtyFields as Partial<VacuumBase>,
           userToken,
         });
       } else {
@@ -104,6 +120,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       }
     },
   });
+
+  const { reset, handleSubmit } = form;
 
   useEffect(() => {
     if (vacuum?.id) {
@@ -118,27 +136,123 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
   return (
     <form
-      className="p-4 flex flex-col gap-4"
+      className="pb-2 md:p-4 flex flex-col gap-10"
       onSubmit={(e) => {
         e.preventDefault();
         handleSubmit();
+
+        const formErrors = form.getAllErrors();
+        if (Object.keys(formErrors).length > 0) {
+          console.error("Form errors:", formErrors);
+        }
       }}
     >
-      <AppForm>
-        <AppField
-          name="imageUrl"
-          children={(field) => (
-            <field.FormTextField
-              label="Image URL"
-              value={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
-        />
-
+      <form.AppForm>
         <div className="flex flex-col md:flex-row gap-4 md:gap-12">
           <div className="md:w-1/2 flex flex-col gap-2">
-            <AppField
+            <form.AppField
+              name="imageUrl"
+              children={(field) => (
+                <field.FormImageUploadField
+                  label="Click to upload image"
+                  value={field.state.value}
+                  onChange={(value) => field.setValue(value)}
+                />
+              )}
+            />
+
+            <form.AppField name="affiliateLinks" mode="array">
+              {(field) => {
+                return (
+                  <div className="flex flex-col gap-2 bg-background p-4">
+                    <div className="text-lg font-semibold">Affiliate Links</div>
+
+                    {field.state.value.map((link, index) => {
+                      return (
+                        <div key={index} className="flex flex-col gap-1 bg-background-alt p-2 rounded-lg text-sm!">
+                          <form.AppField
+                            name={`affiliateLinks[${index}].region`}
+                            children={(field) => (
+                              <field.FormSelectField
+                                label="Region"
+                                options={Object.values(Region)}
+                                selectedOption={field.state.value ?? Region.America}
+                                onChange={(value) => field.setValue(value)}
+                              />
+                            )}
+                          />
+
+                          <form.AppField
+                            name={`affiliateLinks[${index}].currency`}
+                            children={(field) => (
+                              <field.FormSelectField
+                                label="Currency"
+                                options={Object.values(Currency)}
+                                selectedOption={field.state.value ?? Currency.USD}
+                                onChange={(value) => field.setValue(value)}
+                              />
+                            )}
+                          />
+
+                          <form.AppField
+                            name={`affiliateLinks[${index}].price`}
+                            children={(field) => (
+                              <field.FormTextField
+                                type="number"
+                                label="Price"
+                                value={field.state.value ?? 300}
+                                onChange={(value) => field.setValue(value)}
+                              />
+                            )}
+                          />
+
+                          <form.AppField
+                            name={`affiliateLinks[${index}].site`}
+                            children={(field) => (
+                              <field.FormTextField
+                                label="Site"
+                                value={field.state.value ?? "Amazon"}
+                                onChange={(value) => field.setValue(value)}
+                              />
+                            )}
+                          />
+
+                          <form.AppField
+                            name={`affiliateLinks[${index}].url`}
+                            children={(field) => (
+                              <field.FormTextField
+                                label="URL"
+                                value={field.state.value ?? ""}
+                                onChange={(value) => field.setValue(value)}
+                              />
+                            )}
+                          />
+                        </div>
+                      );
+                    })}
+
+                    <button
+                      type="button"
+                      className="bg-background-alt! border! border-border! px-4 py-2 rounded-md cursor-pointer"
+                      onClick={() =>
+                        field.pushValue({
+                          region: Region.America,
+                          currency: Currency.USD,
+                          price: 300,
+                          site: "Amazon",
+                          url: "",
+                        })
+                      }
+                    >
+                      Add Affiliate Link
+                    </button>
+                  </div>
+                );
+              }}
+            </form.AppField>
+          </div>
+          <div className="md:w-1/2 flex flex-col gap-2">
+            <form.AppField
               name="brand"
               children={(field) => (
                 <field.FormTextField
@@ -149,7 +263,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="model"
               children={(field) => (
                 <field.FormTextField
@@ -160,7 +274,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="mappingTechnology"
               children={(field) => (
                 <field.FormSelectField
@@ -172,7 +286,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="batteryLifeInMinutes"
               children={(field) => (
                 <field.FormTextField
@@ -184,7 +298,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="suctionPowerInPascals"
               children={(field) => (
                 <field.FormTextField
@@ -196,7 +310,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="noiseLevelInDecibels"
               children={(field) => (
                 <field.FormTextField
@@ -208,7 +322,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="dustbinCapacityInLiters"
               children={(field) => (
                 <field.FormTextField
@@ -219,10 +333,19 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 />
               )}
             />
-          </div>
 
-          <div className="md:w-1/2 flex flex-col gap-2">
-            <AppField
+            <form.AppField
+              name="otherFeatures"
+              children={(field) => (
+                <field.FormTextField
+                  label="Other Features"
+                  value={field.state.value.join(", ")}
+                  onChange={(value) => field.setValue(value.split(",").map((v) => v.trim()))}
+                />
+              )}
+            />
+
+            <form.AppField
               name="hasMoppingFeature"
               children={(field) => (
                 <field.FormToggleField
@@ -233,7 +356,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasSelfEmptyingFeature"
               children={(field) => (
                 <field.FormToggleField
@@ -244,7 +367,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasZoneCleaningFeature"
               children={(field) => (
                 <field.FormToggleField
@@ -255,7 +378,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasMultiFloorMappingFeature"
               children={(field) => (
                 <field.FormToggleField
@@ -266,7 +389,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasCarpetBoostFeature"
               children={(field) => (
                 <field.FormToggleField
@@ -277,7 +400,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasVirtualWallsFeature"
               children={(field) => (
                 <field.FormToggleField
@@ -288,7 +411,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasAppControl"
               children={(field) => (
                 <field.FormToggleField
@@ -299,7 +422,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasSmartHomeIntegration"
               children={(field) => (
                 <field.FormToggleField
@@ -310,7 +433,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasVoiceControl"
               children={(field) => (
                 <field.FormToggleField
@@ -321,7 +444,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasRemoteControl"
               children={(field) => (
                 <field.FormToggleField
@@ -332,7 +455,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               )}
             />
 
-            <AppField
+            <form.AppField
               name="hasManualControl"
               children={(field) => (
                 <field.FormToggleField
@@ -359,9 +482,9 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               Delete
             </ConfirmButton>
           ) : null}
-          <formRest.FormSubmitButton>Save</formRest.FormSubmitButton>
+          <form.FormSubmitButton>Save</form.FormSubmitButton>
         </div>
-      </AppForm>
+      </form.AppForm>
     </form>
   );
 }

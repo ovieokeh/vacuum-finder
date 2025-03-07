@@ -25,7 +25,6 @@ export function useVacuumQuery(vacuumId: string) {
     },
     enabled: Boolean(vacuumId),
     throwOnError: (error) => {
-      console.log("errorroror", error);
       if (error.message === "Failed to fetch vacuum") {
         return false;
       }
@@ -67,13 +66,15 @@ export function useUpdateVacuumMutation({ onSuccess }: { onSuccess?: () => void 
       const response = await fetch(`/api/vacuums/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: userToken ?? "" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ data }),
       });
       if (!response.ok) throw new Error("Failed to update vacuum");
       return response.json();
     },
     onSuccess: (vacuum) => {
       queryClient.invalidateQueries({ queryKey: ["vacuums"] });
+      queryClient.invalidateQueries({ queryKey: ["user-vacuums"] });
+
       if (vacuum.id) {
         queryClient.invalidateQueries({ queryKey: ["vacuums", vacuum.id] });
       }

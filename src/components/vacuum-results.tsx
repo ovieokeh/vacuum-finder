@@ -44,9 +44,22 @@ export function VacuumResults({
     () => ({
       columns: [
         {
+          header: "",
+          accessorKey: "image",
+          size: relativeWidth(containerWidth, 8),
+          cell: (value) => (
+            <img
+              src={value.row.original.imageUrl}
+              alt={value.row.original.brand + " " + value.row.original.model}
+              className="w-16 h-16 object-contain"
+            />
+          ),
+          enableSorting: false,
+        },
+        {
           header: "Name",
           accessorKey: "name",
-          size: relativeWidth(containerWidth, 25),
+          size: relativeWidth(containerWidth, 20),
           cell: (value) => {
             const brand = value.row.original.brand;
             const model = value.row.original.model;
@@ -57,15 +70,15 @@ export function VacuumResults({
         {
           header: "Price",
           accessorKey: "price",
-          size: relativeWidth(containerWidth, 11),
+          maxSize: relativeWidth(containerWidth, 12),
           cell: (value) => {
             const cheapestPrice = getCheapestPrice(value.row.original, currency);
             return cheapestPrice === 0 ? (
               <span className="block w-full">n/a</span>
             ) : cheapestPrice === -1 ? (
               <Popover
-                className="grow flex justify-center"
                 panelClassName="bg-background p-4 border border-border"
+                triggerClassName="p-0!"
                 trigger={<MdInfoOutline className="w-4 h-4 text-text!" />}
               >
                 <p className="text-text/90">No price available in your chosen currency.</p>
@@ -80,7 +93,7 @@ export function VacuumResults({
         {
           header: "Battery",
           accessorKey: "batteryLifeInMinutes",
-          size: relativeWidth(containerWidth, 12),
+          size: relativeWidth(containerWidth, 10),
           cell: (value) => {
             const batteryLife = value.getValue();
             const batteryLifeHours = Math.floor(batteryLife / 60);
@@ -100,14 +113,14 @@ export function VacuumResults({
         {
           header: "Noise",
           accessorKey: "noiseLevelInDecibels",
-          size: relativeWidth(containerWidth, 11),
+          size: relativeWidth(containerWidth, 12),
           cell: (value) => `${value.getValue()} dB`,
           enableSorting: true,
         },
         {
           header: "Features",
           accessorKey: "features",
-          size: relativeWidth(containerWidth, 23),
+          size: relativeWidth(containerWidth, 20),
           cell: (value) => (
             <VacuumFeatures
               vacuum={value.row.original}

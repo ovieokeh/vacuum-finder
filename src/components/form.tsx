@@ -21,6 +21,7 @@ import {
 } from "@tanstack/react-form";
 import clsx from "clsx";
 import { ComponentType, PropsWithChildren } from "react";
+import ImageUpload from "./image-upload";
 
 const FormTextField = <T extends string | number>({
   type = "text",
@@ -125,7 +126,7 @@ const FormSelectField = <T extends string>({
             <ListboxOption
               key={option + index}
               value={option}
-              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background cursor-pointer"
+              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer"
             >
               {option}
             </ListboxOption>
@@ -152,12 +153,31 @@ const FormSubmitButton = ({
   );
 };
 
+const FormImageUploadField = ({
+  className,
+  value,
+  label,
+  showPreview,
+  onChange,
+}: {
+  className?: string;
+  value?: string;
+  label?: React.ReactNode;
+  showPreview?: boolean;
+  onChange: (value: string) => void;
+}) => {
+  return (
+    <ImageUpload currentUrl={value} label={label} showPreview={showPreview} onUpload={onChange} className={className} />
+  );
+};
+
 const { fieldContext, formContext } = createFormHookContexts();
 export const formInit = {
   fieldComponents: {
     FormTextField,
     FormToggleField,
     FormSelectField,
+    FormImageUploadField,
   },
   formComponents: {
     FormSubmitButton,

@@ -3,6 +3,7 @@ import { flexRender, Table, Row, Cell, Header, HeaderGroup, useReactTable, Table
 import { VirtualItem, Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import clsx from "clsx";
+import { useIsClient } from "../hooks/use-is-client";
 
 interface TableContainerProps<T> {
   tableOptions: TableOptions<T>;
@@ -179,13 +180,14 @@ function TableBody<T extends Record<string, unknown>>({
   handleRowClick,
 }: TableBodyProps<T>) {
   const rows = table.getRowModel().rows;
+  const isClient = useIsClient();
 
   const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: rows.length,
     estimateSize: () => 33,
     getScrollElement: () => tableContainerRef.current,
     measureElement:
-      typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") === -1
+      isClient && navigator.userAgent.indexOf("Firefox") === -1
         ? (el) => el?.getBoundingClientRect().height
         : undefined,
     overscan: 5,
