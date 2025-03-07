@@ -23,13 +23,13 @@ export const Navigation = () => {
   return (
     <div className="z-20 p-4 grow shadow sticky" ref={navRef}>
       <div className="max-w-[1200px] mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-4 md:gap-6 font-semibold text-text!">
+        <div className="flex items-center  gap-4 md:gap-6 text-text!">
           <Link to="/" className="text-text!">
             <span className="hidden md:block">Robot Vacuum Finder</span>
             <span className="md:hidden">Home</span>
           </Link>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Link to="/vacuums" className="text-text hover:text-text/90">
               Finder
             </Link>

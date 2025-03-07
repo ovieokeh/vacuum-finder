@@ -142,7 +142,7 @@ export function VacuumResults({
 
 const VacuumMobileList = ({ results, navigateRoot }: VacuumResultsProps) => {
   return (
-    <ul className="space-y-4">
+    <ul className="space-y-4 py-2">
       {results?.data?.map((vacuum) => (
         <li key={vacuum.id} className="flex flex-col gap-4 p-4 border border-border rounded-lg">
           <Link to={`${navigateRoot}/${vacuum.id}`}>

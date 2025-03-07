@@ -10,7 +10,7 @@ export function VacuumSearchPage() {
         <title>Robot Vacuum Finder</title>
         <meta name="description" content="Find the best robot vacuum for your needs with our vacuum finder tool." />
       </Helmet>
-      <VacuumWizard className="md:mx-auto md:max-w-[1200px] pt-2 px-4" />
+      <VacuumWizard className="md:mx-auto md:max-w-[1200px] p-4" />
       <Outlet />
     </>
   );

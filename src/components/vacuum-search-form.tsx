@@ -286,7 +286,7 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
 
   // --- Desktop & Mobile Filters ---
   const desktopFilters = (
-    <div className="space-y-6 hidden md:block">
+    <div className="hidden md:block">
       <div className="h-[69vh] overflow-y-scroll space-y-2">
         {simpleFilters}
         <Button
