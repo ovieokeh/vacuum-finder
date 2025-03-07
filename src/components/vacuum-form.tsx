@@ -7,7 +7,7 @@ import { useAddVacuumMutation, useDeleteVacuumMutation, useUpdateVacuumMutation 
 import { useAppForm } from "./form";
 import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumBase, VacuumMappingTechnology } from "../types";
 import { ConfirmButton } from "./confirm-button";
-import { FaMinus } from "react-icons/fa";
+import { FaMinus, FaTrash } from "react-icons/fa";
 
 interface AdminVacuumFormProps {
   vacuum?: Vacuum;
@@ -228,6 +228,14 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                               />
                             )}
                           />
+
+                          <button
+                            type="button"
+                            className="w-fit text-red px-4 py-2 rounded-md cursor-pointer"
+                            onClick={() => field.removeValue(index)}
+                          >
+                            <FaTrash className="w-4 h-4" />
+                          </button>
                         </div>
                       );
                     })}
