@@ -16,7 +16,7 @@ export const VacuumInfo = ({ vacuum, imageClassName = "" }: VacuumResultProps) =
     <div className="flex flex-col md:flex-row gap-4">
       {/* Image */}
       <div className={twMerge(" h-36 flex-shrink-0 md:mb-0 overflow-hidden rounded", imageClassName)}>
-        <img className="object-cover w-full h-full" src={vacuum.imageUrl} alt={name} />
+        <img className="object-contain w-full h-full" src={vacuum.imageUrl} alt={name} />
       </div>
       {/* Main info */}
       <div className="flex flex-col gap-2">
