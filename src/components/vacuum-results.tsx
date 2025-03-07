@@ -2,14 +2,11 @@ import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, TableOptions } from "@tanstack/react-table";
 
-import { CurrencySymbolMapping, Vacuum, VacuumsFilter } from "../types";
+import { Vacuum, VacuumsFilter } from "../types";
 import { TableContainer } from "./table";
 import { VacuumInfo } from "./vacuum-info";
 import { VacuumFeatures } from "./vacuum-features";
-import { getCheapestPrice } from "../shared-utils/price";
-import { MdInfoOutline } from "react-icons/md";
-import { Popover } from "./popover";
-import { useSiteConfig } from "../providers/site-config";
+import { PriceDisplay } from "./price-display";
 
 interface VacuumResultsProps {
   filters?: VacuumsFilter;
@@ -35,10 +32,7 @@ export function VacuumResults({
 }: VacuumResultsProps & {
   containerWidth: number;
 }) {
-  const siteConfig = useSiteConfig();
   const navigate = useNavigate();
-
-  const currency = filters?.currency ?? siteConfig.currency;
 
   const tableOptions: TableOptions<Vacuum> = useMemo(
     () => ({
@@ -71,23 +65,7 @@ export function VacuumResults({
           header: "Price",
           accessorKey: "price",
           maxSize: relativeWidth(containerWidth, 12),
-          cell: (value) => {
-            const cheapestPrice = getCheapestPrice(value.row.original, currency);
-            return cheapestPrice === 0 ? (
-              <span className="block w-full">n/a</span>
-            ) : cheapestPrice === -1 ? (
-              <Popover
-                panelClassName="bg-background p-4 border border-border"
-                triggerClassName="p-0!"
-                trigger={<MdInfoOutline className="w-4 h-4 text-text!" />}
-              >
-                <p className="text-text/90">No price available in your chosen currency.</p>
-                <p className="text-text/90">Try changing your selected currency at the top of the page.</p>
-              </Popover>
-            ) : (
-              <p className="block w-full">{`${CurrencySymbolMapping[currency]}${cheapestPrice}`}</p>
-            );
-          },
+          cell: (value) => <PriceDisplay vacuum={value.row.original} />,
           enableSorting: true,
         },
         {
@@ -136,7 +114,7 @@ export function VacuumResults({
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
     }),
-    [results, currency, containerWidth]
+    [results, containerWidth]
   );
 
   return (

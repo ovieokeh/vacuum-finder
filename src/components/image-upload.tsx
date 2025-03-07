@@ -51,7 +51,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
         if (existingFile) {
           const { data } = supabaseFrontend.storage.from(bucket).getPublicUrl(fileName);
-          console.log("File already exists", fileName, existingFile);
           if (showPreview) {
             setPreviewUrl(data.publicUrl);
           }

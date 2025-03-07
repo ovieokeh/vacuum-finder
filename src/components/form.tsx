@@ -22,11 +22,14 @@ import {
 import clsx from "clsx";
 import { ComponentType, PropsWithChildren } from "react";
 import ImageUpload from "./image-upload";
+import { twMerge } from "tailwind-merge";
 
 const FormTextField = <T extends string | number>({
   type = "text",
-  label,
   icon,
+  label,
+  labelIcon,
+  inputContainerClassName,
   onChange,
   ...rest
 }: {
@@ -35,23 +38,30 @@ const FormTextField = <T extends string | number>({
   type?: string;
   label?: string;
   icon?: React.ReactNode;
+  labelIcon?: React.ReactNode;
+  inputContainerClassName?: string;
 }) => {
   return (
     <Field className="space-y-2">
       {label && (
         <Label className="flex items-center gap-2 text-sm/6 font-medium">
-          {icon}
+          {labelIcon}
           {label}
         </Label>
       )}
-      <Input
-        type={type}
-        className={
-          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
-        }
-        onChange={(e) => onChange(type === "number" ? (+e.target.value as T) : (e.target.value as T))}
-        {...rest}
-      />
+
+      <div className={twMerge("flex items-center gap-2", inputContainerClassName)}>
+        {icon}
+
+        <Input
+          type={type}
+          className={
+            "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
+          }
+          onChange={(e) => onChange(type === "number" ? (+e.target.value as T) : (e.target.value as T))}
+          {...rest}
+        />
+      </div>
     </Field>
   );
 };

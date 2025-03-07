@@ -1,9 +1,8 @@
 import { twMerge } from "tailwind-merge";
 
-import { CurrencySymbolMapping, Vacuum } from "../types";
-import { useSiteConfig } from "../providers/site-config";
+import { Vacuum } from "../types";
 import { VacuumFeatures } from "./vacuum-features";
-import { getCheapestPrice } from "../shared-utils/price";
+import { PriceDisplay } from "./price-display";
 
 interface VacuumResultProps {
   vacuum: Vacuum;
@@ -11,9 +10,6 @@ interface VacuumResultProps {
 }
 
 export const VacuumInfo = ({ vacuum, imageClassName = "" }: VacuumResultProps) => {
-  const { currency } = useSiteConfig();
-
-  const price = getCheapestPrice(vacuum, currency);
   const name = `${vacuum.brand} ${vacuum.model}`;
 
   return (
@@ -30,10 +26,7 @@ export const VacuumInfo = ({ vacuum, imageClassName = "" }: VacuumResultProps) =
             {vacuum.brand} – {vacuum.model}
           </p>
         </div>
-        <p className="mt-2 md:mt-0 text-lg font-bold text-accent">
-          {price === 0 ? "n/a" : price === -1 ? "n/a" : CurrencySymbolMapping[currency]}
-          {price}
-        </p>
+        <PriceDisplay vacuum={vacuum} />
 
         {/* Feature icons */}
         <div>

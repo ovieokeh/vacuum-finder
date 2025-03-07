@@ -92,8 +92,10 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
       ) VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `);
 
+    const id = randomUUID();
+
     const result = stmt.run(
-      randomUUID(),
+      id,
       imageUrl,
       brand,
       model,
@@ -117,8 +119,8 @@ export const addVacuumHandler = async (req: Request, res: Response) => {
       userData.user.email
     );
 
-    if (affiliateLinks.length > 0) {
-      insertAffiliateLinks(affiliateLinks, result.lastInsertRowid.toString(), userData.user.email);
+    if (result.lastInsertRowid) {
+      insertAffiliateLinks(affiliateLinks, id, userData.user.email);
     }
 
     res.json({ message: "Vacuum added successfully.", result });

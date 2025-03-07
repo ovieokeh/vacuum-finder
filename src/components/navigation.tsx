@@ -23,7 +23,6 @@ export const Navigation = () => {
   return (
     <div className="max-w-[1200px] mx-auto p-4 grow flex justify-between items-center" ref={navRef}>
       <div className="flex items-center gap-4 md:gap-6">
-        <h2 className="font-semibold text-lg"></h2>
         <Link to="/" className="text-text!">
           <span className="hidden md:block">Robot Vacuum Buyer Tool</span>
           <span className="md:hidden">RVBT</span>
@@ -44,12 +43,12 @@ export const Navigation = () => {
         </div>
       </div>
 
-      <div className="flex flow-row gap-4 min-w-38 justify-between">
+      <div className="flex flow-row gap-4 items-center justify-between">
         <Listbox value={region} onChange={(value) => setRegion(value)}>
           <div className="flex flex-col gap-2">
             <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! py-1! bg-background!">
               <CurrentRegionIcon className="w-4 h-4" />
-              {region}
+              <span className="hidden md:block">{region}</span>
             </ListboxButton>
             <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
               {Object.values(Region).map((type) => (

@@ -7,6 +7,7 @@ import { useAddVacuumMutation, useDeleteVacuumMutation, useUpdateVacuumMutation 
 import { useAppForm } from "./form";
 import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumBase, VacuumMappingTechnology } from "../types";
 import { ConfirmButton } from "./confirm-button";
+import { FaMinus } from "react-icons/fa";
 
 interface AdminVacuumFormProps {
   vacuum?: Vacuum;
@@ -336,12 +337,46 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
             <form.AppField
               name="otherFeatures"
-              children={(field) => (
-                <field.FormTextField
-                  label="Other Features"
-                  value={field.state.value.join(", ")}
-                  onChange={(value) => field.setValue(value.split(",").map((v) => v.trim()))}
-                />
+              mode="array"
+              children={(arrayField) => (
+                <div className="flex flex-col gap-2 py-4">
+                  <div className="font-semibold">Other Features</div>
+
+                  {arrayField.state.value.map((feature, index) => {
+                    return (
+                      <form.AppField
+                        key={`otherFeatures[${index}]`}
+                        name={`otherFeatures[${index}]`}
+                        children={(field) => (
+                          <div className="flex gap-2">
+                            <field.FormTextField
+                              inputContainerClassName="flex-row-reverse"
+                              icon={
+                                <button
+                                  type="button"
+                                  className="outline-0! focus-within:outline-0! border-0! py-0! px-0! cursor-pointer"
+                                  onClick={() => arrayField.removeValue(index)}
+                                >
+                                  <FaMinus className="w-4 h-4" />
+                                </button>
+                              }
+                              value={field.state.value}
+                              onChange={(value) => field.setValue(value)}
+                            />
+                          </div>
+                        )}
+                      />
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    className="bg-background-alt! border! border-border! px-4 py-2 rounded-md cursor-pointer"
+                    onClick={() => arrayField.pushValue("")}
+                  >
+                    Add Feature
+                  </button>
+                </div>
               )}
             />
 
