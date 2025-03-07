@@ -261,41 +261,129 @@ export const searchVacuums = async (req: Request, res: Response) => {
 
 export const filterVacuums = async (req: Request, res: Response) => {
   try {
-    const { budget, mopFunction: mopFunctionBool, currency } = req.body;
-    const mopFunction = mopFunctionBool ? 1 : null;
+    // Extract filters from the request body.
+    // Expecting filters for all VacuumBase fields plus affiliate filters.
+    const {
+      // String fields
+      brand,
+      mappingTechnology,
+      // Numeric fields (using “min” or “max” where it makes sense)
+      minBatteryLifeInMinutes,
+      minSuctionPowerInPascals,
+      maxNoiseLevelInDecibels,
+      minWaterTankCapacityInLiters,
+      minDustbinCapacityInLiters,
+      // Array field
+      otherFeatures,
+      // Affiliate filtering: budget and region.
+      // NOTE: Do not filter by currency – only by price.
+      budget,
+      // region,
+    } = req.body;
 
-    // Parse pagination params
+    // Parse pagination parameters.
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 10;
     const offset = (page - 1) * limit;
 
-    // We’ll add mop & affiliate link filtering in both the total count query and the main query
-    const baseWhere = `
-      WHERE (? IS NULL OR v.hasMoppingFeature = ?)
-      AND (
-        al.id IS NOT NULL
-        OR NOT EXISTS (
-          SELECT 1 FROM affiliate_links WHERE vacuumId = v.id
-        )
-      )
-    `;
+    // Build dynamic filtering conditions and corresponding parameters.
+    const conditions: string[] = [];
+    const params: any[] = [];
 
-    const whereParams = [mopFunction, mopFunction];
+    // --- VacuumBase string filters ---
+    if (brand && brand.length > 0) {
+      conditions.push("v.brand = ?");
+      params.push(brand);
+    }
+    if (mappingTechnology) {
+      conditions.push("v.mappingTechnology = ?");
+      params.push(mappingTechnology);
+    }
 
-    // 1) Count total
+    // --- VacuumBase numeric filters ---
+    if (minBatteryLifeInMinutes) {
+      conditions.push("v.batteryLifeInMinutes >= ?");
+      params.push(minBatteryLifeInMinutes);
+    }
+    if (minSuctionPowerInPascals) {
+      conditions.push("v.suctionPowerInPascals >= ?");
+      params.push(minSuctionPowerInPascals);
+    }
+    if (maxNoiseLevelInDecibels) {
+      conditions.push("v.noiseLevelInDecibels <= ?");
+      params.push(maxNoiseLevelInDecibels);
+    }
+    if (minWaterTankCapacityInLiters) {
+      // Cast in case the value is stored as a string.
+      conditions.push("CAST(v.waterTankCapacityInLiters AS REAL) >= ?");
+      params.push(minWaterTankCapacityInLiters);
+    }
+    if (minDustbinCapacityInLiters) {
+      conditions.push("CAST(v.dustbinCapacityInLiters AS REAL) >= ?");
+      params.push(minDustbinCapacityInLiters);
+    }
+
+    // --- VacuumBase boolean filters ---
+    const booleanProps: (keyof typeof req.body)[] = [
+      "hasMoppingFeature",
+      "hasSelfEmptyingFeature",
+      "hasZoneCleaningFeature",
+      "hasMultiFloorMappingFeature",
+      "hasCarpetBoostFeature",
+      "hasVirtualWallsFeature",
+      "hasSmartHomeIntegration",
+      "hasVoiceControl",
+      "hasAppControl",
+      "hasRemoteControl",
+      "hasManualControl",
+    ];
+    for (const prop of booleanProps) {
+      if (req.body[prop] !== undefined) {
+        conditions.push(`v.${prop.toString() as string} = ?`);
+        // Assuming booleans are stored as 0/1 in the DB.
+        params.push(req.body[prop] ? 1 : 0);
+      }
+    }
+
+    // --- VacuumBase array filter for "otherFeatures" ---
+    // We assume "otherFeatures" is stored as a JSON string.
+    if (otherFeatures && Array.isArray(otherFeatures) && otherFeatures.length > 0) {
+      otherFeatures.forEach((feature: string) => {
+        conditions.push("v.otherFeatures LIKE ?");
+        params.push(`%${feature}%`);
+      });
+    }
+
+    // --- Affiliate link filtering (by price and region only) ---
+    // For region "Global", include vacuums that either have an affiliate link under budget
+    // OR have no affiliate link at all.
+    // if (region === "Global") {
+    //   conditions.push(
+    //     "((al.id IS NOT NULL AND al.price <= ?) OR (NOT EXISTS (SELECT 1 FROM affiliate_links WHERE vacuumId = v.id)))"
+    //   );
+    //   params.push(budget);
+    // } else {
+    //   // For specific regions, require an affiliate link with a matching region and price under budget.
+    //   conditions.push("al.id IS NOT NULL");
+    //   conditions.push("al.region = ?");
+    // }
+    if (budget && !isNaN(budget) && budget > 0) {
+      conditions.push("al.price <= ?");
+      params.push(budget);
+    }
+
+    // Combine all conditions into one WHERE clause.
+    const whereClause = conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : "";
+
+    // Build the count query.
     const countQuery = `
       SELECT COUNT(DISTINCT v.id) as total
       FROM vacuums v
-      LEFT JOIN affiliate_links al 
-        ON al.vacuumId = v.id 
-        AND al.currency = ?
-        AND al.price <= ?
-      ${baseWhere}
+      LEFT JOIN affiliate_links al ON al.vacuumId = v.id
+      ${whereClause}
     `;
-    const countResult = db.prepare(countQuery).get(currency, budget, ...whereParams) as any;
-    const total = countResult?.total || 0;
 
-    // 2) Fetch data with limit/offset
+    // Build the main query, selecting affiliate link details if available.
     const mainQuery = `
       SELECT 
         v.*,
@@ -306,20 +394,26 @@ export const filterVacuums = async (req: Request, res: Response) => {
         al.site,
         al.url
       FROM vacuums v
-      LEFT JOIN affiliate_links al 
-        ON al.vacuumId = v.id 
-        AND al.price <= ?
-      ${baseWhere}
+      LEFT JOIN affiliate_links al ON al.vacuumId = v.id
+      ${whereClause}
       LIMIT ? OFFSET ?
     `;
-    const rows = db.prepare(mainQuery).all(budget, ...whereParams, limit, offset);
+    // Append pagination parameters for the main query.
+    const mainParams = [...params, limit, offset];
 
-    // Group rows by vacuum id
+    console.log("Filtering vacuums with query:", mainQuery, mainParams);
+    // Execute the queries.
+    const countResult = db.prepare(countQuery).get(...params) as any;
+    const total = countResult?.total || 0;
+    const rows = db.prepare(mainQuery).all(...mainParams);
+
+    // Group rows by vacuum id and merge affiliate link data.
     const vacuumMap: { [key: string]: any } = {};
     rows.forEach((row: any) => {
       const vacuumId = row.id;
       if (!vacuumMap[vacuumId]) {
         vacuumMap[vacuumId] = { ...row, affiliateLinks: [] };
+        // Remove affiliate link columns from the vacuum record.
         delete vacuumMap[vacuumId].affiliateLinkId;
         delete vacuumMap[vacuumId].region;
         delete vacuumMap[vacuumId].currency;
@@ -338,22 +432,24 @@ export const filterVacuums = async (req: Request, res: Response) => {
         });
       }
     });
-
     const vacuums = Object.values(vacuumMap);
 
-    // Convert numeric booleans
+    // Post-process: convert numeric booleans to true/false and parse JSON for otherFeatures.
     vacuums.forEach((vacuum: any) => {
       Object.keys(vacuum).forEach((key) => {
         if (typeof vacuum[key] === "number" && [0, 1].includes(vacuum[key])) {
-          vacuum[key] = !!vacuum[key];
+          vacuum[key] = Boolean(vacuum[key]);
         }
-        if (key === "otherFeatures") {
-          vacuum[key] = JSON.parse(vacuum[key]);
+        if (key === "otherFeatures" && typeof vacuum[key] === "string") {
+          try {
+            vacuum[key] = JSON.parse(vacuum[key]);
+          } catch {
+            // If parsing fails, leave the value as-is.
+          }
         }
       });
     });
 
-    // Respond with pagination
     res.json({
       data: vacuums,
       page,

@@ -204,7 +204,7 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
   return (
     <div className="mt-4 space-y-4">
       <h4 className="font-semibold text-base text-text/90">What do the features mean?</h4>
-      <div className="space-y-3 md:h-[50svh] overflow-y-scroll">
+      <div className="space-y-3">
         {specsList.map((item, idx) => (
           <div key={idx} className={`flex flex-col p-3 border-l-4 rounded ${item.colorClass}`}>
             <span className="font-medium">{item.label}</span>

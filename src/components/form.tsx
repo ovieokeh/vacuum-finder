@@ -173,10 +173,18 @@ const FormSelectField = <T extends string>({
           </Label>
         )}
         <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-background! border! border-border!">
-          {selectedOption ?? <span className="text-text/80 text-sm">Select an option</span>}
+          {selectedOption || <span className="text-text/80 text-sm">Select an option</span>}
           <GoChevronDown className="w-4 h-4" />
         </ListboxButton>
         <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
+          {!!selectedOption && (
+            <ListboxOption
+              value=""
+              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer text-red-700"
+            >
+              Clear
+            </ListboxOption>
+          )}
           {options.map((option, index) => (
             <ListboxOption
               key={option + index}

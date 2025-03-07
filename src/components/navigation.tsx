@@ -44,7 +44,7 @@ export const Navigation = () => {
           </div>
         </div>
 
-        <div className="flex flow-row gap-4 items-center justify-between">
+        <div className="flex flow-row gap-1 md:gap-4 items-center justify-between">
           <Listbox value={region} onChange={(value) => setRegion(value)}>
             <div className="flex flex-col gap-2">
               <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! py-1! bg-background!">

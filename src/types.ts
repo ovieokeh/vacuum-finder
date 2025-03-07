@@ -52,14 +52,31 @@ export enum FloorType {
   Laminate = "Laminate",
 }
 export interface VacuumsFilter {
-  houseSizeSqM: number;
-  floorType: FloorType;
   budget: number;
-  numRooms: number;
   numPets: number;
   mopFunction: boolean;
   region: Region;
   currency: Currency;
+
+  // additional filters
+  brand: string;
+  mappingTechnology: VacuumMappingTechnology;
+  minBatteryLifeInMinutes: number;
+  minSuctionPowerInPascals: number;
+  maxNoiseLevelInDecibels: number;
+  minWaterTankCapacityInLiters: number;
+  minDustbinCapacityInLiters: number;
+  hasMoppingFeature: boolean;
+  hasSelfEmptyingFeature: boolean;
+  hasZoneCleaningFeature: boolean;
+  hasMultiFloorMappingFeature: boolean;
+  hasCarpetBoostFeature: boolean;
+  hasVirtualWallsFeature: boolean;
+  hasSmartHomeIntegration: boolean;
+  hasVoiceControl: boolean;
+  hasAppControl: boolean;
+  hasRemoteControl: boolean;
+  hasManualControl: boolean;
 }
 
 export enum Region {
