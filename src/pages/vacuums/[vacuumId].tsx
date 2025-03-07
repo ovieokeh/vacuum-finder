@@ -8,6 +8,7 @@ import { VacuumSpecExplanations } from "../../components/vacuum-spec-explanation
 import { VacuumInfo } from "../../components/vacuum-info";
 import { useAppSelector } from "../../redux";
 import { useVacuumQuery } from "../../database/hooks";
+import { AffiliateLinksTable } from "../../components/affiliate-links";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();
@@ -34,12 +35,13 @@ export function VacuumInfoPage() {
           content={`Read about the ${name} robot vacuum cleaner. Compare features, price, and more.`}
         />
       </Helmet>
-      <Modal title={name ?? ""} isOpen close={handleClose} panelClassName="min-w-[80%]">
+      <Modal title={name ?? ""} isOpen close={handleClose} panelClassName="w-full! max-w-[800px]!">
         <div className="flex flex-col flex-grow gap-4">
           {vacuum ? (
             <>
               <VacuumInfo vacuum={vacuum} imageClassName="w-full h-64 md:size-52 mx-auto grow" />
               <VacuumSpecExplanations vacuum={vacuum} filters={filters} />
+              <AffiliateLinksTable links={vacuum.affiliateLinks} vacuumName={name} />
             </>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4">

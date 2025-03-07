@@ -150,7 +150,7 @@ const FormToggleField = ({
   );
 };
 
-const FormSelectField = <T extends string>({
+export const FormSelectField = <T extends string>({
   label,
   icon,
   options,

@@ -107,7 +107,7 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
     <div className="mt-4">
       <h4 className="text-lg font-semibold mb-2">Feature Explanations</h4>
       {summaries.map((sentence, idx) => (
-        <p key={idx} className="mb-2 text-sm text-text">
+        <p key={idx} className="mb-2 text-text">
           {sentence}
         </p>
       ))}
