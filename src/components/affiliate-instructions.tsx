@@ -64,10 +64,22 @@ export const AffiliateLinkInstructions = () => {
       </DisclosureButton>
 
       <DisclosurePanel className="p-4 bg-background">
-        <p className="mb-4">
-          Visit the following sites to get your affiliate links. Make sure to only use the links from the region you are
-          targeting.
+        <p className="mb-2">
+          Sstart with "Amazon US" to get a product. Once you find one, search for the same product on the other Amazon
+          sites (UK, DE, CA, JP, AU). If you find the same product, add the link to the list below.
         </p>
+
+        <p className="flex flex-col gap-2 mb-4">
+          Important: Links should not contain any tracking parameters. They should be clean URLs. e.g
+          <span className="block font-semibold text-xs">
+            https://www.amazon.com/eufy-robot-vacuum-Replacement-Accessories/dp/B0CTTFY9TK
+          </span>
+          not
+          <span className="block font-semibold text-xs">
+            https://www.amazon.com/eufy-robot-vacuum-Replacement-Accessories/dp/B0CTTFY9TK?dib=eyJ2IjoiMSJ9.S_sx_m7R7Q2I-ZkjYJBxC3rkqZL3nv14PE-PojxrxVdCyXQDTusqs0l-lucvqhKqvX9NzBmD6CILP9Gfoz_X-WAN6o62CSjMLidUD
+          </span>
+        </p>
+
         {sites.map((site) => (
           <div key={site.url} className="flex gap-2">
             <div>

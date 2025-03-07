@@ -12,10 +12,11 @@ import {
 import { useAppForm } from "./form";
 import { AffiliateLinkBase, Currency, Region, Vacuum, VacuumBase, VacuumMappingTechnology } from "../types";
 import { ConfirmButton } from "./confirm-button";
-import { FaMinus, FaTrash } from "react-icons/fa";
+import { FaChevronDown, FaMinus, FaTrash } from "react-icons/fa";
 import { AffiliateLinkInstructions } from "./affiliate-instructions";
 import { useStore } from "@tanstack/react-form";
 import { LuInfo } from "react-icons/lu";
+import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 
 interface AdminVacuumFormProps {
   vacuum?: Vacuum;
@@ -318,7 +319,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
                     <AffiliateLinkInstructions />
 
-                    {field.state.value.map((link, index) => {
+                    {field.state.value.map((_link, index) => {
                       return (
                         <div key={index} className="flex flex-col gap-1 bg-background-alt p-2 rounded-lg text-sm!">
                           <form.AppField
@@ -720,23 +721,54 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
           </div>
         </div>
 
-        <div className="flex gap-2">
-          {vacuum?.id ? (
-            <ConfirmButton
-              onClick={() => {
-                deleteVacuumMutation.mutateAsync({
-                  id: vacuum.id,
-                  userToken,
-                });
-              }}
-              confirmText="Delete Vacuum"
-            >
-              Delete
-            </ConfirmButton>
-          ) : null}
-          <form.FormSubmitButton>Save</form.FormSubmitButton>
+        <div className="flex flex-col gap-4">
+          <Checklist />
+          <div className="flex gap-2">
+            {vacuum?.id ? (
+              <ConfirmButton
+                onClick={() => {
+                  deleteVacuumMutation.mutateAsync({
+                    id: vacuum.id,
+                    userToken,
+                  });
+                }}
+                confirmText="Delete Vacuum"
+              >
+                Delete
+              </ConfirmButton>
+            ) : null}
+            <form.FormSubmitButton>Save</form.FormSubmitButton>
+          </div>
         </div>
       </form.AppForm>
     </form>
   );
 }
+
+const checklistItems = [
+  "Rename the vacuum image as (brand)-(model).jpg",
+  "Check that this is a new vacuum and not a duplicate",
+  "Add all affiliate links you could find for the different regions",
+  "Fill out all the fields to the best of your ability",
+  "If you can't find a feature, set it to false or 0 (if it's a number)",
+];
+const Checklist = () => {
+  return (
+    <Disclosure as="div" className="flex flex-col gap-4 max-w-md">
+      <DisclosureButton className="flex justify-between items-center gap-2 px-2! grow w-full bg-background">
+        <p className="text-lg font-semibold flex items-center justify-between gap-4 grow">
+          Before submitting
+          <FaChevronDown className="w-4 h-4" />
+        </p>
+      </DisclosureButton>
+
+      <DisclosurePanel className="p-4 bg-background">
+        <ul className="list-disc list-inside">
+          {checklistItems.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      </DisclosurePanel>
+    </Disclosure>
+  );
+};
