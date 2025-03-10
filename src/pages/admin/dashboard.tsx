@@ -15,7 +15,7 @@ export function AdminDashboardPage() {
   const { userToken, currency, logout } = useSiteConfig();
   const windowWidth = useWindowWidth();
 
-  const vacuumsQuery = useSearchVacuums({});
+  const vacuumsQuery = useSearchVacuums({}, true);
   const refetch = vacuumsQuery.refetch;
   const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
 

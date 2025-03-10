@@ -77,17 +77,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     }
   }, [reset, vacuum]);
 
-  const brand = useWatch({
+  const { brand, model, otherFeatures } = useWatch({
     control: vacuumForm.control,
-    name: "brand",
-  });
-  const model = useWatch({
-    control: vacuumForm.control,
-    name: "model",
-  });
-  const otherFeatures = useWatch({
-    control: vacuumForm.control,
-    name: "otherFeatures",
   });
 
   const affiliateLinksController = useFieldArray({
@@ -103,12 +94,6 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     () => (brand && model ? searchVacuumQuery.data : null),
     [brand, model, searchVacuumQuery.data]
   );
-
-  const formValues = useWatch({
-    control: vacuumForm.control,
-  });
-
-  console.log({ formValues });
 
   return (
     <FormProvider {...vacuumForm}>
@@ -222,16 +207,18 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
                   {!vacuum?.id && similarVacuums?.results?.length ? (
                     <div className="bg-background-alt p-4 rounded-lg">
-                      <p className="flex gap-2 items-center">
-                        <LuInfo className="w-4 h-4" />
-                        It seems a vacuum with a similar brand and model already exists:
+                      <p className="flex gap-2 items-start">
+                        <LuInfo className="w-3 h-3" />
+                        <span className="text-sm pt-0 -mt-1">
+                          It seems a vacuum with a similar brand and model already exists:
+                        </span>
                       </p>
                       <ul>
                         {similarVacuums.results.map((vacuum) => (
                           <li key={vacuum.id}>
                             <Link
                               to={`/vacuums/${vacuum.id}`}
-                              className="text-blue-700 dark:text-blue-300"
+                              className="text-blue-700 dark:text-blue-300 text-sm pl-5"
                               target="_blank"
                             >
                               {vacuum.brand} {vacuum.model}
@@ -295,7 +282,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
             <div className="flex flex-col gap-2 mb-6">
               <p className="text-sm/6 font-medium">Other Features</p>
 
-              {otherFeatures.map((_field, index) => {
+              {otherFeatures?.map((_field, index) => {
                 return (
                   <div key={index} className="flex gap-2">
                     <Controller
@@ -337,7 +324,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
               <Button
                 className="flex items-center gap-2 text-accent px-0!"
-                onClick={() => vacuumForm.setValue("otherFeatures", [...otherFeatures, ""])}
+                onClick={() => vacuumForm.setValue("otherFeatures", [...(otherFeatures ?? []), ""])}
               >
                 <LuPlus className="w-4 h-4" />
                 Add Feature

@@ -26,8 +26,6 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
     );
   }, [links, selectedRegion, selectedCurrency]);
 
-  console.log("filteredLinks", filteredLinks);
-
   // Define table columns using TanStack react-table types.
   const columns = useMemo<ColumnDef<AffiliateLink>[]>(
     () => [

@@ -33,7 +33,6 @@ export function VacuumResults({
 }: VacuumResultsProps & {
   containerWidth: number;
 }) {
-  console.log({ results, filters, navigateRoot, emptyView, containerWidth });
   const navigate = useNavigate();
 
   const tableOptions: TableOptions<VacuumWithAffiliateLinks> = useMemo(

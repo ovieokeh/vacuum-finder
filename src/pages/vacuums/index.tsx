@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
@@ -42,18 +42,16 @@ export function VacuumSearchPage() {
       hasManualControl: false,
     },
   });
+  const [currentFilters, setCurrentFilters] = useState<VacuumsFilters>({});
 
   const filters = useWatch({ control: form.control });
-  const searchVacuumsQuery = useSearchVacuums(filters);
+  const searchVacuumsQuery = useSearchVacuums(currentFilters);
   const { refetch } = searchVacuumsQuery;
   const searchVacuums = useMemo(() => searchVacuumsQuery.data, [searchVacuumsQuery.data]);
 
-  const isLoading = searchVacuumsQuery.isLoading;
-  console.log({ isLoading });
-
   const dispatch = useAppDispatch();
 
-  const { handleSubmit, setValue } = form;
+  const { handleSubmit, setValue, reset } = form;
 
   useEffect(() => {
     refetch();
@@ -71,6 +69,11 @@ export function VacuumSearchPage() {
     dispatch(replaceState({ value: filters }));
   }, [dispatch, filters]);
 
+  const resetFilters = useCallback(() => {
+    setCurrentFilters({});
+    reset();
+  }, [reset]);
+
   const filtersContainerWidth = filtersContainerRef.current?.clientWidth ?? 300;
   const vacuumResultsWidth = Math.min(windowWidth - (filtersContainerWidth + 64), 868);
 
@@ -84,7 +87,7 @@ export function VacuumSearchPage() {
       <div
         className="flex flex-col-reverse justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1240px] p-4"
         style={{
-          height: `calc(100% - ${navHeight + 16}px)`,
+          minHeight: `calc(100% - ${navHeight + 16}px)`,
         }}
       >
         <div
@@ -100,15 +103,20 @@ export function VacuumSearchPage() {
               form={form}
               handleSubmit={() => {
                 handleSubmit(() => {
-                  refetch();
+                  setCurrentFilters(filters);
                 })();
               }}
+              resetFilters={resetFilters}
             />
           </FormProvider>
         </div>
 
         <div className="md:border md:border-border md:border-l-0 md:w-3/4 md:h-full overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0">
-          <VacuumResults containerWidth={vacuumResultsWidth} filters={filters} results={searchVacuums?.results} />
+          <VacuumResults
+            containerWidth={vacuumResultsWidth}
+            filters={currentFilters}
+            results={searchVacuums?.results}
+          />
         </div>
       </div>
       <Outlet />

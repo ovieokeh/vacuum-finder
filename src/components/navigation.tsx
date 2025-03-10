@@ -8,8 +8,7 @@ import { IoGlobeOutline } from "react-icons/io5";
 
 export const Navigation = () => {
   const navRef = useRef<HTMLDivElement>(null);
-  const { region, currency, setRegion, setCurrency, setNavHeight } = useSiteConfig();
-  const { user } = useSiteConfig();
+  const { user, region, currency, setRegion, setCurrency, setNavHeight } = useSiteConfig();
 
   useEffect(() => {
     if (navRef.current) {

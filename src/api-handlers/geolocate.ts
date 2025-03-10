@@ -49,7 +49,6 @@ export const geolocateHandler = async (req: Request, res: Response) => {
     // Derive region from timezone
     if (timezone) {
       const splitRegion = timezone.split("/")[0].toLowerCase();
-      console.log("splitRegion", splitRegion);
       region = SUPPORTED_REGIONS.includes(splitRegion as Region) ? splitRegion : "americas";
     }
 

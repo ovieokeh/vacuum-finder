@@ -16,10 +16,19 @@ export const useGetVacuum = (id: string) => {
   });
 };
 
-export const useSearchVacuums = (filters: VacuumsFilters) => {
+export const useSearchVacuums = (filters: VacuumsFilters, owned?: boolean) => {
+  const stringifiedFilters = JSON.stringify(filters);
   return useQuery({
-    queryKey: ["search-vacuums"],
-    queryFn: () => searchVacuums({ filters, page: 1, limit: 10 }),
+    queryKey: ["search-vacuums", stringifiedFilters, owned],
+    queryFn: () =>
+      searchVacuums({
+        filters: {
+          ...filters,
+          owned,
+        },
+        page: 1,
+        limit: 10,
+      }),
     enabled: true,
   });
 };
@@ -49,14 +58,10 @@ export const useUpdateVacuum = (args: { onSuccess?: () => void } = {}) => {
 };
 
 export const useDeleteVacuum = (args: { onSuccess?: () => void } = {}) => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationKey: ["delete-vacuum"],
     mutationFn: deleteVacuum,
     onSettled: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["search-vacuums"] });
-      queryClient.invalidateQueries({ queryKey: ["get-vacuum"] });
       if (data && args.onSuccess) args.onSuccess();
     },
   });

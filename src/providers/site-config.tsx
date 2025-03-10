@@ -74,13 +74,12 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
     if (userLanguage) {
       setLanguage(userLanguage);
     }
-  }, [userLanguage]);
-  useEffect(() => {
+
     if (userRegion) {
       setRegion(userRegion);
       setCurrency(userRegion === "europe" ? "eur" : "usd");
     }
-  }, [userRegion]);
+  }, [userLanguage, userRegion]);
 
   return (
     <SiteConfigContext.Provider

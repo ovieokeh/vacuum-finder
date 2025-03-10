@@ -16,12 +16,14 @@ import { FormSelectField, FormTextField, FormToggleField } from "./form-componen
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
   handleSubmit: () => void;
+  resetFilters: () => void;
 }
 
-export function VacuumSearchForm({ form, handleSubmit }: VacuumSearchFormProps) {
+export function VacuumSearchForm({ form, handleSubmit, resetFilters }: VacuumSearchFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const brandsQuery = useListBrands();
   const brands = brandsQuery.data;
+  const isFormDirty = form.formState.isDirty;
 
   // --- Simple Filters ---
   const simpleFilters = useMemo(
@@ -157,38 +159,51 @@ export function VacuumSearchForm({ form, handleSubmit }: VacuumSearchFormProps) 
     []
   );
 
+  const advancedFiltersToggle = useMemo(
+    () => (
+      <Button
+        type="button"
+        onClick={() => setShowAdvanced((prev) => !prev)}
+        className="my-4 p-0! text-sm text-primary underline outline-0! focus:outline-0! border-0!"
+      >
+        {showAdvanced ? "Hide Advanced Filters" : "Show Advanced Filters"}
+      </Button>
+    ),
+    [showAdvanced]
+  );
+
   // --- Desktop & Mobile Filters ---
   const desktopFilters = (
     <div className="hidden md:block">
       <div className="h-[69vh] overflow-y-scroll space-y-2">
         {simpleFilters}
-        <Button
-          type="button"
-          onClick={() => setShowAdvanced((prev) => !prev)}
-          className="my-4 p-0! text-sm text-primary underline"
-        >
-          {showAdvanced ? "Hide Advanced Filters" : "Show Advanced Filters"}
-        </Button>
+        {advancedFiltersToggle}
         {showAdvanced && advancedFilters}
       </div>
 
-      <Button type="button" onClick={() => handleSubmit()} className="w-full bg-background border! border-border!">
-        Find Vacuums
-      </Button>
+      <div className="flex flex-col gap-4">
+        {isFormDirty && (
+          <Button type="button" onClick={() => resetFilters()} className="w-full bg-red-500/10 border! border-red-500!">
+            Reset Filters
+          </Button>
+        )}
+        <Button type="button" onClick={() => handleSubmit()} className="w-full bg-background border! border-border!">
+          Find Vacuums
+        </Button>
+      </div>
     </div>
   );
 
   const mobileFilters = (
-    <MobileFiltersDialog className="block md:hidden" form={form} handleSubmit={handleSubmit}>
+    <MobileFiltersDialog
+      className="block md:hidden"
+      form={form}
+      handleSubmit={handleSubmit}
+      resetFilters={resetFilters}
+    >
       <div className="flex flex-col gap-4">
         {simpleFilters}
-        <Button
-          type="button"
-          onClick={() => setShowAdvanced((prev) => !prev)}
-          className="text-sm text-primary underline"
-        >
-          {showAdvanced ? "Hide Advanced Filters" : "Show Advanced Filters"}
-        </Button>
+        {advancedFiltersToggle}
         {showAdvanced && advancedFilters}
       </div>
     </MobileFiltersDialog>
@@ -221,6 +236,7 @@ const MobileFiltersDialog = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const formValues = useWatch({ control: form.control });
+  const isFormDirty = form.formState.isDirty;
 
   const filtersDisplay = Object.entries(formValues).reduce((acc, [key, value]) => {
     let displayValue = "";
@@ -273,16 +289,32 @@ const MobileFiltersDialog = ({
       </Button>
       <Modal title="Refine your vacuum search" isOpen={isOpen} close={close} childrenClassName="space-y-6">
         {children}
-        <Button
-          className="w-full bg-background border! border-border!"
-          type="button"
-          onClick={() => {
-            close();
-            handleSubmit();
-          }}
-        >
-          Find Vacuums
-        </Button>
+
+        <div className="flex flex-col gap-4">
+          {isFormDirty && (
+            <Button
+              type="button"
+              onClick={() => {
+                close();
+                form.reset();
+              }}
+              className="w-full bg-red-500/10 border! border-red-500!"
+            >
+              Reset Filters
+            </Button>
+          )}
+
+          <Button
+            className="w-full bg-background border! border-border!"
+            type="button"
+            onClick={() => {
+              close();
+              handleSubmit();
+            }}
+          >
+            Find Vacuums
+          </Button>
+        </div>
       </Modal>
     </div>
   );

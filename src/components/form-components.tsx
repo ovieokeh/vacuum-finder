@@ -237,7 +237,6 @@ export const FormComboboxField = <T extends string>({
     <Combobox<T>
       value={value}
       onChange={(newValue) => {
-        console.log("Changed: ", newValue);
         if (!newValue) {
           return;
         }
