@@ -231,7 +231,7 @@ export const mockVacuums: Vacuum[] = [
 export const mockAffiliateLinks: AffiliateLinkBase[] = [
   {
     vacuumId: "roborock_s8_maxv_ultra",
-    region: Region.America,
+    region: Region.Americas,
     currency: Currency.USD,
     price: 1799.99,
     site: "Amazon",
@@ -247,7 +247,7 @@ export const mockAffiliateLinks: AffiliateLinkBase[] = [
   },
   {
     vacuumId: "irobot_roomba_j9_combo_plus",
-    region: Region.America,
+    region: Region.Americas,
     currency: Currency.USD,
     price: 999.99,
     site: "Amazon",
@@ -263,7 +263,7 @@ export const mockAffiliateLinks: AffiliateLinkBase[] = [
   },
   {
     vacuumId: "dreame_x40",
-    region: Region.America,
+    region: Region.Americas,
     currency: Currency.USD,
     price: 799.99,
     site: "Amazon",
@@ -279,7 +279,7 @@ export const mockAffiliateLinks: AffiliateLinkBase[] = [
   },
   {
     vacuumId: "eufy_x10_pro_omni",
-    region: Region.America,
+    region: Region.Americas,
     currency: Currency.USD,
     price: 799.99,
     site: "Amazon",

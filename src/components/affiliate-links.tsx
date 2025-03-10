@@ -1,37 +1,41 @@
 import React, { useMemo, useState } from "react";
 import { getCoreRowModel, ColumnDef } from "@tanstack/react-table";
-import { AffiliateLinkBase, Currency, Region, WithId } from "../types";
+
 import { TableContainer } from "./table";
-import { FormSelectField } from "./form";
+import { FormSelectField } from "./form-components";
+import { AffiliateLink, AffiliateLinks, Currency, Region } from "../database";
 
 interface AffiliateLinksTableProps {
   vacuumName: string;
-  links?: WithId<AffiliateLinkBase>[];
+  links?: AffiliateLinks;
 }
 
 export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuumName, links }) => {
   // Filter state (with "All" as the default for no filter)
-  const [selectedRegion, setSelectedRegion] = useState<string>("All");
-  const [selectedCurrency, setSelectedCurrency] = useState<string>("All");
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>("americas");
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>("usd");
 
   // Filter the links array based on the current filter selections.
   const filteredLinks = useMemo(() => {
-    return links?.filter((link) => {
-      const matchRegion = selectedRegion === "All" || link.region === selectedRegion;
-      const matchCurrency = selectedCurrency === "All" || link.currency === selectedCurrency;
-      return matchRegion && matchCurrency;
-    });
+    return (
+      links?.filter((link) => {
+        const matchRegion = !selectedRegion || link.region === selectedRegion;
+        const matchCurrency = !selectedCurrency || link.currency === selectedCurrency;
+        return matchRegion && matchCurrency;
+      }) ?? []
+    );
   }, [links, selectedRegion, selectedCurrency]);
 
   console.log("filteredLinks", filteredLinks);
 
   // Define table columns using TanStack react-table types.
-  const columns = useMemo<ColumnDef<WithId<AffiliateLinkBase>>[]>(
+  const columns = useMemo<ColumnDef<AffiliateLink>[]>(
     () => [
       {
         accessorKey: "region",
         header: "Region",
         maxSize: 100,
+        cell: (info) => <p className="capitalize">{info.getValue<Region>()}</p>,
       },
       {
         accessorKey: "price",
@@ -40,9 +44,15 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
         maxSize: 100,
       },
       {
-        accessorKey: "site",
+        accessorKey: "link",
         header: "Site",
         maxSize: 100,
+        cell: (info) => {
+          const link = info.getValue<string>();
+          const site = link.split("/")[2];
+
+          return <p>{site}</p>;
+        },
       },
     ],
     []
@@ -60,13 +70,10 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Purchase Links</h2>
+      <h2 className="text-lg font-semibold">Purchase Links</h2>
 
       <p className="text-text/90 mb-4">
         Below are purchase links for the {vacuumName}. Click on a row to open the link in a new tab.
-        <p className="text-text/90 mb-4">
-          Read up on the features of the {vacuumName} below and compare it to other models you're interested in.
-        </p>
       </p>
 
       {/* Filter controls */}
@@ -74,17 +81,19 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
         <div className="grow">
           <FormSelectField
             label="Region"
-            selectedOption={selectedRegion}
+            value={selectedRegion ?? "americas"}
             onChange={(e) => setSelectedRegion(e)}
-            options={["All", ...Object.values(Region)]}
+            options={["americas", "europe", "asia", "africa", "australia"]}
           />
         </div>
         <div className="grow">
           <FormSelectField
             label="Currency"
-            selectedOption={selectedCurrency}
+            value={selectedCurrency ?? "usd"}
             onChange={(e) => setSelectedCurrency(e)}
-            options={["All", ...Object.values(Currency)]}
+            options={["usd", "eur"]}
+            labelClassName="uppercase"
+            optionClassName="uppercase"
           />
         </div>
       </div>
@@ -92,7 +101,7 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
       {!!links && links.length > 0 ? (
         <TableContainer
           tableOptions={tableOptions}
-          handleRowClick={(link) => window.open(link.url, "_blank", "noopener,noreferrer")}
+          handleRowClick={(link) => window.open(link.link, "_blank", "noopener,noreferrer")}
         />
       ) : (
         <div>

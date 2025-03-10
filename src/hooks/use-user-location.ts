@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Region } from "../types";
+
 import { useIsClient } from "./use-is-client";
+import { Region } from "../database";
 
 interface UserLocation {
   language: string;
@@ -15,13 +16,13 @@ export const useUserLocation = () => {
   const isClient = useIsClient();
   const [userLocation, setUserLocation] = useState<UserLocation>(() => {
     if (!isClient) {
-      return { language: "en", country_code: "US", country_name: "United States", region: Region.Global };
+      return { language: "en", country_code: "US", country_name: "United States", region: "americas" };
     }
 
     const userLanguage = navigator.language.split("-")[0];
     const userCountry = navigator.language.split("-")[1];
 
-    return { language: userLanguage, country: userCountry, region: Region.Global };
+    return { language: userLanguage, country: userCountry, region: "americas" };
   });
 
   const getLocationByIP = async () => {

@@ -2,8 +2,9 @@ import React from "react";
 import { flexRender, Table, Row, Cell, Header, HeaderGroup, useReactTable, TableOptions } from "@tanstack/react-table";
 import { VirtualItem, Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
-import clsx from "clsx";
+
 import { useIsClient } from "../hooks/use-is-client";
+import { twMerge } from "tailwind-merge";
 
 interface TableContainerProps<T> {
   tableOptions: TableOptions<T>;
@@ -151,7 +152,7 @@ function TableHeadCell<T extends Record<string, unknown>>({ header }: TableHeadC
     >
       <div
         onClick={canSort ? sortHandler : undefined}
-        className={clsx("px-3 py-2", canSort ? "flex items-center gap-2 cursor-pointer select-none" : "")}
+        className={twMerge("px-3 py-2", canSort ? "flex items-center gap-2 cursor-pointer select-none" : "")}
       >
         {flexRender(header.column.columnDef.header, header.getContext())}
         {sortIndicator}

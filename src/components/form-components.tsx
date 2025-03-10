@@ -1,4 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
+import { useEffect, useState } from "react";
 import {
   Field,
   Button,
@@ -14,27 +14,13 @@ import {
   ComboboxOption,
   ComboboxInput,
 } from "@headlessui/react";
+import { ControllerFieldState } from "react-hook-form";
 import { GoChevronDown } from "react-icons/go";
-import {
-  FieldComponent,
-  FormAsyncValidateOrFn,
-  FormValidateOrFn,
-  ReactFormExtendedApi,
-  createFormHook,
-  createFormHookContexts,
-} from "@tanstack/react-form";
-import clsx from "clsx";
-import { ComponentType, PropsWithChildren, useEffect, useState } from "react";
-import ImageUpload from "./image-upload";
 import { twMerge } from "tailwind-merge";
 
-interface FormError {
-  key: string;
-  error: string;
-}
+import ImageUpload from "./image-upload";
 
-const ErrorRenderer = ({ name, errors }: { name: string; errors: (FormError | undefined | null)[] }) => {
-  const error = errors.find((error) => error?.key === name)?.error;
+const ErrorRenderer = ({ error }: { error?: string }) => {
   if (!error) {
     return null;
   }
@@ -42,24 +28,27 @@ const ErrorRenderer = ({ name, errors }: { name: string; errors: (FormError | un
   return <div className="text-red-500 text-sm">{error}</div>;
 };
 
-const FormTextField = <T extends string | number>({
+interface FormFieldProps<T> {
+  value: T;
+  onChange: (value: T) => void;
+  state?: ControllerFieldState;
+}
+
+export const FormTextField = <T extends string | number>({
   type = "text",
   icon,
   label,
   labelIcon,
   inputContainerClassName,
   onChange,
-  formErrors = [],
+  state,
   ...rest
-}: {
-  value: T;
-  onChange: (value: T) => void;
+}: FormFieldProps<T> & {
   type?: string;
   label?: string;
   icon?: React.ReactNode;
   labelIcon?: React.ReactNode;
   inputContainerClassName?: string;
-  formErrors?: (FormError | undefined | null)[];
   name: string;
 }) => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +70,7 @@ const FormTextField = <T extends string | number>({
     onChange(value as T);
   };
 
-  const error = formErrors.find((error) => error?.key === rest.name)?.error;
+  const error = state?.error?.message;
 
   return (
     <Field className="space-y-2">
@@ -106,46 +95,50 @@ const FormTextField = <T extends string | number>({
         />
       </div>
 
-      <ErrorRenderer name={rest.name} errors={formErrors} />
+      <ErrorRenderer error={error} />
     </Field>
   );
 };
 
-const FormToggleField = ({
+export const FormToggleField = ({
   icon,
   label,
-  checked,
+  value,
+  state,
   onChange,
-}: {
-  checked: boolean;
-  onChange: (e: boolean) => void;
+}: FormFieldProps<boolean> & {
   label?: string;
   icon?: React.ReactNode;
 }) => {
+  const error = state?.error?.message;
+
   return (
-    <Field className="flex items-center gap-2">
-      <Switch
-        checked={checked}
-        onChange={(e) => onChange(e)}
-        className={clsx(
-          `border-border! group relative flex w-10 h-5.5 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
-          checked ? "bg-blue-100!" : "bg-background/70!"
-        )}
-      >
-        <span
-          aria-hidden="true"
-          className="pointer-events-none inline-block size-4 translate-y-0.5 translate-x-0.5 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-5"
-          style={{
-            backgroundColor: checked ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
-          }}
-        />
-      </Switch>
+    <Field className="flex flex-col gap-2 py-2">
       {label && (
         <Label className="flex items-center gap-2 text-sm/6 font-medium">
           {icon}
           {label}
         </Label>
       )}
+
+      <Switch
+        checked={value}
+        onChange={(e) => onChange(e)}
+        className={twMerge(
+          `border-border! group relative flex w-10 h-5.5 p-0! cursor-pointer rounded-full! transition-colors duration-200 ease-in-out focus:outline-none! outline-none!`,
+          value ? "bg-blue-100!" : "bg-background/70!"
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none inline-block size-4 translate-y-0.5 translate-x-0.5 rounded-full ring-0 shadow-lg transition duration-200 ease-in-out group-data-[checked]:translate-x-5"
+          style={{
+            backgroundColor: value ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
+          }}
+        />
+      </Switch>
+
+      <ErrorRenderer error={error} />
     </Field>
   );
 };
@@ -154,17 +147,22 @@ export const FormSelectField = <T extends string>({
   label,
   icon,
   options,
-  selectedOption,
+  value,
   onChange,
-}: {
+  state,
+  labelClassName,
+  optionClassName,
+}: FormFieldProps<T> & {
   label?: string;
   icon?: React.ReactNode;
   options: T[];
-  selectedOption: T;
-  onChange: (value: T) => void;
+  labelClassName?: string;
+  optionClassName?: string;
 }) => {
+  const error = state?.error?.message;
+
   return (
-    <Listbox value={selectedOption} onChange={(value) => onChange(value)}>
+    <Listbox value={value} onChange={(value) => onChange(value)}>
       <div className="flex flex-col gap-2">
         {label && (
           <Label className="flex items-center gap-2 text-sm/6 font-medium">
@@ -172,15 +170,20 @@ export const FormSelectField = <T extends string>({
             {label}
           </Label>
         )}
-        <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! bg-background! border! border-border!">
-          {selectedOption || <span className="text-text/80 text-sm">Select an option</span>}
+        <ListboxButton
+          className={twMerge(
+            "flex flex-row items-center justify-between gap-2 text-left px-2! bg-background! border! border-border! capitalize",
+            labelClassName
+          )}
+        >
+          {value || <span className="text-text/80 text-sm">Select an option</span>}
           <GoChevronDown className="w-4 h-4" />
         </ListboxButton>
         <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
-          {!!selectedOption && (
+          {!!value && (
             <ListboxOption
               value=""
-              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer text-red-700"
+              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer text-red-700 dark:text-red-300"
             >
               Clear
             </ListboxOption>
@@ -189,37 +192,37 @@ export const FormSelectField = <T extends string>({
             <ListboxOption
               key={option + index}
               value={option}
-              className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer"
+              className={twMerge(
+                "group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer capitalize",
+                optionClassName
+              )}
             >
               {option}
             </ListboxOption>
           ))}
         </ListboxOptions>
       </div>
+
+      <ErrorRenderer error={error} />
     </Listbox>
   );
 };
 
-const FormComboboxField = <T extends string>({
-  name,
+export const FormComboboxField = <T extends string>({
   label,
   options = [],
-  selectedOption,
+  value,
   onChange,
-  formErrors = [],
-}: {
+  state,
+}: FormFieldProps<T> & {
   label?: string;
   options: T[];
-  selectedOption: T;
-  onChange: (value: T) => void;
-  formErrors?: (FormError | undefined | null)[];
-  name: string;
 }) => {
-  const [query, setQuery] = useState(selectedOption as string);
+  const [query, setQuery] = useState(value as string);
 
   useEffect(() => {
-    setQuery(selectedOption as string);
-  }, [selectedOption]);
+    setQuery(value as string);
+  }, [value]);
 
   const filteredOptions =
     query === ""
@@ -228,11 +231,11 @@ const FormComboboxField = <T extends string>({
           return option?.toLowerCase().includes(query?.toLowerCase());
         });
 
-  const error = formErrors.find((error) => error?.key === name)?.error;
+  const error = state?.error?.message;
 
   return (
     <Combobox<T>
-      value={selectedOption}
+      value={value}
       onChange={(newValue) => {
         console.log("Changed: ", newValue);
         if (!newValue) {
@@ -243,11 +246,11 @@ const FormComboboxField = <T extends string>({
         onChange(newValue as T);
       }}
     >
-      {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
+      {label && <Label className="flex items-center gap-2 text-sm/6 font-medium capitalize">{label}</Label>}
 
       <ComboboxInput
         className={twMerge(
-          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
+          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary capitalize",
           !!error && "border-red-500"
         )}
         aria-label={label}
@@ -255,7 +258,7 @@ const FormComboboxField = <T extends string>({
         onChange={(event) => setQuery(event.target.value)}
       />
 
-      <ErrorRenderer name={name} errors={formErrors} />
+      <ErrorRenderer error={error} />
 
       <ComboboxOptions anchor="bottom start" className="w-[300px] border bg-background empty:invisible p-2 rounded">
         {!!query && query.length > 0 && (
@@ -273,7 +276,7 @@ const FormComboboxField = <T extends string>({
           <ComboboxOption
             key={option + index}
             value={option}
-            className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt"
+            className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt capitalize"
           >
             {option}
           </ComboboxOption>
@@ -283,7 +286,7 @@ const FormComboboxField = <T extends string>({
   );
 };
 
-const FormSubmitButton = ({
+export const FormSubmitButton = ({
   type = "submit",
   className,
   children,
@@ -293,86 +296,69 @@ const FormSubmitButton = ({
   children: React.ReactNode;
 }) => {
   return (
-    <Button type={type} className={clsx("bg-background! border! border-border!", className)}>
+    <Button type={type} className={twMerge("bg-background! border! border-border!", className)}>
       {children}
     </Button>
   );
 };
 
-const FormImageUploadField = ({
+export const FormImageUploadField = ({
   className,
   value,
   label,
   showPreview,
   onChange,
-}: {
+}: FormFieldProps<string> & {
   className?: string;
-  value?: string;
   label?: React.ReactNode;
   showPreview?: boolean;
-  onChange: (value: string) => void;
 }) => {
   return (
     <ImageUpload currentUrl={value} label={label} showPreview={showPreview} onUpload={onChange} className={className} />
   );
 };
 
-const { fieldContext, formContext } = createFormHookContexts();
-export const formInit = {
-  fieldComponents: {
-    FormTextField,
-    FormToggleField,
-    FormSelectField,
-    FormComboboxField,
-    FormImageUploadField,
-  },
-  formComponents: {
-    FormSubmitButton,
-  },
-  fieldContext,
-  formContext,
-};
-
-export type AppFieldExtendedReactFormApi<
-  TFormData,
-  TOnMount extends undefined | FormValidateOrFn<TFormData>,
-  TOnChange extends undefined | FormValidateOrFn<TFormData>,
-  TOnChangeAsync extends undefined | FormAsyncValidateOrFn<TFormData>,
-  TOnBlur extends undefined | FormValidateOrFn<TFormData>,
-  TOnBlurAsync extends undefined | FormAsyncValidateOrFn<TFormData>,
-  TOnSubmit extends undefined | FormValidateOrFn<TFormData>,
-  TOnSubmitAsync extends undefined | FormAsyncValidateOrFn<TFormData>,
-  TOnServer extends undefined | FormAsyncValidateOrFn<TFormData>,
-  TSubmitMeta,
-  TFieldComponents extends Record<string, ComponentType<any>>,
-  TFormComponents extends Record<string, ComponentType<any>>
-> = ReactFormExtendedApi<
-  TFormData,
-  TOnMount,
-  TOnChange,
-  TOnChangeAsync,
-  TOnBlur,
-  TOnBlurAsync,
-  TOnSubmit,
-  TOnSubmitAsync,
-  TOnServer,
-  TSubmitMeta
-> &
-  TFormComponents & {
-    AppField: FieldComponent<
-      TFormData,
-      TOnMount,
-      TOnChange,
-      TOnChangeAsync,
-      TOnBlur,
-      TOnBlurAsync,
-      TOnSubmit,
-      TOnSubmitAsync,
-      TOnServer,
-      TSubmitMeta,
-      NoInfer<TFieldComponents>
-    >;
-    AppForm: ComponentType<PropsWithChildren>;
+export const FormTabField = ({
+  label,
+  value,
+  onChange,
+}: FormFieldProps<boolean | undefined> & {
+  label?: string;
+}) => {
+  const VALUE_MAPPING = {
+    yes: true,
+    no: false,
+    unknown: undefined,
   };
 
-export const { useAppForm } = createFormHook(formInit);
+  const isValueSelected = (tab: string) => {
+    const selectedValue = VALUE_MAPPING[tab as keyof typeof VALUE_MAPPING];
+    return value === selectedValue;
+  };
+
+  return (
+    <Field className="flex flex-col space-y-2">
+      {label && <Label className="text-sm/6 font-medium">{label}</Label>}
+
+      <div
+        className="flex border border-accent bg-accent rounded overflow-hidden"
+        style={{
+          gap: "1px",
+        }}
+      >
+        {Object.keys(VALUE_MAPPING).map((tab, index) => (
+          <Button
+            key={index}
+            className={twMerge(
+              "flex-1 py-2 text-sm rounded-none!  border-none! bg-background text-text/80 capitalize outline-0!",
+              isValueSelected(tab) && "bg-accent text-background"
+            )}
+            onClick={() => onChange(VALUE_MAPPING[tab as keyof typeof VALUE_MAPPING])}
+          >
+            {tab}
+          </Button>
+        ))}
+      </div>
+    </Field>
+  );
+};

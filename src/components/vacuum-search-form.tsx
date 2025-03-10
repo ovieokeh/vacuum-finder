@@ -1,287 +1,160 @@
 import { useMemo, useState } from "react";
+import { Controller, UseFormReturn, useWatch } from "react-hook-form";
+import { Button } from "@headlessui/react";
 import { BiWallet } from "react-icons/bi";
 import { MdPets } from "react-icons/md";
 import { GiSoap } from "react-icons/gi";
 import { CiEdit } from "react-icons/ci";
 import { IoFilterOutline } from "react-icons/io5";
-import { Button } from "@headlessui/react";
-import { AnyFormApi, FormValidateOrFn, useStore } from "@tanstack/react-form";
-import { useSiteConfig } from "../providers/site-config";
-import { CurrencySymbolMapping, VacuumMappingTechnology, VacuumsFilter } from "../types";
-import { AppFieldExtendedReactFormApi, formInit } from "./form";
-import { Modal } from "./modal";
-import { useVacuumBrandsQuery } from "../database/hooks";
 
-export type VacuumSearchFormInterface = AppFieldExtendedReactFormApi<
-  VacuumsFilter,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  FormValidateOrFn<VacuumsFilter> | undefined,
-  typeof formInit.fieldComponents,
-  typeof formInit.formComponents
->;
+import { useSiteConfig } from "../providers/site-config";
+import { CurrencySymbolMapping, VacuumsFilters } from "../types";
+import { Modal } from "./modal";
+import { useListBrands } from "../database/hooks";
+import { FormSelectField, FormTextField, FormToggleField } from "./form-components";
 
 interface VacuumSearchFormProps {
-  form: VacuumSearchFormInterface;
+  form: UseFormReturn<VacuumsFilters>;
+  handleSubmit: () => void;
 }
 
-export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
+export function VacuumSearchForm({ form, handleSubmit }: VacuumSearchFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const brandsQuery = useVacuumBrandsQuery();
+  const brandsQuery = useListBrands();
   const brands = brandsQuery.data;
 
   // --- Simple Filters ---
   const simpleFilters = useMemo(
     () => (
       <>
-        <form.AppField
+        <Controller
           name="brand"
-          children={(field) => (
-            <field.FormSelectField
-              label="Brand"
-              selectedOption={field.state.value}
-              options={brands?.brands || []}
-              onChange={(value) => field.setValue(value)}
-            />
+          render={({ field, fieldState }) => (
+            <FormSelectField label="Brand" options={brands || []} state={fieldState} {...field} />
           )}
         />
 
-        <form.AppField
+        <Controller
           name="budget"
-          children={(field) => (
-            <field.FormTextField
-              name="budget"
+          render={({ field, fieldState }) => (
+            <FormTextField
               type="number"
               label="Budget"
-              icon={<BiWallet className="w-4 h-4 text-primary" />}
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
+              labelIcon={<BiWallet className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              {...field}
             />
           )}
         />
 
-        <form.AppField
+        <Controller
           name="mappingTechnology"
-          children={(field) => (
-            <field.FormSelectField
-              label="Mapping Technology"
-              selectedOption={field.state.value}
-              options={Object.values(VacuumMappingTechnology)}
-              onChange={(value) => field.setValue(value)}
-            />
+          render={({ field, fieldState }) => (
+            <FormSelectField label="Mapping Technology" options={["laser", "camera"]} state={fieldState} {...field} />
           )}
         />
 
-        <form.AppField
+        <Controller
           name="numPets"
-          children={(field) => (
-            <field.FormTextField
-              name="numPets"
+          render={({ field, fieldState }) => (
+            <FormTextField
               type="number"
               label="Number of pets"
-              icon={<MdPets className="w-4 h-4 text-primary" />}
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
+              labelIcon={<MdPets className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              {...field}
             />
           )}
         />
 
-        <form.AppField
+        <Controller
           name="mopFunction"
-          children={(field) => (
-            <field.FormToggleField
+          render={({ field, fieldState }) => (
+            <FormToggleField
               label="Mop feature"
               icon={<GiSoap className="w-4 h-4 text-primary" />}
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
+              state={fieldState}
+              {...field}
             />
           )}
         />
       </>
     ),
-    [form, brands?.brands]
+    [brands]
   );
 
   // --- Advanced Filters (all keys from VacuumBase) ---
   const advancedFilters = useMemo(
     () => (
-      <div className="mt-4 grid grid-cols-1 gap-4">
-        <form.AppField
+      <div className="mt-4 flex flex-col gap-4 pb-4">
+        <Controller
           name="minBatteryLifeInMinutes"
-          children={(field) => (
-            <field.FormTextField
-              name="minBatteryLifeInMinutes"
-              type="number"
-              label="Min Battery Life (minutes)"
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
-            />
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Battery Life (minutes)" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
+        <Controller
           name="minSuctionPowerInPascals"
-          children={(field) => (
-            <field.FormTextField
-              name="minSuctionPowerInPascals"
-              type="number"
-              label="Min Suction Power (Pascals)"
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
-            />
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Suction Power (Pascals)" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
+        <Controller
           name="maxNoiseLevelInDecibels"
-          children={(field) => (
-            <field.FormTextField
-              name="maxNoiseLevelInDecibels"
-              type="number"
-              label="Max Noise Level (dB)"
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
-            />
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Max Noise Level (dB)" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
+        <Controller
           name="minWaterTankCapacityInLiters"
-          children={(field) => (
-            <field.FormTextField
-              name="minWaterTankCapacityInLiters"
-              type="number"
-              label="Min Water Tank Capacity (liters)"
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
-            />
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Water Tank Capacity (liters)" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
+        <Controller
           name="minDustbinCapacityInLiters"
-          children={(field) => (
-            <field.FormTextField
-              name="minDustbinCapacityInLiters"
-              type="number"
-              label="Min Dustbin Capacity (liters)"
-              value={field.state.value}
-              onChange={(value) => field.setValue(value as number)}
-              formErrors={form.getAllErrors().form.errors}
-            />
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Dustbin Capacity (liters)" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
+        <Controller
           name="hasSelfEmptyingFeature"
-          children={(field) => (
-            <field.FormToggleField
-              label="Self-emptying"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
+          render={({ field, fieldState }) => <FormToggleField label="Self-emptying" state={fieldState} {...field} />}
         />
-        <form.AppField
+        <Controller
           name="hasZoneCleaningFeature"
-          children={(field) => (
-            <field.FormToggleField
-              label="Zone cleaning"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
+          render={({ field, fieldState }) => <FormToggleField label="Zone cleaning" state={fieldState} {...field} />}
         />
-        <form.AppField
+        <Controller
           name="hasMultiFloorMappingFeature"
-          children={(field) => (
-            <field.FormToggleField
-              label="Multi-floor mapping"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
+          render={({ field, fieldState }) => (
+            <FormToggleField label="Multi-floor mapping" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
-          name="hasCarpetBoostFeature"
-          children={(field) => (
-            <field.FormToggleField
-              label="Carpet boost"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
-        />
-        <form.AppField
+
+        <Controller
           name="hasVirtualWallsFeature"
-          children={(field) => (
-            <field.FormToggleField
-              label="Virtual walls"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
+          render={({ field, fieldState }) => <FormToggleField label="Virtual walls" state={fieldState} {...field} />}
         />
-        <form.AppField
+        <Controller
           name="hasSmartHomeIntegration"
-          children={(field) => (
-            <field.FormToggleField
-              label="Smart home integration"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
+          render={({ field, fieldState }) => (
+            <FormToggleField label="Smart home integration" state={fieldState} {...field} />
           )}
         />
-        <form.AppField
-          name="hasVoiceControl"
-          children={(field) => (
-            <field.FormToggleField
-              label="Voice control"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
-        />
-        <form.AppField
+
+        <Controller
           name="hasAppControl"
-          children={(field) => (
-            <field.FormToggleField
-              label="App control"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
+          render={({ field, fieldState }) => <FormToggleField label="App control" state={fieldState} {...field} />}
         />
-        <form.AppField
-          name="hasRemoteControl"
-          children={(field) => (
-            <field.FormToggleField
-              label="Remote control"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
-        />
-        <form.AppField
+
+        <Controller
           name="hasManualControl"
-          children={(field) => (
-            <field.FormToggleField
-              label="Manual control"
-              checked={field.state.value}
-              onChange={(value) => field.setValue(value)}
-            />
-          )}
+          render={({ field, fieldState }) => <FormToggleField label="Manual control" state={fieldState} {...field} />}
         />
       </div>
     ),
-    [form]
+    []
   );
 
   // --- Desktop & Mobile Filters ---
@@ -298,20 +171,15 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
         </Button>
         {showAdvanced && advancedFilters}
       </div>
-      <form.AppForm>
-        <Button
-          type="button"
-          onClick={() => form.handleSubmit()}
-          className="w-full bg-background border! border-border!"
-        >
-          Find Vacuums
-        </Button>
-      </form.AppForm>
+
+      <Button type="button" onClick={() => handleSubmit()} className="w-full bg-background border! border-border!">
+        Find Vacuums
+      </Button>
     </div>
   );
 
   const mobileFilters = (
-    <MobileFiltersDialog className="block md:hidden" form={form}>
+    <MobileFiltersDialog className="block md:hidden" form={form} handleSubmit={handleSubmit}>
       <div className="flex flex-col gap-4">
         {simpleFilters}
         <Button
@@ -326,17 +194,12 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
     </MobileFiltersDialog>
   );
 
-  const formErrors = form.getAllErrors().form.errors;
-  if (formErrors.length) {
-    console.log("Form errors", formErrors);
-  }
-
   return (
     <form
       className="px-4 py-2 md:p-4 flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
-        form.handleSubmit();
+        handleSubmit();
       }}
     >
       {desktopFilters}
@@ -348,28 +211,22 @@ export function VacuumSearchForm({ form }: VacuumSearchFormProps) {
 const MobileFiltersDialog = ({
   className = "",
   form,
+  handleSubmit,
   children,
-}: {
+}: VacuumSearchFormProps & {
   className?: string;
-  form: AnyFormApi;
   children: React.ReactNode;
 }) => {
   const { currency } = useSiteConfig();
   const [isOpen, setIsOpen] = useState(false);
 
-  const formValues = useStore(form.store, (s) => s.values as VacuumsFilter);
+  const formValues = useWatch({ control: form.control });
 
   const filtersDisplay = Object.entries(formValues).reduce((acc, [key, value]) => {
     let displayValue = "";
     switch (key) {
-      case "floorType":
-        displayValue = `${value} floor`;
-        break;
       case "budget":
         displayValue = `${CurrencySymbolMapping[currency]}${value}`;
-        break;
-      case "houseSizeSqM":
-        displayValue = `${value}sqm`;
         break;
       case "numRooms":
         displayValue = `${value} rooms`;
@@ -421,7 +278,7 @@ const MobileFiltersDialog = ({
           type="button"
           onClick={() => {
             close();
-            form.handleSubmit();
+            handleSubmit();
           }}
         >
           Find Vacuums

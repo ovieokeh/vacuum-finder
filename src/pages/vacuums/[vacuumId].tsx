@@ -7,8 +7,9 @@ import { Modal } from "../../components/modal";
 import { VacuumSpecExplanations } from "../../components/vacuum-spec-explanations";
 import { VacuumInfo } from "../../components/vacuum-info";
 import { useAppSelector } from "../../redux";
-import { useVacuumQuery } from "../../database/hooks";
+
 import { AffiliateLinksTable } from "../../components/affiliate-links";
+import { useGetVacuum } from "../../database/hooks";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();
@@ -16,7 +17,7 @@ export function VacuumInfoPage() {
 
   const navigate = useNavigate();
 
-  const vacuumQuery = useVacuumQuery(vacuumId);
+  const vacuumQuery = useGetVacuum(vacuumId);
   const vacuum = vacuumQuery.data;
   const name = `${vacuum?.brand} ${vacuum?.model}`;
 

@@ -1,11 +1,10 @@
 import { Locator, test } from "@playwright/test";
-import { Region } from "../src/types";
 import { readFile, writeFile } from "fs/promises";
 
 const mainSite = {
   name: "Amazon US",
   url: "https://www.amazon.com/s?k=robot+vacuums",
-  region: Region.Global,
+  region: "americas",
 };
 // const sites = [
 //   {
@@ -21,7 +20,7 @@ const mainSite = {
 //   {
 //     name: "Amazon CA",
 //     url: "https://www.amazon.ca/s?k=robot+vacuums&i=kitchen&rh=n%3A2206275011%2Cp_123%3A168956%257C183681%257C223008%257C240984%257C316796%257C811979&dc&qid=1741341654&rnid=119962390011&ref=sr_nr_p_123_8&ds=v1%3AvNXI4Bbj%2F20h9Oq0DWnwpBgxvBukFUJKgPgaqXo8hhI",
-//     region: Region.America,
+//     region: Region.Americas,
 //   },
 //   {
 //     name: "Amazon JP",
@@ -55,8 +54,6 @@ const brands = ["eufy"];
 const getOutputFile = async () => {
   const previousProductDetailsString = await readFile("productDetails.json", "utf-8");
   const parsedProductDetails = previousProductDetailsString ? JSON.parse(previousProductDetailsString) : [];
-
-  console.log("parsedProductDetails", parsedProductDetails.length);
   return parsedProductDetails;
 };
 

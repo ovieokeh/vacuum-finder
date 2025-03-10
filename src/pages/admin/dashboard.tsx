@@ -1,13 +1,13 @@
+import { useEffect, useMemo } from "react";
+import { Link, Outlet } from "react-router-dom";
 import { Button } from "@headlessui/react";
+
 import { PageHeader } from "../../components/page-header";
 import { useProtectedRoute } from "../../hooks/use-protected-route";
 import { useSiteConfig } from "../../providers/site-config";
-import { useQuery } from "@tanstack/react-query";
-import { Vacuum } from "../../types";
 import { VacuumResults } from "../../components/vacuum-results";
 import { useWindowWidth } from "../../hooks/use-window-width";
-import { useEffect, useMemo } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { useSearchVacuums } from "../../database/hooks";
 
 export function AdminDashboardPage() {
   useProtectedRoute();
@@ -15,26 +15,15 @@ export function AdminDashboardPage() {
   const { userToken, currency, logout } = useSiteConfig();
   const windowWidth = useWindowWidth();
 
-  const vacuumsQuery = useQuery<{ data: Vacuum[] }>({
-    queryKey: ["user-vacuums"],
-    queryFn: async () => {
-      const response = await fetch("/api/vacuums?owned=true", {
-        headers: { Authorization: `${userToken}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch vacuums");
-      return response.json();
-    },
-    enabled: !!userToken,
-  });
-
+  const vacuumsQuery = useSearchVacuums({});
   const refetch = vacuumsQuery.refetch;
+  const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
+
   useEffect(() => {
     if (userToken) {
       refetch();
     }
-  }, [refetch, currency, userToken]);
-
-  const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
+  }, [currency, userToken, refetch]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-text w-full">
@@ -59,7 +48,7 @@ export function AdminDashboardPage() {
             Add a new vacuum
           </Link>
           <VacuumResults
-            results={vacuums}
+            results={vacuums?.results}
             containerWidth={windowWidth}
             navigateRoot="/admin/vacuums"
             emptyView={

@@ -1,11 +1,18 @@
 import { MdInfoOutline } from "react-icons/md";
-import { Popover } from "./popover";
-import { CurrencySymbolMapping, Vacuum } from "../types";
+
+import { CurrencySymbolMapping } from "../types";
+import { VacuumWithAffiliateLinks } from "../database";
 import { getCheapestPrice } from "../shared-utils/price";
 import { useSiteConfig } from "../providers/site-config";
+import { Popover } from "./popover";
 
-export const PriceDisplay = ({ vacuum }: { vacuum: Vacuum }) => {
+export const PriceDisplay = ({ vacuum }: { vacuum: VacuumWithAffiliateLinks }) => {
   const { currency } = useSiteConfig();
+
+  if (!vacuum?.affiliateLinks) {
+    return <span className="block w-full">n/a</span>;
+  }
+
   const cheapestPrice = getCheapestPrice(vacuum, currency);
   return cheapestPrice === 0 ? (
     <span className="block w-full">n/a</span>

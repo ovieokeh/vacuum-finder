@@ -27,7 +27,6 @@ export default function App() {
 
   // scroll restoration
   useEffect(() => {
-    console.log("scrolling to top", location.pathname);
     if (scrollRef.current) {
       scrollRef.current.scrollTo(0, 0);
     }

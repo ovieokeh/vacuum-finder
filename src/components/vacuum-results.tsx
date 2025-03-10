@@ -2,19 +2,18 @@ import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, TableOptions } from "@tanstack/react-table";
 
-import { Vacuum, VacuumsFilter } from "../types";
+import { VacuumsFilters } from "../types";
 import { TableContainer } from "./table";
 import { VacuumInfo } from "./vacuum-info";
 import { VacuumFeatures } from "./vacuum-features";
 import { PriceDisplay } from "./price-display";
+import { VacuumsWithAffiliateLinks, VacuumWithAffiliateLinks } from "../database";
 
 interface VacuumResultsProps {
-  filters?: VacuumsFilter;
+  filters?: VacuumsFilters;
   navigateRoot?: string;
   emptyView?: React.ReactNode;
-  results?: {
-    data: Vacuum[];
-  };
+  results?: VacuumsWithAffiliateLinks;
 }
 
 const relativeWidth = (width: number, percent: number) => {
@@ -22,7 +21,7 @@ const relativeWidth = (width: number, percent: number) => {
 };
 
 export function VacuumResults({
-  results = { data: [] },
+  results = [],
   filters,
   navigateRoot = "/vacuums",
   emptyView = (
@@ -34,9 +33,10 @@ export function VacuumResults({
 }: VacuumResultsProps & {
   containerWidth: number;
 }) {
+  console.log({ results, filters, navigateRoot, emptyView, containerWidth });
   const navigate = useNavigate();
 
-  const tableOptions: TableOptions<Vacuum> = useMemo(
+  const tableOptions: TableOptions<VacuumWithAffiliateLinks> = useMemo(
     () => ({
       columns: [
         {
@@ -55,7 +55,7 @@ export function VacuumResults({
         {
           header: "Name",
           accessorKey: "name",
-          size: relativeWidth(containerWidth, 20),
+          size: relativeWidth(containerWidth, 26),
           cell: (value) => {
             const brand = value.row.original.brand;
             const model = value.row.original.model;
@@ -91,16 +91,9 @@ export function VacuumResults({
           enableSorting: true,
         },
         {
-          header: "Noise",
-          accessorKey: "noiseLevelInDecibels",
-          size: relativeWidth(containerWidth, 12),
-          cell: (value) => `${value.getValue()} dB`,
-          enableSorting: true,
-        },
-        {
           header: "Features",
           accessorKey: "features",
-          size: relativeWidth(containerWidth, 20),
+          size: relativeWidth(containerWidth, 26),
           cell: (value) => (
             <VacuumFeatures
               vacuum={value.row.original}
@@ -111,7 +104,7 @@ export function VacuumResults({
           enableSorting: false,
         },
       ],
-      data: results?.data,
+      data: results,
       getCoreRowModel: getCoreRowModel(),
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
@@ -121,12 +114,12 @@ export function VacuumResults({
 
   return (
     <>
-      {!results || results?.data?.length === 0 ? (
+      {!results || results?.length === 0 ? (
         emptyView
       ) : (
         <>
           <div className="hidden md:block">
-            <TableContainer<Vacuum>
+            <TableContainer<VacuumWithAffiliateLinks>
               tableOptions={tableOptions}
               handleRowClick={(vacuum) => navigate(`${navigateRoot}/${vacuum.id}`)}
             />
@@ -143,7 +136,7 @@ export function VacuumResults({
 const VacuumMobileList = ({ results, navigateRoot }: VacuumResultsProps) => {
   return (
     <ul className="space-y-4 py-2">
-      {results?.data?.map((vacuum) => (
+      {results?.map((vacuum) => (
         <li key={vacuum.id} className="flex flex-col gap-4 p-4 border border-border rounded-lg">
           <Link to={`${navigateRoot}/${vacuum.id}`}>
             <VacuumInfo vacuum={vacuum} />

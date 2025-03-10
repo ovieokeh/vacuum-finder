@@ -1,19 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Currency, FloorType, Region, VacuumsFilter } from "../types";
+import { VacuumsFilters } from "../types";
 
-const initialState: VacuumsFilter = {
-  floorType: FloorType.Hardwood,
+const initialState: VacuumsFilters = {
   budget: 500,
-  houseSizeSqM: 32,
-  numRooms: 1,
   numPets: 0,
   mopFunction: true,
-  region: Region.Europe,
-  currency: Currency.USD,
+  region: "americas" as const,
+  currency: "usd" as const,
 };
 
 interface UpdateValuePayload {
-  value: VacuumsFilter;
+  value: VacuumsFilters;
 }
 
 const vacuumFiltersSlice = createSlice({
@@ -27,5 +24,5 @@ const vacuumFiltersSlice = createSlice({
 });
 
 export const { replaceState } = vacuumFiltersSlice.actions;
-export const selectVacuumFilters = (state: { vacuumFilters: VacuumsFilter }) => state.vacuumFilters;
+export const selectVacuumFilters = (state: { vacuumFilters: VacuumsFilters }) => state.vacuumFilters;
 export default vacuumFiltersSlice.reducer;

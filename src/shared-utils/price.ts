@@ -1,6 +1,10 @@
-import { Vacuum } from "../types";
+import { VacuumWithAffiliateLinks } from "../database";
 
-export const getCheapestPrice = (vacuum: Vacuum, currency: string) => {
+export const getCheapestPrice = (vacuum: VacuumWithAffiliateLinks, currency: string) => {
+  if (!vacuum) {
+    return 0;
+  }
+
   const affiliateLinks = vacuum.affiliateLinks || [];
   if (affiliateLinks.length === 0) {
     return 0;

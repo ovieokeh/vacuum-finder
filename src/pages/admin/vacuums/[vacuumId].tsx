@@ -4,8 +4,8 @@ import { Helmet } from "react-helmet";
 
 import { Modal } from "../../../components/modal";
 import { AdminVacuumForm } from "../../../components/vacuum-form";
-import { useVacuumQuery } from "../../../database/hooks";
 import { useProtectedRoute } from "../../../hooks/use-protected-route";
+import { useGetVacuum } from "../../../database/hooks";
 
 export function AdminVacuumEditPage() {
   useProtectedRoute();
@@ -14,9 +14,9 @@ export function AdminVacuumEditPage() {
   invariant(vacuumId, "Expected vacuumId to be defined");
   const navigate = useNavigate();
 
-  const vacuumQuery = useVacuumQuery(vacuumId);
+  const vacuumQuery = useGetVacuum(vacuumId);
   const vacuum = vacuumQuery.data;
-  const name = `${vacuum?.brand} ${vacuum?.model}`;
+  const name = `${vacuum?.brand ?? "Brand"} ${vacuum?.model ?? "Model"}`;
 
   return (
     <>

@@ -4,8 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 import Sitemap from "vite-plugin-sitemap";
 import { config } from "dotenv";
 
-import { db } from "./src/database";
-import { Vacuum } from "./src/types";
+// import { Vacuum } from "./src/types";
+// import { supabase } from "./src/database";
 
 config();
 
@@ -13,13 +13,13 @@ const buildRoutes = () => {
   const routes: string[] = ["/", "/privacy-policy", "/terms-of-service", "/guides", "/vacuums"];
 
   try {
-    const vacuums = db.prepare("SELECT * FROM vacuums").all();
-    vacuums.forEach((vacuum) => {
-      const typedVacuum = vacuum as Vacuum;
-      if (typedVacuum.id) {
-        routes.push(`/vacuums/${typedVacuum.id}`);
-      }
-    });
+    // const vacuums = await supabase.from('Vacuums').select('id').select()
+    // vacuums.forEach((vacuum) => {
+    //   const typedVacuum = vacuum as Vacuum;
+    //   if (typedVacuum.id) {
+    //     routes.push(`/vacuums/${typedVacuum.id}`);
+    //   }
+    // });
   } catch (e) {
     console.error("Error building routes", e.message);
   }

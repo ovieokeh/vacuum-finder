@@ -1,11 +1,11 @@
 import { twMerge } from "tailwind-merge";
 
-import { Vacuum } from "../types";
 import { VacuumFeatures } from "./vacuum-features";
 import { PriceDisplay } from "./price-display";
+import { VacuumWithAffiliateLinks } from "../database";
 
 interface VacuumResultProps {
-  vacuum: Vacuum;
+  vacuum: VacuumWithAffiliateLinks;
   imageClassName?: string;
 }
 

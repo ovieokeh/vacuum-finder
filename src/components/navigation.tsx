@@ -1,7 +1,7 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 
 import { useSiteConfig } from "../providers/site-config";
-import { Currency, CurrencyIconMapping, Region, RegionIconMapping } from "../types";
+import { CurrencyIconMapping, RegionIconMapping, SUPPORTED_CURRENCIES, SUPPORTED_REGIONS } from "../types";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { IoGlobeOutline } from "react-icons/io5";
@@ -22,14 +22,14 @@ export const Navigation = () => {
 
   return (
     <div className="z-20 p-4 grow shadow sticky" ref={navRef}>
-      <div className="max-w-[1240px] mx-auto flex items-center justify-between md:px-4">
+      <div className="max-w-[1240px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-6 text-sm md:text-base text-text!">
-          <Link to="/" className="text-text!">
+          <Link to="/" className="text-text! font-semibold">
             <span className="hidden md:block">Robot Vacuum Finder</span>
             <span className="md:hidden">Home</span>
           </Link>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:gap-6">
             <Link to="/vacuums" className="text-text hover:text-text/90">
               Finder
             </Link>
@@ -49,14 +49,14 @@ export const Navigation = () => {
             <div className="flex flex-col gap-2">
               <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! py-1! bg-background!">
                 <CurrentRegionIcon className="w-4 h-4" />
-                <span className="hidden md:block">{region}</span>
+                <span className="hidden md:block capitalize">{region}</span>
               </ListboxButton>
-              <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
-                {Object.values(Region).map((type) => (
+              <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-20">
+                {SUPPORTED_REGIONS.map((type) => (
                   <ListboxOption
                     key={type}
                     value={type}
-                    className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer"
+                    className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer capitalize"
                   >
                     {type}
                   </ListboxOption>
@@ -70,12 +70,12 @@ export const Navigation = () => {
               <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! py-2! bg-background!">
                 <CurrentCurrencyIcon className="w-4 h-4" />
               </ListboxButton>
-              <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
-                {Object.values(Currency).map((type) => (
+              <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-20">
+                {SUPPORTED_CURRENCIES.map((type) => (
                   <ListboxOption
                     key={type}
                     value={type}
-                    className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer"
+                    className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer uppercase"
                   >
                     {type}
                   </ListboxOption>

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { supabaseFrontend } from "../providers/site-config";
+
+import { supabase } from "../database";
 
 interface ImageUploadProps {
   bucket?: string;
@@ -43,10 +44,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
       try {
         const fileName = file.name;
-        const { data: existingFile } = await supabaseFrontend.storage.from(bucket).exists(fileName);
+        const { data: existingFile } = await supabase.storage.from(bucket).exists(fileName);
 
         if (existingFile) {
-          const { data } = supabaseFrontend.storage.from(bucket).getPublicUrl(fileName);
+          const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
           if (showPreview) {
             setPreviewUrl(data.publicUrl);
           }
@@ -56,12 +57,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         }
 
         // You could also rename the file or generate a random name
-        const { error: uploadError } = await supabaseFrontend.storage.from(bucket).upload(fileName, file);
+        const { error: uploadError } = await supabase.storage.from(bucket).upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
         // Make the file publicly available
-        const { data } = supabaseFrontend.storage.from(bucket).getPublicUrl(fileName);
+        const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
 
         if (!data) throw new Error("Could not get public URL");
 
@@ -92,11 +93,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           <span>Uploading...</span>
         </div>
       ) : previewUrl ? (
-        <img
-          src={previewUrl}
-          alt="Uploaded Preview"
-          className="object-contain w-auto max-h-[22rem] rounded shadow bg-background"
-        />
+        <img src={previewUrl} alt="Uploaded Preview" className="object-contain w-auto max-h-[22rem] bg-background" />
       ) : (
         <span className="text-sm text-text/90">{label ?? "No image uploaded"}</span>
       )}

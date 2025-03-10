@@ -1,14 +1,19 @@
 import { ReactNode } from "react";
-import { FaBatteryHalf, FaDog, FaTrashAlt, FaMobileAlt } from "react-icons/fa";
+import { FaBatteryHalf, FaDog, FaTrashAlt, FaMobileAlt, FaChild } from "react-icons/fa";
 import { BsFillVolumeUpFill } from "react-icons/bs";
 import { GiVacuumCleaner, GiWaterDrop } from "react-icons/gi";
 import { MdSensors, MdLayers } from "react-icons/md";
+import { TfiLayoutAccordionSeparated } from "react-icons/tfi";
+import { TbSmartHome } from "react-icons/tb";
 
-import { Vacuum, VacuumsFilter } from "../types";
+import { VacuumsFilters } from "../types";
+import { Vacuum, VacuumWithAffiliateLinks } from "../database";
+import { LuSpeech, LuTarget } from "react-icons/lu";
+import { IoGameController } from "react-icons/io5";
 
 interface VacuumResultProps {
-  vacuum: Vacuum;
-  filters: VacuumsFilter;
+  vacuum: VacuumWithAffiliateLinks;
+  filters: VacuumsFilters;
 }
 
 export const VacuumFeatures = ({
@@ -25,10 +30,15 @@ export const VacuumFeatures = ({
     ["noiseLevelInDecibels"]: { icon: <BsFillVolumeUpFill />, text: `${vacuum.noiseLevelInDecibels} dB` },
     ["mappingTechnology"]: { icon: <MdSensors />, text: vacuum.mappingTechnology },
     ["hasMultiFloorMappingFeature"]: { icon: <MdLayers />, text: "Multi-floor" },
-    ["hasVirtualWallsFeature"]: { icon: <MdSensors />, text: "Virtual walls" },
+    ["hasVirtualWallsFeature"]: { icon: <TfiLayoutAccordionSeparated />, text: "Virtual walls" },
     ["hasMoppingFeature"]: { icon: <GiWaterDrop />, text: "Mop" },
     ["hasSelfEmptyingFeature"]: { icon: <FaTrashAlt />, text: "Self-empty" },
-    ["hasAppControl"]: { icon: <FaMobileAlt />, text: "App Control" },
+    ["hasAppControlFeature"]: { icon: <FaMobileAlt />, text: "App Control" },
+    ["hasZoneCleaningFeature"]: { icon: <LuTarget />, text: "Zone cleaning" },
+    ["hasSmartHomeIntegrationFeature"]: { icon: <TbSmartHome />, text: "Smart home" },
+    ["hasManualControlFeature"]: { icon: <IoGameController />, text: "Manual control" },
+    ["hasVoiceControlFeature"]: { icon: <LuSpeech />, text: "Voice control" },
+    ["hasChildLockFeature"]: { icon: <FaChild />, text: "Child lock" },
   };
 
   let keys = Object.keys(featureKeyMapping) as (keyof Vacuum)[];
@@ -37,9 +47,18 @@ export const VacuumFeatures = ({
     keys.splice(limit);
   }
 
+  if (!vacuum) {
+    return null;
+  }
+
   return (
     <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
       {keys.map((key) => {
+        const featureValue = vacuum[key];
+        if (!featureValue) {
+          return null;
+        }
+
         const feature = featureKeyMapping[key as keyof Vacuum];
         if (feature && !exclude.includes(key as keyof Vacuum)) {
           const { icon, text } = feature;
@@ -52,7 +71,7 @@ export const VacuumFeatures = ({
         }
         return null;
       })}
-      {vacuum.suctionPowerInPascals > 3000 ? (
+      {vacuum.suctionPowerInPascals && vacuum.suctionPowerInPascals > 3000 ? (
         <div key="hasPetHairOptimized" className="flex items-center gap-1">
           <FaDog />
           <span>Pet-friendly</span>

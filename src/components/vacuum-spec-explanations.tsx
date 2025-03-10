@@ -1,15 +1,20 @@
-import { Vacuum, VacuumMappingTechnology, VacuumsFilter } from "../types";
+import { MappingTechnology, VacuumWithAffiliateLinks } from "../database";
+import { VacuumsFilters } from "../types";
 
 interface VacuumSpecExplanationsProps {
-  vacuum: Vacuum;
-  filters: VacuumsFilter;
+  vacuum: VacuumWithAffiliateLinks;
+  filters: VacuumsFilters;
 }
 
-export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanationsProps) => {
+export const VacuumSpecExplanations = ({ vacuum }: VacuumSpecExplanationsProps) => {
+  if (!vacuum) {
+    return null;
+  }
+
   // Create a conversational summary for each feature
 
   const batterySummary = (() => {
-    const mins = vacuum.batteryLifeInMinutes;
+    const mins = vacuum.batteryLifeInMinutes ?? 0;
     if (mins < 60) {
       return `The battery lasts only ${mins} minutes, which might be limiting for a larger home.`;
     } else if (mins >= 60 && mins < 120) {
@@ -20,7 +25,7 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
   })();
 
   const suctionSummary = (() => {
-    const pa = vacuum.suctionPowerInPascals;
+    const pa = vacuum.suctionPowerInPascals ?? 0;
     if (pa < 2000) {
       return `With only ${pa} Pascals of suction, it may struggle with stubborn dirt or thick carpets.`;
     } else if (pa >= 2000 && pa < 3000) {
@@ -43,8 +48,8 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
   })();
 
   const mappingSummary = (() => {
-    const tech = vacuum.mappingTechnology as VacuumMappingTechnology;
-    if (tech === VacuumMappingTechnology.Laser) {
+    const tech = vacuum.mappingTechnology as MappingTechnology;
+    if (tech === "laser") {
       return `Its laser mapping system ensures precise navigation.`;
     }
     return `Using camera-based mapping, it navigates well though it might have trouble in low light.`;
@@ -61,31 +66,30 @@ export const VacuumSpecExplanations = ({ vacuum, filters }: VacuumSpecExplanatio
   const selfEmptySummary = (() => {
     if (typeof vacuum.hasSelfEmptyingFeature === "boolean") {
       if (vacuum.hasSelfEmptyingFeature) {
-        return filters.numPets > 0
-          ? `The self-emptying feature is especially useful if you have pets.`
-          : `Its self-emptying dustbin reduces maintenance.`;
+        return `Its self-emptying dustbin reduces maintenance.`;
       } else {
-        return filters.numPets > 0
-          ? `Without self-emptying, you’ll need to manually clear the dustbin—which might be a hassle if you have pets.`
-          : `The dustbin requires manual emptying.`;
+        return `The dustbin requires manual emptying.`;
       }
     }
     return "";
   })();
 
-  const appControlSummary = vacuum.hasAppControl ? `App control adds convenience for scheduling and adjustments.` : "";
+  const appControlSummary = vacuum.hasAppControlFeature
+    ? `App control adds convenience for scheduling and adjustments.`
+    : "";
 
   const virtualWallsSummary = vacuum.hasVirtualWallsFeature
     ? `Virtual walls let you restrict cleaning areas as needed.`
     : "";
 
   const petHairSummary = (() => {
+    const suctionPowerInPascals = vacuum.suctionPowerInPascals ?? 0;
     // Use suction power as a proxy for pet hair performance.
-    if (filters.numPets > 0) {
-      return vacuum.suctionPowerInPascals >= 3000
-        ? `Its strong suction makes it well-equipped for handling pet hair.`
-        : `It might not be ideal for pet hair if you have several pets.`;
-    }
+
+    return suctionPowerInPascals >= 3000
+      ? `Its strong suction makes it well-equipped for handling pet hair.`
+      : `It might not be ideal for pet hair if you have several pets.`;
+
     return "";
   })();
 

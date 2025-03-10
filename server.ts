@@ -1,18 +1,9 @@
 import fs from "node:fs/promises";
 import express, { Request, Response } from "express";
-import { populateMockData, setupDatabase } from "./src/database/setup";
 import { ViteDevServer } from "vite";
 import { config } from "dotenv";
 
-import { addVacuumHandler, deleteVacuumHandler, updateVacuumHandler } from "./src/api-handlers/vacuums/admin";
-import {
-  getVacuum,
-  listVacuums,
-  filterVacuums,
-  searchVacuums,
-  listVacuumBrands,
-} from "./src/api-handlers/vacuums/public";
-import { geolocateHandler } from "./src/api-handlers/utils/geolocate";
+import { geolocateHandler } from "./src/api-handlers/geolocate";
 
 config();
 
@@ -55,15 +46,6 @@ async function startServer() {
   app.use("/favicon.svg", express.static("./public/favicon.svg"));
 
   app.use(express.json());
-  // API endpoints…
-  app.post("/api/vacuums", addVacuumHandler as any);
-  app.put("/api/vacuums/:id", updateVacuumHandler as any);
-  app.delete("/api/vacuums/:id", deleteVacuumHandler as any);
-  app.get("/api/vacuums", listVacuums);
-  app.get("/api/vacuums/:id", getVacuum);
-  app.post("/api/filter-vacuums", filterVacuums);
-  app.get("/api/search-vacuums", searchVacuums);
-  app.get("/api/vacuum-brands", listVacuumBrands);
 
   // Utils endpoints
   app.get("/api/geolocate", geolocateHandler);
@@ -99,10 +81,6 @@ async function startServer() {
   });
 
   app.listen(port, () => {
-    setupDatabase();
-    if (!isProduction) {
-      populateMockData();
-    }
     console.log(`Server started at http://localhost:${port}`);
   });
 }

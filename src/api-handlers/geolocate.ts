@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import geoip from "geoip-lite";
 import { publicIpv4 } from "public-ip";
-import { Region } from "../../types";
+import { SUPPORTED_REGIONS } from "../types";
 
 // Geolocate a user by IP address
 export const geolocateHandler = async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ export const geolocateHandler = async (req: Request, res: Response) => {
     const acceptLanguageHeader = req.headers["accept-language"];
 
     let locale = "";
-    let region = Region.America;
+    let region = "americas";
 
     if (userPrefLang) {
       // If user preference is provided, use it directly
@@ -48,7 +48,7 @@ export const geolocateHandler = async (req: Request, res: Response) => {
     // Derive region from timezone
     if (timezone) {
       const splitRegion = timezone.split("/")[0];
-      region = Region[splitRegion as keyof typeof Region] || Region.America;
+      region = splitRegion in SUPPORTED_REGIONS ? splitRegion : "americas";
     }
 
     // 4) Return data

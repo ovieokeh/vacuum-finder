@@ -43,7 +43,7 @@ export function AdminAuthPage() {
 
       {/* Main content (form) */}
       <main className="flex-grow px-6 py-8 sm:py-12">
-        <div className="max-w-[1280px] px-4 mx-auto">
+        <div className="max-w-[1240px] px-4 mx-auto">
           <form onSubmit={handleLogin} className="bg-background-alt p-8 rounded border border-border space-y-4">
             {errorMessage && <div className="text-sm text-red-500">{errorMessage}</div>}
 
