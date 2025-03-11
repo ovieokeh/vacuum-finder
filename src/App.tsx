@@ -19,11 +19,14 @@ import { reduxStore } from "./redux";
 import "./index.css";
 import { useEffect, useRef } from "react";
 
+import { useSeoSetup } from "./hooks/use-seo-setup";
+
 const queryClient = new QueryClient();
 
 export default function App() {
   const location = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  useSeoSetup();
 
   // scroll restoration
   useEffect(() => {
