@@ -14,6 +14,7 @@ interface VacuumResultsProps {
   navigateRoot?: string;
   emptyView?: React.ReactNode;
   results?: VacuumsWithAffiliateLinks;
+  isLoading?: boolean;
 }
 
 const relativeWidth = (width: number, percent: number) => {
@@ -21,6 +22,7 @@ const relativeWidth = (width: number, percent: number) => {
 };
 
 export function VacuumResults({
+  isLoading,
   results = [],
   filters,
   navigateRoot = "/vacuums",
@@ -114,7 +116,13 @@ export function VacuumResults({
   return (
     <>
       {!results || results?.length === 0 ? (
-        emptyView
+        isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <p>Loading...</p>
+          </div>
+        ) : (
+          emptyView
+        )
       ) : (
         <>
           <div className="hidden md:block">

@@ -44,13 +44,18 @@ export function VacuumInfoPage() {
               <AffiliateLinksTable links={vacuum.affiliateLinks} vacuumName={name} />
               <VacuumSpecExplanations vacuum={vacuum} filters={filters} />
             </>
+          ) : vacuumQuery.isLoading ? (
+            <div className="flex flex-col items-center justify-center gap-4">
+              <div className="animate-pulse w-12 h-12 bg-accent rounded-full" />
+              <p className="text-lg font-semibold text-accent">Loading vacuum...</p>
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4">
               <CiCircleInfo className="w-12 h-12 text-accent" />
               <p className="text-lg font-semibold text-accent">Vacuum not found</p>
             </div>
           )}
-          {/* Future expansions: affiliate links, user reviews, etc. */}
+          {/* Future expansions: user reviews, etc. */}
         </div>
       </Modal>
     </>

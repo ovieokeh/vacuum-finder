@@ -51,25 +51,6 @@ export const FormTextField = <T extends string | number>({
   inputContainerClassName?: string;
   name: string;
 }) => {
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (type !== "number") {
-      onChange(e.target.value as T);
-      return;
-    }
-
-    const value = e.target.value;
-    if (!value) {
-      onChange(value as T);
-      return;
-    }
-
-    if (isNaN(+value)) {
-      return;
-    }
-
-    onChange(value as T);
-  };
-
   const error = state?.error?.message;
 
   return (
@@ -86,12 +67,12 @@ export const FormTextField = <T extends string | number>({
 
         <Input
           {...rest}
-          type="text"
+          type={type}
           className={twMerge(
             "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
             !!error && "border-red-500"
           )}
-          onChange={handleOnChange}
+          onChange={(e) => onChange(e.target.value as T)}
         />
       </div>
 
