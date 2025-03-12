@@ -226,11 +226,11 @@ export const FormComboboxField = <T extends string>({
         onChange(newValue as T);
       }}
     >
-      {label && <Label className="flex items-center gap-2 text-sm/6 font-medium capitalize">{label}</Label>}
+      {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
 
       <ComboboxInput
         className={twMerge(
-          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary capitalize",
+          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
           !!error && "border-red-500"
         )}
         aria-label={label}
@@ -256,7 +256,7 @@ export const FormComboboxField = <T extends string>({
           <ComboboxOption
             key={option + index}
             value={option}
-            className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt capitalize"
+            className="cursor-pointer px-2 py-4 data-[focus]:bg-background-alt"
           >
             {option}
           </ComboboxOption>

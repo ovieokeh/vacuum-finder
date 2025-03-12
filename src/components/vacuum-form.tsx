@@ -247,7 +247,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
             <Controller
               name="batteryLifeInMinutes"
               render={({ field, fieldState }) => (
-                <FormTextField type="number" label="Battery Life (minutes)" {...field} state={fieldState} />
+                <FormTextField type="number" label="Battery Runtime (minutes)" {...field} state={fieldState} />
               )}
             />
 
@@ -266,16 +266,16 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
             />
 
             <Controller
-              name="waterTankCapacityInLiters"
+              name="dustbinCapacityInLiters"
               render={({ field, fieldState }) => (
-                <FormTextField type="number" label="Water Tank Capacity (L)" {...field} state={fieldState} />
+                <FormTextField type="number" label="Dustbin Capacity (L)" {...field} state={fieldState} />
               )}
             />
 
             <Controller
-              name="dustbinCapacityInLiters"
+              name="waterTankCapacityInLiters"
               render={({ field, fieldState }) => (
-                <FormTextField type="number" label="Dustbin Capacity (L)" {...field} state={fieldState} />
+                <FormTextField type="number" label="Water Tank Capacity (L)" {...field} state={fieldState} />
               )}
             />
 
