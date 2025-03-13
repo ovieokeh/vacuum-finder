@@ -86,7 +86,7 @@ export function VacuumSearchPage() {
       </Helmet>
 
       <div
-        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1240px] px-4 pt-2 md:p-4 h-[calc(100%-3rem)] md:h-full relative`}
+        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1240px] px-4 pt-2 md:p-4 h-[calc(100svh-162px)] md:h-full relative`}
       >
         <div
           className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full"
@@ -115,7 +115,7 @@ export function VacuumSearchPage() {
           className={`md:border md:border-border md:w-3/4 overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0`}
         >
           <VacuumResults
-            className="flex flex-wrap"
+            className="flex flex-wrap gap-4 md:gap-0"
             linkClassname="md:basis-1/2 lg:basis-1/3"
             containerWidth={vacuumResultsWidth}
             results={searchVacuums?.results}

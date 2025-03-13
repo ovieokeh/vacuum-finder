@@ -59,7 +59,7 @@ const tryLink = (
 
 export const HomePage = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <>
       <PageHeader
         containerClassName="border-b-0"
         className="items-center text-center"
@@ -100,6 +100,6 @@ export const HomePage = () => {
       </section>
 
       <Footer />
-    </div>
+    </>
   );
 };

@@ -63,7 +63,6 @@ export default function App() {
               ref={scrollRef}
               style={{
                 height: `calc(100vh - ${navHeight + 10}px)`,
-                overflow: "hidden",
               }}
             >
               <Routes>

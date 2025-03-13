@@ -303,8 +303,14 @@ const MobileFiltersDialog = ({
       <Button onClick={open} className="px-0! py-2! text-start outline-0! focus:outline-0! opacity-70 text-sm!">
         {filtersDisplay} <CiEdit className="inline w-5 h-5" />
       </Button>
-      <Modal title="Refine your vacuum search" isOpen={isOpen} close={close} childrenClassName="space-y-6">
-        {children}
+      <Modal
+        title="Refine your vacuum search"
+        isOpen={isOpen}
+        close={close}
+        panelClassName="overflow-hidden"
+        childrenClassName="space-y-6 overflow-y-hidden"
+      >
+        <div className=" h-[calc(100svh-161px)] overflow-y-scroll">{children}</div>
 
         <div className="flex flex-col gap-4">
           {isFormDirty && (
