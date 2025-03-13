@@ -187,7 +187,7 @@ export function VacuumSearchForm({
       <div
         className={`overflow-y-scroll space-y-2`}
         style={{
-          height: `calc(${filtersContainerHeight - navHeight - 52}px)`,
+          height: `calc(${filtersContainerHeight - navHeight - 68}px)`,
           overflow: "hidden",
           overflowY: "scroll",
         }}
@@ -197,14 +197,22 @@ export function VacuumSearchForm({
         {showAdvanced && advancedFilters}
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex gap-4 pt-4">
         {isFormDirty && (
-          <Button type="button" onClick={() => resetFilters()} className="w-full bg-red-500/10 border! border-red-500!">
-            Reset Filters
+          <Button
+            type="button"
+            onClick={() => resetFilters()}
+            className="w-full bg-red-500/10 border! border-red-500! px-3! py-2!"
+          >
+            Reset
           </Button>
         )}
-        <Button type="button" onClick={() => handleSubmit()} className="w-full bg-background border! border-border!">
-          Find Vacuums
+        <Button
+          type="button"
+          onClick={() => handleSubmit()}
+          className="w-full bg-background border! border-border! px-3! py-2!"
+        >
+          Search
         </Button>
       </div>
     </div>

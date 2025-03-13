@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Link, Outlet } from "react-router";
 import { Helmet } from "react-helmet";
 import { Button } from "@headlessui/react";
@@ -6,17 +6,23 @@ import { Button } from "@headlessui/react";
 import { PageHeader } from "../../components/page-header";
 import { useProtectedRoute } from "../../hooks/use-protected-route";
 import { useSiteConfig } from "../../providers/site-config";
-import { VacuumResults } from "../../components/vacuum-results";
 import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSearchVacuums } from "../../database/hooks";
+import { VacuumsTable } from "../../components/vacuums-table";
 
 export function AdminDashboardPage() {
   useProtectedRoute();
 
+  const [page, setPage] = useState(1);
+
   const { userToken, currency, logout } = useSiteConfig();
   const windowWidth = useWindowWidth();
 
-  const vacuumsQuery = useSearchVacuums({}, true);
+  const vacuumsQuery = useSearchVacuums({
+    filters: {},
+    owned: true,
+    page,
+  });
   const refetch = vacuumsQuery.refetch;
   const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
 
@@ -54,15 +60,21 @@ export function AdminDashboardPage() {
             >
               Add a new vacuum
             </Link>
-            <VacuumResults
+            <VacuumsTable
               results={vacuums?.results}
               containerWidth={windowWidth}
-              navigateRoot="/admin/vacuums"
               emptyView={
                 <div className="py-2 text-text/90 italic">
                   You don't have any vacuum entries yet. Add a new vacuum with the button above
                 </div>
               }
+            />
+
+            <TablePagination
+              page={vacuums?.page ?? 1}
+              setPage={(page) => setPage(page)}
+              totalCount={vacuumsQuery.data?.total ?? 0}
+              limit={vacuums?.limit ?? 10}
             />
           </div>
         </div>
@@ -72,3 +84,49 @@ export function AdminDashboardPage() {
     </>
   );
 }
+
+interface TablePaginationProps {
+  page: number;
+  setPage: Dispatch<SetStateAction<number>>;
+  limit: number;
+  totalCount: number;
+}
+
+const TablePagination = ({ page, setPage, limit, totalCount }: TablePaginationProps) => {
+  const pages = useMemo(() => {
+    const totalPages = Math.ceil(totalCount / limit);
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }, [totalCount, limit]);
+
+  const hasNextPage = pages.length > 0 && page < pages[pages.length - 1];
+
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <Button
+        onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+        disabled={page === 1}
+        className="w-fit bg-background-alt border border-border disabled:opacity-50"
+      >
+        Previous
+      </Button>
+      {pages.map((p) => (
+        <Button
+          key={p}
+          onClick={() => setPage(p)}
+          className={`size-8 text-xs p-0! bg-background-alt border border-border ${
+            p === page ? "font-bold! bg-accent!" : ""
+          }`}
+        >
+          {p}
+        </Button>
+      ))}
+      <Button
+        onClick={() => setPage((prev) => prev + 1)}
+        disabled={!hasNextPage}
+        className="w-fit bg-background-alt border border-border disabled:opacity-50"
+      >
+        Next
+      </Button>
+    </div>
+  );
+};

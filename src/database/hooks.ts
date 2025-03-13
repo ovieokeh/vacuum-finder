@@ -1,4 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { VacuumsFilters } from "../types";
 import { searchVacuums } from "./handlers/vacuums/search";
@@ -16,21 +18,73 @@ export const useGetVacuum = (id: string) => {
   });
 };
 
-export const useSearchVacuums = (filters: VacuumsFilters, owned?: boolean) => {
+interface UseSearchVacuumsArgs {
+  filters: VacuumsFilters;
+  owned?: boolean;
+  page?: number;
+  limit?: number;
+}
+export const useSearchVacuums = ({ filters, owned, page = 1, limit = 10 }: UseSearchVacuumsArgs) => {
   const stringifiedFilters = JSON.stringify(filters);
-  return useQuery({
-    queryKey: ["search-vacuums", stringifiedFilters, owned],
+  const query = useQuery({
+    queryKey: ["search-vacuums", stringifiedFilters, owned, page],
     queryFn: () =>
       searchVacuums({
         filters: {
           ...filters,
           owned,
         },
-        page: 1,
-        limit: 10,
+        page,
+        limit,
       }),
     enabled: true,
   });
+
+  return query;
+};
+
+export const useSearchVacuumsInfinite = ({ filters, owned, page = 0, limit = 10 }: UseSearchVacuumsArgs) => {
+  const stringifiedFilters = JSON.stringify(filters);
+  const query = useInfiniteQuery({
+    queryKey: ["search-vacuums", stringifiedFilters, owned],
+    queryFn: (context) =>
+      searchVacuums({
+        filters: {
+          ...filters,
+          owned,
+        },
+        page: context.pageParam ?? page,
+        limit,
+      }),
+    initialPageParam: page,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.results.length < limit) {
+        return undefined;
+      }
+      return lastPage.page + 1;
+    },
+    getPreviousPageParam: (firstPage) => {
+      if (firstPage.page === 1) {
+        return undefined;
+      }
+      return firstPage.page - 1;
+    },
+
+    enabled: true,
+  });
+
+  return query;
+};
+
+export const useInfiniteQueryFetcher = (fetchNextPage: () => void) => {
+  const { ref, inView } = useInView();
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage]);
+
+  return { ref };
 };
 
 export const useAddVacuum = (args: { onSuccess?: () => void } = {}) => {

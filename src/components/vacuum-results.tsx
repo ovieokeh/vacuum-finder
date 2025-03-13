@@ -3,12 +3,12 @@ import { VacuumsWithAffiliateLinks } from "../database";
 import { twMerge } from "tailwind-merge";
 
 interface VacuumResultsProps {
-  navigateRoot?: string;
-  emptyView?: React.ReactNode;
   results?: VacuumsWithAffiliateLinks;
   isLoading?: boolean;
   linkClassname?: string;
   className?: string;
+  emptyView?: React.ReactNode;
+  fetchMoreComponent?: React.ReactNode;
 }
 
 export function VacuumResults({
@@ -21,6 +21,7 @@ export function VacuumResults({
       <p>No results found. Adjust filters and try again.</p>
     </div>
   ),
+  fetchMoreComponent,
 }: VacuumResultsProps & {
   containerWidth: number;
 }) {
@@ -39,6 +40,8 @@ export function VacuumResults({
           {results?.map((vacuum) => (
             <VacuumInfo key={vacuum.id} vacuum={vacuum} className={linkClassname} />
           ))}
+
+          {fetchMoreComponent}
         </ul>
       )}
     </>

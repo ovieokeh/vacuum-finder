@@ -6,7 +6,7 @@ import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSiteConfig } from "../../providers/site-config";
 import { replaceState } from "../../redux/vacuum-filters-reducer";
-import { useSearchVacuums } from "../../database/hooks";
+import { useInfiniteQueryFetcher, useSearchVacuumsInfinite } from "../../database/hooks";
 import { useAppDispatch } from "../../redux";
 import { VacuumSearchForm } from "../../components/vacuum-search-form";
 import { VacuumResults } from "../../components/vacuum-results";
@@ -43,19 +43,27 @@ export function VacuumSearchPage() {
     },
   });
   const [currentFilters, setCurrentFilters] = useState<VacuumsFilters>({});
-
   const filters = useWatch({ control: form.control });
-  const searchVacuumsQuery = useSearchVacuums(currentFilters);
-  const { refetch } = searchVacuumsQuery;
-  const searchVacuums = useMemo(() => searchVacuumsQuery.data, [searchVacuumsQuery.data]);
+  const searchVacuumsQuery = useSearchVacuumsInfinite({
+    filters: currentFilters,
+    page: 1,
+    limit: 9,
+  });
+  const vacuums = useMemo(
+    () => searchVacuumsQuery.data?.pages.map((page) => page.results).flat() ?? [],
+    [searchVacuumsQuery.data]
+  );
 
-  const dispatch = useAppDispatch();
-
-  const { handleSubmit, setValue, reset } = form;
+  const { refetch, fetchNextPage } = searchVacuumsQuery;
+  const { ref } = useInfiniteQueryFetcher(fetchNextPage);
 
   useEffect(() => {
     refetch();
   }, [refetch, currency, region]);
+
+  const dispatch = useAppDispatch();
+
+  const { handleSubmit, setValue, reset } = form;
 
   useEffect(() => {
     setValue("currency", currency);
@@ -64,7 +72,7 @@ export function VacuumSearchPage() {
     setValue("region", region);
   }, [region, setValue]);
 
-  // sync form with redux
+  // sync form with redux to share filters with :vacuum page
   useEffect(() => {
     dispatch(replaceState({ value: filters }));
   }, [dispatch, filters]);
@@ -77,6 +85,18 @@ export function VacuumSearchPage() {
   const filtersContainerWidth = filtersContainerRef.current?.clientWidth ?? 300;
   const filtersContainerHeight = filtersContainerRef.current?.clientHeight ?? 300;
   const vacuumResultsWidth = Math.min(windowWidth - (filtersContainerWidth + 64), 868);
+
+  const fetchMoreComponent = useMemo(() => {
+    return (
+      <div
+        ref={ref}
+        style={{
+          minHeight: 40,
+          minWidth: 40,
+        }}
+      />
+    );
+  }, [ref]);
 
   return (
     <>
@@ -118,7 +138,8 @@ export function VacuumSearchPage() {
             className="flex flex-wrap gap-4 md:gap-0"
             linkClassname="md:basis-1/2 lg:basis-1/3"
             containerWidth={vacuumResultsWidth}
-            results={searchVacuums?.results}
+            results={vacuums}
+            fetchMoreComponent={fetchMoreComponent}
           />
         </div>
       </div>

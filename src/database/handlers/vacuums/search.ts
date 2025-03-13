@@ -5,6 +5,7 @@ export interface VacuumsSearchResult {
   results: VacuumsWithAffiliateLinks;
   page: number;
   limit: number;
+  total: number;
 }
 export const searchVacuums = async ({
   filters,
@@ -32,6 +33,7 @@ export const searchVacuums = async ({
   if (brand) supabaseQuery.eq("brand", brand);
   if (owned) supabaseQuery.eq("userEmail", userEmail!);
 
+  const total = (await supabaseQuery).count ?? 0;
   const { data, error } = await supabaseQuery.range(offset, offset + limit - 1).limit(limit);
 
   if (error) {
@@ -42,5 +44,6 @@ export const searchVacuums = async ({
     results: data,
     page,
     limit,
+    total,
   };
 };

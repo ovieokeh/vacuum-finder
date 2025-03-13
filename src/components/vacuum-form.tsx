@@ -87,8 +87,10 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   });
 
   const searchVacuumQuery = useSearchVacuums({
-    brand,
-    model,
+    filters: {
+      brand,
+      model,
+    },
   });
   const similarVacuums = useMemo(
     () => (brand && model ? searchVacuumQuery.data : null),
