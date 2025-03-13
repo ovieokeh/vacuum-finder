@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { VacuumsFilters } from "../types";
 import { searchVacuums } from "./handlers/vacuums/search";
@@ -23,8 +23,9 @@ interface UseSearchVacuumsArgs {
   owned?: boolean;
   page?: number;
   limit?: number;
+  enabled?: boolean;
 }
-export const useSearchVacuums = ({ filters, owned, page = 1, limit = 10 }: UseSearchVacuumsArgs) => {
+export const useSearchVacuums = ({ filters, owned, page = 1, limit = 10, enabled = true }: UseSearchVacuumsArgs) => {
   const stringifiedFilters = JSON.stringify(filters);
   const query = useQuery({
     queryKey: ["search-vacuums", stringifiedFilters, owned, page],
@@ -37,7 +38,8 @@ export const useSearchVacuums = ({ filters, owned, page = 1, limit = 10 }: UseSe
         page,
         limit,
       }),
-    enabled: true,
+    placeholderData: keepPreviousData,
+    enabled,
   });
 
   return query;

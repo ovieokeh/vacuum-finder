@@ -28,13 +28,35 @@ export const searchVacuums = async ({
   const supabaseQuery = supabase.from("Vacuums").select(`
     *,
     affiliateLinks:AffiliateLinks (*)
-  `);
-  if (model) supabaseQuery.eq("model", model);
-  if (brand) supabaseQuery.eq("brand", brand);
-  if (owned) supabaseQuery.eq("userEmail", userEmail!);
+    `);
+  const matchCountQuery = supabase.from("Vacuums").select("id", { count: "exact" });
+  if (model) {
+    supabaseQuery.ilike("model", `%${model}%`);
+    matchCountQuery.ilike("model", `%${model}%`);
+  }
+  if (brand) {
+    supabaseQuery.ilike("brand", `%${brand}%`);
+    matchCountQuery.ilike("brand", `%${brand}%`);
+  }
+  if (owned) {
+    supabaseQuery.eq("userEmail", userEmail!);
+    matchCountQuery.eq("userEmail", userEmail!);
+  }
 
-  const total = (await supabaseQuery).count ?? 0;
-  const { data, error } = await supabaseQuery.range(offset, offset + limit - 1).limit(limit);
+  const [queryResponse, countQueryResponse] = await Promise.allSettled([
+    supabaseQuery.range(offset, offset + limit - 1).limit(limit),
+    (await matchCountQuery).count,
+  ]);
+
+  if (queryResponse.status === "rejected") {
+    throw queryResponse.reason;
+  }
+  if (countQueryResponse.status === "rejected") {
+    throw countQueryResponse.reason;
+  }
+
+  const { data, error } = queryResponse.value;
+  const total = countQueryResponse.value;
 
   if (error) {
     throw error;
@@ -44,6 +66,6 @@ export const searchVacuums = async ({
     results: data,
     page,
     limit,
-    total,
+    total: total as number,
   };
 };

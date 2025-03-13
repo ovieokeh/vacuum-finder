@@ -22,6 +22,7 @@ export function AdminDashboardPage() {
     filters: {},
     owned: true,
     page,
+    limit: 5,
   });
   const refetch = vacuumsQuery.refetch;
   const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
@@ -61,6 +62,7 @@ export function AdminDashboardPage() {
               Add a new vacuum
             </Link>
             <VacuumsTable
+              navigateRoot="/admin/vacuums"
               results={vacuums?.results}
               containerWidth={windowWidth}
               emptyView={

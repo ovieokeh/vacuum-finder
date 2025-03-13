@@ -2,6 +2,11 @@
 
 @tailwind utilities;
 
+@import "vercel-toast/css";
+.toast-inner {
+  padding: 1em !important;
+}
+
 * {
   box-sizing: border-box;
 }

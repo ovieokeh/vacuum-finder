@@ -1,14 +1,24 @@
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
+import { Button, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
+import { createToast } from "vercel-toast";
+import { FaChevronDown, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
+import { LuInfo, LuPlus } from "react-icons/lu";
+import { Controller, Form, FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 import { ConfirmButton } from "./confirm-button";
-import { FaChevronDown, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { AffiliateLinkInstructions } from "./affiliate-instructions";
-import { LuInfo, LuPlus } from "react-icons/lu";
-import { Button, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { useAddVacuum, useDeleteVacuum, useListBrands, useSearchVacuums, useUpdateVacuum } from "../database/hooks";
-import { AffiliateLinkCreate, VacuumCreate, VacuumWithAffiliateLinks } from "../database";
-import { Controller, Form, FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+  AffiliateLinkCreate,
+  Currency,
+  MappingTechnology,
+  Region,
+  VacuumCreate,
+  VacuumWithAffiliateLinks,
+} from "../database";
 import {
   FormComboboxField,
   FormImageUploadField,
@@ -39,6 +49,42 @@ const extractDirtyFields = (original: VacuumCreate, updated: VacuumCreate) => {
   return dirtyFields;
 };
 
+const schema = yup.object({
+  brand: yup.string().required(),
+  model: yup.string().required(),
+  imageUrl: yup.string().url().required(),
+  mappingTechnology: yup.string<MappingTechnology>().required(),
+  batteryLifeInMinutes: yup.number().required().nullable(),
+  suctionPowerInPascals: yup.number().required().nullable(),
+  noiseLevelInDecibels: yup.number().required().nullable(),
+  dustbinCapacityInLiters: yup.number().required().nullable(),
+  waterTankCapacityInLiters: yup.number().required().nullable(),
+  hasChildLockFeature: yup.boolean().required().nullable(),
+  hasMoppingFeature: yup.boolean().required().nullable(),
+  hasSelfEmptyingFeature: yup.boolean().required().nullable(),
+  hasZoneCleaningFeature: yup.boolean().required().nullable(),
+  hasMultiFloorMappingFeature: yup.boolean().required().nullable(),
+  hasVirtualWallsFeature: yup.boolean().required().nullable(),
+  hasAppControlFeature: yup.boolean().required().nullable(),
+  hasSmartHomeIntegrationFeature: yup.boolean().required().nullable(),
+  hasManualControlFeature: yup.boolean().required().nullable(),
+  hasVoiceControlFeature: yup.boolean().required().nullable(),
+  otherFeatures: yup.array().of(yup.string().required()).required(),
+  affiliateLinks: yup
+    .array()
+    .of(
+      yup
+        .object({
+          region: yup.string<Region>().required(),
+          currency: yup.string<Currency>().required(),
+          price: yup.number().required(),
+          link: yup.string().url().required(),
+        })
+        .required()
+    )
+    .required(),
+});
+
 export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const navigate = useNavigate();
 
@@ -65,9 +111,27 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     defaultValues: {
       imageUrl: "https://cevxzvsqlweccdszjadm.supabase.co/storage/v1/object/public/product-images//empty.jpg",
       mappingTechnology: "laser",
+      brand: "",
+      model: "",
+      batteryLifeInMinutes: null,
+      suctionPowerInPascals: null,
+      noiseLevelInDecibels: null,
+      dustbinCapacityInLiters: null,
+      waterTankCapacityInLiters: null,
+      hasChildLockFeature: null,
+      hasMoppingFeature: null,
+      hasSelfEmptyingFeature: null,
+      hasZoneCleaningFeature: null,
+      hasMultiFloorMappingFeature: null,
+      hasVirtualWallsFeature: null,
+      hasAppControlFeature: null,
+      hasSmartHomeIntegrationFeature: null,
+      hasManualControlFeature: null,
+      hasVoiceControlFeature: null,
       otherFeatures: [""],
       affiliateLinks: [],
     },
+    resolver: yupResolver(schema),
   });
   const { reset } = vacuumForm;
 
@@ -91,6 +155,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       brand,
       model,
     },
+    enabled: !!brand && !!model,
   });
   const similarVacuums = useMemo(
     () => (brand && model ? searchVacuumQuery.data : null),
@@ -102,19 +167,34 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
       <Form
         className="pb-2 md:p-4 md:px-0 flex flex-col gap-10"
         onSubmit={(e) => {
+          if (similarVacuums?.total && similarVacuums.total > 0 && !vacuum?.id) {
+            createToast("It seems this vacuum already exists. Please check the list of similar vacuums", {
+              type: "error",
+              timeout: 3000,
+            });
+            return;
+          }
           const data = e.data as FormValues;
+
+          let toastMessage = "Vacuum added successfully";
 
           if (vacuum?.id) {
             const dirtyFields = extractDirtyFields(vacuum, data);
             updateVacuumMutation.mutate({
               data: dirtyFields as VacuumWithAffiliateLinks,
             });
+            toastMessage = "Vacuum updated successfully";
           } else {
             addVacuumMutation.mutate({
               data,
               affiliateLinks: data.affiliateLinks,
             });
           }
+
+          createToast(toastMessage, {
+            type: "success",
+            timeout: 5000,
+          });
         }}
       >
         <div className="flex flex-col md:flex-row gap-4 md:gap-12">

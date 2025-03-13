@@ -62,7 +62,7 @@ export default function App() {
               className={`mt-0 overflow-y-scroll`}
               ref={scrollRef}
               style={{
-                height: `calc(100vh - ${navHeight + 10}px)`,
+                height: `calc(100svh - ${navHeight + 10}px)`,
               }}
             >
               <Routes>

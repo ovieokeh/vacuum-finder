@@ -14,6 +14,7 @@
   "dependencies": {
     "@es-toolkit/es-toolkit": "npm:@jsr/es-toolkit__es-toolkit@^1.32.0-dev.1015+8d034252",
     "@headlessui/react": "^2.2.0",
+    "@hookform/resolvers": "^4.1.3",
     "@reduxjs/toolkit": "^2.6.0",
     "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/vite": "^4.0.9",
@@ -41,7 +42,9 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.9",
     "type-fest": "^4.37.0",
-    "window": "^4.2.7"
+    "vercel-toast": "^1.8.0",
+    "window": "^4.2.7",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

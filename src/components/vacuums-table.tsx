@@ -48,7 +48,7 @@ export function VacuumsTable({
             <img
               src={value.row.original.imageUrl}
               alt={value.row.original.brand + " " + value.row.original.model}
-              className="w-full h-auto object-contain"
+              className="w-full h-auto min-h-[87px] object-contain"
             />
           ),
           enableSorting: false,
@@ -56,7 +56,7 @@ export function VacuumsTable({
         {
           header: "Name",
           accessorKey: "name",
-          size: relativeWidth(containerWidth, 32),
+          size: relativeWidth(containerWidth, 28),
           cell: (value) => {
             const brand = value.row.original.brand;
             const model = value.row.original.model;
@@ -140,11 +140,11 @@ export function VacuumsTable({
   );
 }
 
-const VacuumMobileList = ({ results }: VacuumResultsProps) => {
+const VacuumMobileList = ({ results, navigateRoot }: VacuumResultsProps) => {
   return (
     <ul className="space-y-4 py-2">
       {results?.map((vacuum) => (
-        <VacuumInfo key={vacuum.id} vacuum={vacuum} />
+        <VacuumInfo key={vacuum.id} vacuum={vacuum} navigateRoot={navigateRoot} />
       ))}
     </ul>
   );

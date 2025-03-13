@@ -11,9 +11,16 @@ interface VacuumResultProps {
   className?: string;
   imageClassName?: string;
   withLink?: boolean;
+  navigateRoot?: string;
 }
 
-export const VacuumInfo = ({ vacuum, className = "", imageClassName = "", withLink = true }: VacuumResultProps) => {
+export const VacuumInfo = ({
+  vacuum,
+  className = "",
+  imageClassName = "",
+  navigateRoot = "",
+  withLink = true,
+}: VacuumResultProps) => {
   const name = `${vacuum.brand} ${vacuum.model}`;
 
   const content = useMemo(
@@ -49,7 +56,7 @@ export const VacuumInfo = ({ vacuum, className = "", imageClassName = "", withLi
   );
 
   return withLink ? (
-    <Link to={vacuum.id} className={sharedClassname}>
+    <Link to={navigateRoot ? `${navigateRoot}/${vacuum.id}` : vacuum.id} className={sharedClassname}>
       {content}
     </Link>
   ) : (

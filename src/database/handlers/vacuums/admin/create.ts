@@ -44,9 +44,9 @@ export const addVacuum = async ({
   const { data: response, error } = await supabase
     .from("Vacuums")
     .insert({
-      brand,
-      model,
-      imageUrl,
+      brand: brand.trim(),
+      model: model.trim(),
+      imageUrl: imageUrl.trim(),
       mappingTechnology: mappingTechnology as MappingTechnology,
       batteryLifeInMinutes,
       suctionPowerInPascals,

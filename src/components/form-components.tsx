@@ -225,6 +225,12 @@ export const FormComboboxField = <T extends string>({
         setQuery(newValue as string);
         onChange(newValue as T);
       }}
+      onClose={() => {
+        const matchOption = options.find((option) => option.toLowerCase().trim() === query.toLowerCase().trim());
+        if (matchOption) {
+          onChange(matchOption as T);
+        }
+      }}
     >
       {label && <Label className="flex items-center gap-2 text-sm/6 font-medium">{label}</Label>}
 
