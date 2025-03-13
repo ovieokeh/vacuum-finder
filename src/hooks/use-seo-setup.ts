@@ -64,7 +64,7 @@ export const useSeoSetup = () => {
       }
       return false;
     });
-    console.log("SEO setup for route", route, matchedRoute);
+
     if (typeof window !== "undefined" && matchedRoute) {
       const config = ROUTE_SEO_CONFIG[matchedRoute];
       document.title = config.title;

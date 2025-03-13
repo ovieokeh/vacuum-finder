@@ -115,8 +115,9 @@ export function VacuumSearchPage() {
           className={`md:border md:border-border md:w-3/4 overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0`}
         >
           <VacuumResults
+            className="flex flex-wrap"
+            linkClassname="md:basis-1/2 lg:basis-1/3"
             containerWidth={vacuumResultsWidth}
-            filters={currentFilters}
             results={searchVacuums?.results}
           />
         </div>

@@ -18,7 +18,7 @@ export const PriceDisplay = ({ vacuum }: { vacuum: VacuumWithAffiliateLinks }) =
     <span className="block w-full">n/a</span>
   ) : cheapestPrice === -1 ? (
     <Popover
-      panelClassName="bg-background-alt p-4 border border-border rounded"
+      panelClassName="bg-background-alt p-4 border border-border rounded z-60"
       triggerClassName="p-0!"
       trigger={<MdInfoOutline className="w-4 h-4 text-text!" />}
     >

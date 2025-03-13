@@ -42,7 +42,7 @@ export const VacuumFeatures = ({
   };
 
   let keys = Object.keys(featureKeyMapping) as (keyof Vacuum)[];
-  keys = keys.filter((key) => exclude.includes(key) === false);
+  keys = keys.filter((key) => exclude.includes(key) === false).filter((key) => !!vacuum[key]);
   if (limit) {
     keys.splice(limit);
   }
@@ -51,9 +51,12 @@ export const VacuumFeatures = ({
     return null;
   }
 
+  const truncated = keys.length > 5;
+  const renderKeys = truncated ? keys.slice(0, 5) : keys;
+
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
-      {keys.map((key) => {
+    <div className="flex flex-wrap gap-x-2 gap-y-1 text-sm">
+      {renderKeys.map((key) => {
         const featureValue = vacuum[key];
         if (!featureValue) {
           return null;
@@ -77,6 +80,7 @@ export const VacuumFeatures = ({
           <span>Pet-friendly</span>
         </div>
       ) : null}
+      {truncated ? <span>{`and ${keys.length - 5} more features`}</span> : null}
     </div>
   );
 };

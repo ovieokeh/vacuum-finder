@@ -1,22 +1,21 @@
-import { Link } from "react-router";
-
-import { VacuumsFilters } from "../types";
 import { VacuumInfo } from "./vacuum-info";
 import { VacuumsWithAffiliateLinks } from "../database";
+import { twMerge } from "tailwind-merge";
 
 interface VacuumResultsProps {
-  filters?: VacuumsFilters;
   navigateRoot?: string;
   emptyView?: React.ReactNode;
   results?: VacuumsWithAffiliateLinks;
   isLoading?: boolean;
+  linkClassname?: string;
+  className?: string;
 }
 
 export function VacuumResults({
   isLoading,
   results = [],
-  filters,
-  navigateRoot = "/vacuums",
+  className = "",
+  linkClassname = "",
   emptyView = (
     <div className="flex justify-center items-center h-64">
       <p>No results found. Adjust filters and try again.</p>
@@ -36,24 +35,12 @@ export function VacuumResults({
           emptyView
         )
       ) : (
-        <div className="">
-          <VacuumMobileList results={results} filters={filters} navigateRoot={navigateRoot} />
-        </div>
+        <ul className={twMerge(className)}>
+          {results?.map((vacuum) => (
+            <VacuumInfo key={vacuum.id} vacuum={vacuum} className={linkClassname} />
+          ))}
+        </ul>
       )}
     </>
   );
 }
-
-const VacuumMobileList = ({ results, navigateRoot }: VacuumResultsProps) => {
-  return (
-    <ul className="space-y-4 py-2">
-      {results?.map((vacuum) => (
-        <li key={vacuum.id} className="flex flex-col gap-4 p-4 border border-border rounded-lg">
-          <Link to={`${navigateRoot}/${vacuum.id}`}>
-            <VacuumInfo vacuum={vacuum} />
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-};
