@@ -2,12 +2,14 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 
 import { useSiteConfig } from "../providers/site-config";
 import { CurrencyIconMapping, RegionIconMapping, SUPPORTED_CURRENCIES, SUPPORTED_REGIONS } from "../types";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { Link } from "react-router";
 import { IoGlobeOutline } from "react-icons/io5";
 
-export const Navigation = () => {
+export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
   const navRef = useRef<HTMLDivElement>(null);
+  useImperativeHandle(ref, () => navRef.current as HTMLDivElement);
+
   const { user, region, currency, setRegion, setCurrency, setNavHeight } = useSiteConfig();
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export const Navigation = () => {
   const CurrentCurrencyIcon = CurrencyIconMapping[currency];
 
   return (
-    <div className="z-20 p-4 grow shadow sticky" ref={navRef}>
+    <div className="z-20 p-4 grow shadow sticky h-[66px]" ref={navRef}>
       <div className="max-w-[1240px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-6 text-sm md:text-base text-text!">
           <Link to="/" className="text-text! font-semibold">
@@ -86,4 +88,4 @@ export const Navigation = () => {
       </div>
     </div>
   );
-};
+});

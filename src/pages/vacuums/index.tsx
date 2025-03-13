@@ -75,6 +75,7 @@ export function VacuumSearchPage() {
   }, [reset]);
 
   const filtersContainerWidth = filtersContainerRef.current?.clientWidth ?? 300;
+  const filtersContainerHeight = filtersContainerRef.current?.clientHeight ?? 300;
   const vacuumResultsWidth = Math.min(windowWidth - (filtersContainerWidth + 64), 868);
 
   return (
@@ -85,13 +86,10 @@ export function VacuumSearchPage() {
       </Helmet>
 
       <div
-        className="flex flex-col-reverse justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1240px] p-4"
-        style={{
-          minHeight: `calc(100% - ${navHeight + 16}px)`,
-        }}
+        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1240px] px-4 pt-2 md:p-4 h-[calc(100%-3rem)] md:h-full relative`}
       >
         <div
-          className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:rounded-tl-lg md:rounded-bl-lg"
+          className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full"
           ref={filtersContainerRef}
         >
           <div className="hidden md:block p-4 pb-0">
@@ -101,6 +99,8 @@ export function VacuumSearchPage() {
           <FormProvider {...form}>
             <VacuumSearchForm
               form={form}
+              navHeight={navHeight}
+              filtersContainerHeight={filtersContainerHeight}
               handleSubmit={() => {
                 handleSubmit(() => {
                   setCurrentFilters(filters);
@@ -111,7 +111,9 @@ export function VacuumSearchPage() {
           </FormProvider>
         </div>
 
-        <div className="md:border md:border-border md:border-l-0 md:w-3/4 md:h-full overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0">
+        <div
+          className={`md:border md:border-border md:w-3/4 overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0`}
+        >
           <VacuumResults
             containerWidth={vacuumResultsWidth}
             filters={currentFilters}

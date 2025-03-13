@@ -17,7 +17,7 @@ import { AdminVacuumAddPage } from "./pages/admin/vacuums/add";
 import { AdminVacuumEditPage } from "./pages/admin/vacuums/[vacuumId]";
 import { reduxStore } from "./redux";
 import "./index.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useSeoSetup } from "./hooks/use-seo-setup";
 
@@ -25,7 +25,9 @@ const queryClient = new QueryClient();
 
 export default function App() {
   const location = useLocation();
+  const navRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState(0);
   useSeoSetup();
 
   // scroll restoration
@@ -34,6 +36,12 @@ export default function App() {
       scrollRef.current.scrollTo(0, 0);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (navRef.current) {
+      setNavHeight(navRef.current.clientHeight);
+    }
+  }, []);
 
   return (
     <>
@@ -48,9 +56,16 @@ export default function App() {
                 content="Find the best robot vacuum for your needs with our vacuum finder tool. Compare robot vacuums by features, price, and more."
               />
             </Helmet>
-            <Navigation />
+            <Navigation ref={navRef} />
 
-            <div className="mt-0 h-[calc(100%-4rem)] overflow-y-scroll" ref={scrollRef}>
+            <div
+              className={`mt-0 overflow-y-scroll`}
+              ref={scrollRef}
+              style={{
+                height: `calc(100vh - ${navHeight + 10}px)`,
+                overflow: "hidden",
+              }}
+            >
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="guides" element={<GuidesPage />} />

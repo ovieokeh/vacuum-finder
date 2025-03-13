@@ -15,12 +15,21 @@ import { FormSelectField, FormTextField, FormToggleField } from "./form-componen
 
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
+  filtersContainerHeight?: number;
+  navHeight?: number;
   handleSubmit: () => void;
   resetFilters: () => void;
 }
 
-export function VacuumSearchForm({ form, handleSubmit, resetFilters }: VacuumSearchFormProps) {
+export function VacuumSearchForm({
+  form,
+  filtersContainerHeight = 0,
+  navHeight = 0,
+  handleSubmit,
+  resetFilters,
+}: VacuumSearchFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+
   const brandsQuery = useListBrands();
   const brands = brandsQuery.data;
   const isFormDirty = form.formState.isDirty;
@@ -175,7 +184,14 @@ export function VacuumSearchForm({ form, handleSubmit, resetFilters }: VacuumSea
   // --- Desktop & Mobile Filters ---
   const desktopFilters = (
     <div className="hidden md:block">
-      <div className="h-[69vh] overflow-y-scroll space-y-2">
+      <div
+        className={`overflow-y-scroll space-y-2`}
+        style={{
+          height: `calc(${filtersContainerHeight - navHeight - 52}px)`,
+          overflow: "hidden",
+          overflowY: "scroll",
+        }}
+      >
         {simpleFilters}
         {advancedFiltersToggle}
         {showAdvanced && advancedFilters}
