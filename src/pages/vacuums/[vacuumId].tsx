@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { invariant } from "es-toolkit";
 import { CiCircleInfo } from "react-icons/ci";
 import { Helmet } from "react-helmet";

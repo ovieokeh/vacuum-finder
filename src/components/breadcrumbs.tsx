@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 import { twMerge } from "tailwind-merge";
 
 interface BreadcrumbsProps {

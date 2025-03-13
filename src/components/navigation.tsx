@@ -3,7 +3,7 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 import { useSiteConfig } from "../providers/site-config";
 import { CurrencyIconMapping, RegionIconMapping, SUPPORTED_CURRENCIES, SUPPORTED_REGIONS } from "../types";
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { IoGlobeOutline } from "react-icons/io5";
 
 export const Navigation = () => {

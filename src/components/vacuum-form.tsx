@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 import { ConfirmButton } from "./confirm-button";
 import { FaChevronDown, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
