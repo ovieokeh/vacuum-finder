@@ -52,9 +52,11 @@ export function VacuumSearchPage() {
 
   useEffect(() => {
     setValue("currency", currency);
+    setCurrentFilters((prev) => ({ ...prev, currency }));
   }, [currency, setValue]);
   useEffect(() => {
     setValue("region", region);
+    setCurrentFilters((prev) => ({ ...prev, region }));
   }, [region, setValue]);
 
   const definedFilters = useMemo(() => markAllValuesAsDefined<VacuumsFilters>(filters), [filters]);

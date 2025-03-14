@@ -19,6 +19,7 @@ import { GoChevronDown } from "react-icons/go";
 import { twMerge } from "tailwind-merge";
 
 import ImageUpload from "./image-upload";
+import { IoMdCloseCircle } from "react-icons/io";
 
 const ErrorRenderer = ({ error }: { error?: string }) => {
   if (!error) {
@@ -74,6 +75,15 @@ export const FormTextField = <T extends string | number>({
           )}
           onChange={(e) => onChange(e.target.value as T)}
         />
+
+        {rest.value?.toLocaleString().length > 0 && (
+          <button
+            onClick={() => (typeof rest.value === "string" ? onChange("" as T) : onChange(0 as T))}
+            className="flex items-center justify-center bg-background-alt w-fit! p-0!"
+          >
+            <IoMdCloseCircle className="size-5 text-white" />
+          </button>
+        )}
       </div>
 
       <ErrorRenderer error={error} />
@@ -307,14 +317,16 @@ export const FormImageUploadField = ({
 export const FormTabField = ({
   label,
   value,
+  unknownLabel = "Unknown",
   onChange,
-}: FormFieldProps<boolean | undefined> & {
+}: FormFieldProps<boolean | null> & {
   label?: string;
+  unknownLabel?: string;
 }) => {
   const VALUE_MAPPING = {
     yes: true,
     no: false,
-    unknown: undefined,
+    unknown: null,
   };
 
   const isValueSelected = (tab: string) => {
@@ -336,12 +348,12 @@ export const FormTabField = ({
           <Button
             key={index}
             className={twMerge(
-              "flex-1 py-2 text-sm rounded-none!  border-none! bg-background text-text/80 capitalize outline-0!",
+              "w-fit! grow shrink! text-sm rounded-none! border-none! bg-background text-text/80 capitalize outline-0!",
               isValueSelected(tab) && "bg-accent text-background"
             )}
             onClick={() => onChange(VALUE_MAPPING[tab as keyof typeof VALUE_MAPPING])}
           >
-            {tab}
+            {tab === "unknown" ? unknownLabel : tab}
           </Button>
         ))}
       </div>

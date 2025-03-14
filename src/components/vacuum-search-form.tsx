@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
-import { Controller, FormProvider, UseFormReturn, useWatch } from "react-hook-form";
-import { Button, Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
-import { BiChevronDown, BiWallet } from "react-icons/bi";
+import { useMemo, useState } from "react";
+import { Controller, UseFormReturn, useWatch } from "react-hook-form";
+import { Button } from "@headlessui/react";
+import { BiWallet } from "react-icons/bi";
 import { MdPets } from "react-icons/md";
 import { GiSoap } from "react-icons/gi";
 import { CiEdit } from "react-icons/ci";
@@ -11,7 +11,7 @@ import { useSiteConfig } from "../providers/site-config";
 import { CurrencySymbolMapping, VacuumsFilters } from "../types";
 import { Modal } from "./modal";
 import { useListBrands } from "../database/hooks";
-import { FormSelectField, FormTextField, FormToggleField } from "./form-components";
+import { FormSelectField, FormTabField, FormTextField, FormToggleField } from "./form-components";
 
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
@@ -28,10 +28,13 @@ export function VacuumSearchForm({
   handleSubmit,
   resetFilters,
 }: VacuumSearchFormProps) {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const brandsQuery = useListBrands();
   const brands = brandsQuery.data;
   const isFormDirty = form.formState.isDirty;
 
+  // --- Simple Filters ---
   const simpleFilters = useMemo(
     () => (
       <>
@@ -91,60 +94,166 @@ export function VacuumSearchForm({
     [brands]
   );
 
-  return (
-    <FormProvider {...form}>
-      <form
-        className="px-4 py-2 md:p-4 flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
+  // --- Advanced Filters (all keys from VacuumBase) ---
+  const advancedFilters = useMemo(
+    () => (
+      <div className="mt-4 flex flex-col gap-4 pb-4">
+        <Controller
+          name="batteryLifeInMinutes"
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Battery Life (minutes)" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="suctionPowerInPascals"
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Suction Power (Pascals)" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="noiseLevelInDecibels"
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Max Noise Level (dB)" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="waterTankCapacityInLiters"
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Water Tank Capacity (liters)" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="dustbinCapacityInLiters"
+          render={({ field, fieldState }) => (
+            <FormTextField type="number" label="Min Dustbin Capacity (liters)" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="hasSelfEmptyingFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Self-emptying" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="hasZoneCleaningFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Zone cleaning" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="hasMultiFloorMappingFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Multi-floor mapping" state={fieldState} {...field} />
+          )}
+        />
+
+        <Controller
+          name="hasVirtualWallsFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Virtual walls" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="hasSmartHomeIntegrationFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Smart home integration" state={fieldState} {...field} />
+          )}
+        />
+
+        <Controller
+          name="hasAppControlFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="App control" state={fieldState} {...field} />
+          )}
+        />
+
+        <Controller
+          name="hasManualControlFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Manual control" state={fieldState} {...field} />
+          )}
+        />
+      </div>
+    ),
+    []
+  );
+
+  const advancedFiltersToggle = useMemo(
+    () => (
+      <Button
+        type="button"
+        onClick={() => setShowAdvanced((prev) => !prev)}
+        className="my-4 p-0! text-sm text-primary underline outline-0! focus:outline-0! border-0!"
+      >
+        {showAdvanced ? "Hide Advanced Filters" : "Show Advanced Filters"}
+      </Button>
+    ),
+    [showAdvanced]
+  );
+
+  // --- Desktop & Mobile Filters ---
+  const desktopFilters = (
+    <div className="hidden md:block">
+      <div
+        className={`overflow-y-scroll space-y-2`}
+        style={{
+          height: `calc(${filtersContainerHeight - navHeight - 68}px)`,
+          overflow: "hidden",
+          overflowY: "scroll",
         }}
       >
-        <div className="hidden md:block">
-          <div
-            className={`overflow-y-scroll space-y-2`}
-            style={{
-              height: `calc(${filtersContainerHeight - navHeight - 68}px)`,
-              overflow: "hidden",
-              overflowY: "scroll",
-            }}
-          >
-            {simpleFilters}
-            <AdvancedFilters form={form} />
-          </div>
+        {simpleFilters}
+        {advancedFiltersToggle}
+        {showAdvanced && advancedFilters}
+      </div>
 
-          <div className="flex gap-4 pt-4">
-            {isFormDirty && (
-              <Button
-                type="button"
-                onClick={() => resetFilters()}
-                className="w-full bg-red-500/10 border! border-red-500! px-3! py-2!"
-              >
-                Reset
-              </Button>
-            )}
-            <Button
-              type="button"
-              onClick={() => handleSubmit()}
-              className="w-full bg-background border! border-border! px-3! py-2!"
-            >
-              Search
-            </Button>
-          </div>
-        </div>
-        <MobileFiltersDialog
-          className="block md:hidden"
-          form={form}
-          handleSubmit={handleSubmit}
-          resetFilters={resetFilters}
+      <div className="flex gap-4 pt-4">
+        {isFormDirty && (
+          <Button
+            type="button"
+            onClick={() => resetFilters()}
+            className="w-full bg-red-500/10 border! border-red-500! px-3! py-2!"
+          >
+            Reset
+          </Button>
+        )}
+        <Button
+          type="button"
+          onClick={() => handleSubmit()}
+          className="w-full bg-background border! border-border! px-3! py-2!"
         >
-          <div className="flex flex-col gap-4">
-            {simpleFilters}
-            <AdvancedFiltersSelectionDialog form={form} />
-          </div>
-        </MobileFiltersDialog>
-      </form>
-    </FormProvider>
+          Search
+        </Button>
+      </div>
+    </div>
+  );
+
+  const mobileFilters = (
+    <MobileFiltersDialog
+      className="block md:hidden"
+      form={form}
+      handleSubmit={handleSubmit}
+      resetFilters={resetFilters}
+    >
+      <div className="flex flex-col gap-4">
+        {simpleFilters}
+        {advancedFiltersToggle}
+        {showAdvanced && advancedFilters}
+      </div>
+    </MobileFiltersDialog>
+  );
+
+  return (
+    <form
+      className="px-4 py-2 md:p-4 flex flex-col gap-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+    >
+      {desktopFilters}
+      {mobileFilters}
+    </form>
   );
 }
 
@@ -249,203 +358,4 @@ const MobileFiltersDialog = ({
       </Modal>
     </div>
   );
-};
-
-const fuzzySearch = (query: string) => (key: string) => key.toLowerCase().includes(query.toLowerCase());
-const shownFieldKeys = ["brand", "budget", "mappingTechnology", "numPets", "hasMoppingFeature", "region", "currency"];
-const getVacuumFilterType = (key: keyof VacuumsFilters) => {
-  // get type from Vacuum type
-  switch (key) {
-    case "batteryLifeInMinutes":
-    case "dustbinCapacityInLiters":
-    case "waterTankCapacityInLiters":
-    case "suctionPowerInPascals":
-    case "noiseLevelInDecibels":
-    case "budget":
-    case "numPets":
-      return "number";
-    case "hasMoppingFeature":
-    case "hasSelfEmptyingFeature":
-    case "hasZoneCleaningFeature":
-    case "hasMultiFloorMappingFeature":
-    case "hasVirtualWallsFeature":
-    case "hasSmartHomeIntegrationFeature":
-    case "hasAppControlFeature":
-    case "hasManualControlFeature":
-    case "hasChildLockFeature":
-    case "hasVoiceControlFeature":
-      return "boolean";
-    default:
-      return "string";
-  }
-};
-
-const renderField = (key: keyof VacuumsFilters) => {
-  const valueTypeFromTypings = getVacuumFilterType(key);
-  const label = FilterKeyToLabel[key];
-
-  console.log("valueTypeFromTypings", valueTypeFromTypings, key, label);
-  switch (valueTypeFromTypings) {
-    case "number":
-      return (
-        <Controller
-          name={key}
-          render={({ field, fieldState }) => (
-            <FormTextField type="number" label={label} state={fieldState} {...field} />
-          )}
-        />
-      );
-    case "boolean":
-      return (
-        <Controller
-          name={key}
-          render={({ field, fieldState }) => <FormToggleField label={label} state={fieldState} {...field} />}
-        />
-      );
-    case "string":
-      return (
-        <Controller
-          name={key}
-          render={({ field, fieldState }) => <FormTextField label={label} state={fieldState} {...field} />}
-        />
-      );
-    default:
-      return null;
-  }
-};
-
-const AdvancedFilters = ({ form }: { form: UseFormReturn<VacuumsFilters> }) => {
-  const formValues = useWatch({ control: form.control });
-
-  console.log("formValues", formValues);
-
-  const renderKeys = useMemo(() => {
-    return Object.entries(formValues)
-      .filter(([, value]) => value !== null)
-      .map(([key]) => key)
-      .filter((key) => !shownFieldKeys.includes(key));
-  }, [formValues]);
-
-  return (
-    <div className="mt-4 flex flex-col gap-4 pb-4">
-      {renderKeys.map((key) => (
-        <div key={key}>{renderField(key as keyof VacuumsFilters)}</div>
-      ))}
-
-      <AdvancedFiltersSelectionDialog form={form} />
-    </div>
-  );
-};
-
-const AdvancedFiltersSelectionDialog = ({ form }: { form: UseFormReturn<VacuumsFilters> }) => {
-  const [query, setQuery] = useState("");
-  const formValues = useWatch({ control: form.control });
-
-  const handleAddFilter = useCallback(
-    (key: keyof VacuumsFilters) => {
-      console.log("key", key);
-      const valueTypeFromTypings = getVacuumFilterType(key);
-      console.log("valueTypeFromTypings", valueTypeFromTypings);
-      const defaultValue = valueTypeFromTypings === "boolean" ? false : valueTypeFromTypings === "number" ? 0 : "";
-      form.setValue(key, defaultValue);
-    },
-    [form]
-  );
-
-  const handleRemoveFilter = useCallback(
-    (key: keyof VacuumsFilters) => {
-      form.setValue(key, null);
-    },
-    [form]
-  );
-
-  const isSet = useCallback((key: keyof VacuumsFilters) => formValues[key] !== null, [formValues]);
-  const handleFieldOptionClick = useCallback(
-    (key: keyof VacuumsFilters) => {
-      if (isSet(key)) {
-        handleRemoveFilter(key);
-      } else {
-        handleAddFilter(key);
-      }
-    },
-    [handleAddFilter, handleRemoveFilter, isSet]
-  );
-
-  const baseFieldKeys = useMemo(() => {
-    return Object.entries(formValues)
-      .map(([key]) => {
-        return key as keyof VacuumsFilters;
-      })
-      .filter((key) => !shownFieldKeys.includes(key));
-  }, [formValues]);
-
-  const fieldKeys = useMemo(() => {
-    return baseFieldKeys.filter((key) => {
-      const label = FilterKeyToLabel[key];
-      return fuzzySearch(query)(label);
-    });
-  }, [baseFieldKeys, query]);
-
-  return (
-    <Combobox
-      value={undefined}
-      onChange={(value) => {
-        if (value) {
-          handleFieldOptionClick(value as keyof VacuumsFilters);
-        }
-      }}
-      onClose={() => setQuery("")}
-      immediate
-    >
-      <div className="relative">
-        <ComboboxButton className="flex items-center gap-2 w-full bg-background border border-border rounded focus:border-accent focus-within:border-accent">
-          <ComboboxInput
-            className="w-full px-3 py-2 outline-0!"
-            placeholder="Add/Remove Filters"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <BiChevronDown className="w-5 h-5 text-primary group-hover:text-primary-dark" />
-        </ComboboxButton>
-      </div>
-
-      <ComboboxOptions
-        anchor="bottom start"
-        transition
-        className="w-[calc(100vw-16px)] md:w-[18rem] border border-border bg-background-alt rounded-xl p-2 h-84 overflow-y-scroll [--anchor-gap:var(--spacing-1)] z-20 -ml-1 md:-ml-[1.5rem]"
-      >
-        {fieldKeys.map((key) => (
-          <ComboboxOption key={key} value={key} onClick={() => handleFieldOptionClick(key)}>
-            <button className="w-full text-left">
-              <span className="text-sm font-semibold">{FilterKeyToLabel[key as keyof VacuumsFilters]}</span>
-            </button>
-          </ComboboxOption>
-        ))}
-      </ComboboxOptions>
-    </Combobox>
-  );
-};
-
-const FilterKeyToLabel: Record<keyof VacuumsFilters, string> = {
-  brand: "Brand",
-  budget: "Budget",
-  mappingTechnology: "Mapping Technology",
-  numPets: "Number of Pets",
-  hasMoppingFeature: "Mop Feature",
-  batteryLifeInMinutes: "Battery Life (minutes)",
-  suctionPowerInPascals: "Suction Power (Pascals)",
-  noiseLevelInDecibels: "Noise Level (dB)",
-  waterTankCapacityInLiters: "Water Tank Capacity (liters)",
-  dustbinCapacityInLiters: "Dustbin Capacity (liters)",
-  hasSelfEmptyingFeature: "Self-emptying Feature",
-  hasZoneCleaningFeature: "Zone Cleaning Feature",
-  hasMultiFloorMappingFeature: "Multi-floor Mapping Feature",
-  hasVirtualWallsFeature: "Virtual Walls Feature",
-  hasSmartHomeIntegrationFeature: "Smart Home Integration Feature",
-  hasAppControlFeature: "App Control Feature",
-  hasManualControlFeature: "Manual Control Feature",
-  hasChildLockFeature: "Child Lock Feature",
-  hasVoiceControlFeature: "Voice Control Feature",
-  region: "Region",
-  currency: "Currency",
 };
