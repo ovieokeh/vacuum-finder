@@ -1,25 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
+import { CookieStorage } from "redux-persist-cookie-storage";
+import Cookies from "cookies-js";
 
 import vacuumFiltersReducer from "./vacuum-filters-reducer";
 
-let isomorphicStorage: any;
-if (typeof window === "undefined") {
-  await import("redux-persist-node-storage").then((module) => {
-    const AsyncNodeStorage = module.AsyncNodeStorage;
-    isomorphicStorage = new AsyncNodeStorage("./.storage");
-  });
-} else {
-  await import("redux-persist/lib/storage").then((module) => {
-    const clientStorage = module.default;
-    isomorphicStorage = clientStorage;
-  });
-}
-
 const persistConfig = {
   key: "root",
-  storage: isomorphicStorage,
+  storage: new CookieStorage(Cookies /*, options */),
   whiteList: ["vacuumsFilters"],
 };
 
