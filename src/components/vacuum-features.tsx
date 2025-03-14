@@ -68,7 +68,7 @@ export const VacuumFeatures = ({
           return (
             <div key={key} className="flex items-center gap-1">
               {icon}
-              <span>{text}</span>
+              <span className="capitalize">{text}</span>
             </div>
           );
         }

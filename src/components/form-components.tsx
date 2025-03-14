@@ -15,11 +15,12 @@ import {
   ComboboxInput,
 } from "@headlessui/react";
 import { ControllerFieldState } from "react-hook-form";
-import { GoChevronDown } from "react-icons/go";
 import { twMerge } from "tailwind-merge";
+import { GoChevronDown } from "react-icons/go";
+import { IoMdCloseCircle } from "react-icons/io";
 
 import ImageUpload from "./image-upload";
-import { IoMdCloseCircle } from "react-icons/io";
+import { useListBrands } from "../database/hooks";
 
 const ErrorRenderer = ({ error }: { error?: string }) => {
   if (!error) {
@@ -54,6 +55,21 @@ export const FormTextField = <T extends string | number>({
 }) => {
   const error = state?.error?.message;
 
+  const shouldShowClearButton = () => {
+    if (rest.value?.toLocaleString().length > 0) {
+      if (!rest.value) {
+        return false;
+      }
+      // is number?
+      if (type === "number") {
+        return +rest.value > 0;
+      }
+
+      return rest.value.toLocaleString().length > 0;
+    }
+    return false;
+  };
+
   return (
     <Field className="space-y-2">
       {label && (
@@ -76,12 +92,12 @@ export const FormTextField = <T extends string | number>({
           onChange={(e) => onChange(e.target.value as T)}
         />
 
-        {rest.value?.toLocaleString().length > 0 && (
+        {shouldShowClearButton() && (
           <button
-            onClick={() => (typeof rest.value === "string" ? onChange("" as T) : onChange(0 as T))}
+            onClick={() => (type === "string" ? onChange("" as T) : onChange(0 as T))}
             className="flex items-center justify-center bg-background-alt w-fit! p-0!"
           >
-            <IoMdCloseCircle className="size-5 text-white" />
+            <IoMdCloseCircle className="size-5 text-text" />
           </button>
         )}
       </div>
@@ -134,7 +150,48 @@ export const FormToggleField = ({
   );
 };
 
-export const FormSelectField = <T extends string>({
+interface FormSelectFieldProps {
+  onChange: (value: string) => void;
+  state?: ControllerFieldState;
+  value: string;
+  label?: string;
+  icon?: React.ReactNode;
+  options: SelectOption[];
+  labelClassName?: string;
+  optionClassName?: string;
+}
+
+export const FormConnectedBrandsSelect = (props: Omit<FormSelectFieldProps, "options">) => {
+  const brandsQuery = useListBrands();
+  const brands = brandsQuery.data ?? [];
+  return (
+    <FormSelectField
+      {...props}
+      options={brands.map((brand) => ({
+        label: brand,
+        value: brand,
+      }))}
+    />
+  );
+};
+
+export const FormConnectedMappingTechnologySelect = (props: Omit<FormSelectFieldProps, "options">) => {
+  return (
+    <FormSelectField
+      {...props}
+      options={["laser", "camera"].map((tech) => ({
+        label: tech,
+        value: tech,
+      }))}
+    />
+  );
+};
+
+interface SelectOption {
+  label: string;
+  value: string;
+}
+export const FormSelectField = ({
   label,
   icon,
   options,
@@ -143,14 +200,10 @@ export const FormSelectField = <T extends string>({
   state,
   labelClassName,
   optionClassName,
-}: FormFieldProps<T> & {
-  label?: string;
-  icon?: React.ReactNode;
-  options: T[];
-  labelClassName?: string;
-  optionClassName?: string;
-}) => {
+}: FormSelectFieldProps) => {
   const error = state?.error?.message;
+
+  const selectedOption = options.find((option) => option.value === value);
 
   return (
     <Listbox value={value} onChange={(value) => onChange(value)}>
@@ -167,7 +220,7 @@ export const FormSelectField = <T extends string>({
             labelClassName
           )}
         >
-          {value || <span className="text-text/80 text-sm">Select an option</span>}
+          {selectedOption?.label || <span className="text-text/80 text-sm">Select an option</span>}
           <GoChevronDown className="w-4 h-4" />
         </ListboxButton>
         <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
@@ -181,14 +234,14 @@ export const FormSelectField = <T extends string>({
           )}
           {options.map((option, index) => (
             <ListboxOption
-              key={option + index}
-              value={option}
+              key={option.value + index}
+              value={option.value}
               className={twMerge(
                 "group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer capitalize",
                 optionClassName
               )}
             >
-              {option}
+              {option.label}
             </ListboxOption>
           ))}
         </ListboxOptions>
@@ -317,9 +370,12 @@ export const FormImageUploadField = ({
 export const FormTabField = ({
   label,
   value,
+  labelIcon,
   unknownLabel = "Unknown",
+  state,
   onChange,
 }: FormFieldProps<boolean | null> & {
+  labelIcon?: React.ReactNode;
   label?: string;
   unknownLabel?: string;
 }) => {
@@ -331,12 +387,25 @@ export const FormTabField = ({
 
   const isValueSelected = (tab: string) => {
     const selectedValue = VALUE_MAPPING[tab as keyof typeof VALUE_MAPPING];
+    if (tab === "unknown") {
+      if (typeof value === "boolean") {
+        return false;
+      }
+      return !value;
+    }
     return value === selectedValue;
   };
 
+  const error = state?.error?.message;
+
   return (
     <Field className="flex flex-col space-y-2">
-      {label && <Label className="text-sm/6 font-medium">{label}</Label>}
+      {label && (
+        <Label className="flex items-center gap-2 text-sm/6 font-medium">
+          {labelIcon}
+          {label}
+        </Label>
+      )}
 
       <div
         className="flex border border-accent bg-accent rounded overflow-hidden"
@@ -357,6 +426,26 @@ export const FormTabField = ({
           </Button>
         ))}
       </div>
+
+      <ErrorRenderer error={error} />
     </Field>
   );
 };
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const REGION_OPTIONS = ["americas", "europe", "asia", "africa", "australia"].map((region) => ({
+  value: region,
+  label: region,
+}));
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const CURRENCY_OPTIONS = ["usd", "eur", "gbp", "cad", "aud"].map((currency) => ({
+  value: currency,
+  label: currency.toUpperCase(),
+}));
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const MAPPING_TECHNOLOGY_OPTIONS = ["laser", "camera"].map((tech) => ({
+  value: tech,
+  label: tech,
+}));

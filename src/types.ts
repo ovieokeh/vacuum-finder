@@ -8,6 +8,8 @@ export type VacuumsFilters = Omit<
   Vacuum,
   "id" | "imageUrl" | "model" | "otherFeatures" | "userEmail" | "createdAt" | "updatedAt"
 > & {
+  brand?: string;
+  model?: string;
   budget?: number;
   numPets?: number;
   region?: Region;

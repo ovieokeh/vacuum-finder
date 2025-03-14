@@ -3,12 +3,15 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 import { useSiteConfig } from "../providers/site-config";
 import { CurrencyIconMapping, RegionIconMapping, SUPPORTED_CURRENCIES, SUPPORTED_REGIONS } from "../types";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { IoGlobeOutline } from "react-icons/io5";
+import { Region } from "../database";
+import { LuUser } from "react-icons/lu";
 
 export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
   const navRef = useRef<HTMLDivElement>(null);
   useImperativeHandle(ref, () => navRef.current as HTMLDivElement);
+  const location = useLocation();
 
   const { user, region, currency, setRegion, setCurrency, setNavHeight } = useSiteConfig();
 
@@ -17,6 +20,18 @@ export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
       setNavHeight(navRef.current.clientHeight);
     }
   }, [setNavHeight]);
+
+  const handleSetRegion = (value: Region) => {
+    setRegion(value);
+    if (value === "europe") {
+      setCurrency("eur");
+    } else {
+      setCurrency("usd");
+    }
+  };
+
+  const appPages = ["/vacuums", "/vacuums/:id"];
+  const isAppPage = appPages.some((page) => location.pathname.startsWith(page));
 
   const CurrentRegionIcon = RegionIconMapping[region] ?? IoGlobeOutline;
   const CurrentCurrencyIcon = CurrencyIconMapping[currency];
@@ -31,22 +46,22 @@ export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
           </Link>
 
           <div className="flex gap-2 md:gap-6">
-            <Link to="/vacuums" className="text-text hover:text-text/90">
-              Finder
+            <Link to="/quiz" className="text-text hover:text-text/90">
+              Quiz
             </Link>
+            {!isAppPage && (
+              <Link to="/vacuums" className="text-text hover:text-text/90">
+                Search
+              </Link>
+            )}
             <Link to="/guides" className="text-text hover:text-text/90">
               Guides
             </Link>
-            {user?.id ? (
-              <Link to="/admin" className="text-text hover:text-text/90">
-                Dashboard
-              </Link>
-            ) : null}
           </div>
         </div>
 
         <div className="flex flow-row gap-1 md:gap-4 items-center justify-between">
-          <Listbox value={region} onChange={(value) => setRegion(value)}>
+          <Listbox value={region} onChange={handleSetRegion}>
             <div className="flex flex-col gap-2">
               <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! py-1! bg-background!">
                 <CurrentRegionIcon className="w-4 h-4" />
@@ -84,6 +99,12 @@ export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
               </ListboxOptions>
             </div>
           </Listbox>
+
+          {user?.id ? (
+            <Link to="/admin" className="text-text hover:text-text/90">
+              <LuUser className="size-6" />
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>

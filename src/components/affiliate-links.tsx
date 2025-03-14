@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { getCoreRowModel, ColumnDef } from "@tanstack/react-table";
 
 import { TableContainer } from "./table";
-import { FormSelectField } from "./form-components";
+import { CURRENCY_OPTIONS, FormSelectField, REGION_OPTIONS } from "./form-components";
 import { AffiliateLink, AffiliateLinks, Currency, Region } from "../database";
 
 interface AffiliateLinksTableProps {
@@ -80,16 +80,16 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
           <FormSelectField
             label="Region"
             value={selectedRegion ?? "americas"}
-            onChange={(e) => setSelectedRegion(e)}
-            options={["americas", "europe", "asia", "africa", "australia"]}
+            onChange={(e) => setSelectedRegion(e as Region)}
+            options={REGION_OPTIONS}
           />
         </div>
         <div className="grow">
           <FormSelectField
             label="Currency"
             value={selectedCurrency ?? "usd"}
-            onChange={(e) => setSelectedCurrency(e)}
-            options={["usd", "eur"]}
+            onChange={(e) => setSelectedCurrency(e as Currency)}
+            options={CURRENCY_OPTIONS}
             labelClassName="uppercase"
             optionClassName="uppercase"
           />

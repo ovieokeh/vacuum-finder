@@ -18,7 +18,10 @@ const baseSupabaseQuery = supabase.from("vacuumaffiliatesummary").select(`
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const baseMatchCountQuery = supabase.from("vacuumaffiliatesummary").select("id", { count: "exact" });
 
-const applyFiltersToQuery = (query: typeof baseSupabaseQuery | typeof baseMatchCountQuery, filters: VacuumsFilters) => {
+const applyFiltersToQuery = (
+  query: typeof baseSupabaseQuery | typeof baseMatchCountQuery,
+  filters: Partial<VacuumsFilters>
+) => {
   const booleanFilterTransform = (key: keyof VacuumsFilters) => (query: any, value: boolean) => query.eq(key, value);
   const SPECIAL_TRANSFORMS: {
     [key in keyof VacuumsFilters]?: (q: typeof query, v: any) => typeof query;
@@ -52,7 +55,7 @@ export const searchVacuums = async ({
   page,
   limit,
 }: {
-  filters: VacuumsFilters & { model?: string; owned?: boolean; budget?: number; currency?: string };
+  filters: Partial<VacuumsFilters> & { model?: string; owned?: boolean; budget?: number; currency?: string };
   page: number;
   limit: number;
 }): Promise<VacuumsSearchResult> => {

@@ -7,27 +7,24 @@ import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSiteConfig } from "../../providers/site-config";
 import { initialSearchFiltersState, replaceState } from "../../redux/vacuum-filters-reducer";
 import { useInfiniteQueryFetcher, useSearchVacuumsInfinite } from "../../database/hooks";
-import { useAppDispatch } from "../../redux";
+import { useAppDispatch, useAppSelector } from "../../redux";
 import { VacuumSearchForm } from "../../components/vacuum-search-form";
 import { VacuumResults } from "../../components/vacuum-results";
 import { VacuumsFilters } from "../../types";
-
-const markAllValuesAsDefined = <T extends Record<string, unknown | undefined>>(obj: any): T => {
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => {
-      return [key, value ?? ""];
-    })
-  ) as T;
-};
+import { markAllValuesAsDefined } from "../../shared-utils/object";
+import { useContentScroll } from "../../hooks/use-disable-body-scroll";
 
 export function VacuumSearchPage() {
   const windowWidth = useWindowWidth();
+  useContentScroll(false);
+
   const { navHeight, region, currency } = useSiteConfig();
+  const sharedFilters = useAppSelector((state) => state.vacuumsFilters);
   const filtersContainerRef = useRef<HTMLDivElement>(null);
   const form = useForm<VacuumsFilters>({
-    defaultValues: initialSearchFiltersState,
+    defaultValues: sharedFilters,
   });
-  const [currentFilters, setCurrentFilters] = useState<VacuumsFilters>(initialSearchFiltersState);
+  const [currentFilters, setCurrentFilters] = useState<VacuumsFilters>(sharedFilters);
   const filters = useWatch({ control: form.control });
   const searchVacuumsQuery = useSearchVacuumsInfinite({
     filters: currentFilters,
@@ -95,7 +92,7 @@ export function VacuumSearchPage() {
       </Helmet>
 
       <div
-        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1280px] px-4 pt-2 h-[calc(100svh-162px)] md:h-full relative`}
+        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1280px] px-4 pt-2 h-[calc(100svh-162px)] md:h-[calc(100svh-76px)] relative`}
       >
         <div
           className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full"

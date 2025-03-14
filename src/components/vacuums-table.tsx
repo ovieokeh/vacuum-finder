@@ -77,6 +77,7 @@ export function VacuumsTable({
           size: relativeWidth(containerWidth, 10),
           cell: (value) => {
             const batteryLife = value.getValue();
+            if (!batteryLife) return "N/A";
             const batteryLifeHours = Math.floor(batteryLife / 60);
             return `${batteryLifeHours}h ${batteryLife % 60}m`;
           },
@@ -87,6 +88,8 @@ export function VacuumsTable({
           accessorKey: "suctionPowerInPascals",
           size: relativeWidth(containerWidth, 10),
           cell: (value) => {
+            const suction = value.getValue();
+            if (!suction) return "N/A";
             return `${value.getValue()} Pa`;
           },
           enableSorting: true,

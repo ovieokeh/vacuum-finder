@@ -11,7 +11,7 @@ import { useSiteConfig } from "../providers/site-config";
 import { CurrencySymbolMapping, VacuumsFilters } from "../types";
 import { Modal } from "./modal";
 import { useListBrands } from "../database/hooks";
-import { FormSelectField, FormTabField, FormTextField, FormToggleField } from "./form-components";
+import { FormSelectField, FormTabField, FormTextField } from "./form-components";
 
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
@@ -34,14 +34,16 @@ export function VacuumSearchForm({
   const brands = brandsQuery.data;
   const isFormDirty = form.formState.isDirty;
 
+  const brandOptions = useMemo(() => brands?.map((brand) => ({ label: brand, value: brand })), [brands]);
+
   // --- Simple Filters ---
   const simpleFilters = useMemo(
     () => (
-      <>
+      <div className="flex flex-col gap-4 pb-4">
         <Controller
           name="brand"
           render={({ field, fieldState }) => (
-            <FormSelectField label="Brand" options={brands || []} state={fieldState} {...field} />
+            <FormSelectField label="Brand" options={brandOptions || []} state={fieldState} {...field} />
           )}
         />
 
@@ -61,7 +63,12 @@ export function VacuumSearchForm({
         <Controller
           name="mappingTechnology"
           render={({ field, fieldState }) => (
-            <FormSelectField label="Mapping Technology" options={["laser", "camera"]} state={fieldState} {...field} />
+            <FormSelectField
+              label="Mapping Technology"
+              options={["laser", "camera"].map((value) => ({ label: value, value }))}
+              state={fieldState}
+              {...field}
+            />
           )}
         />
 
@@ -81,17 +88,18 @@ export function VacuumSearchForm({
         <Controller
           name="hasMoppingFeature"
           render={({ field, fieldState }) => (
-            <FormToggleField
+            <FormTabField
               label="Mop feature"
-              icon={<GiSoap className="w-4 h-4 text-primary" />}
+              unknownLabel="Don't care"
+              labelIcon={<GiSoap className="w-4 h-4 text-primary" />}
               state={fieldState}
               {...field}
             />
           )}
         />
-      </>
+      </div>
     ),
-    [brands]
+    [brandOptions]
   );
 
   // --- Advanced Filters (all keys from VacuumBase) ---

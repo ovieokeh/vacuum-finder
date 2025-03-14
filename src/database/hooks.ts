@@ -19,7 +19,7 @@ export const useGetVacuum = (id: string) => {
 };
 
 interface UseSearchVacuumsArgs {
-  filters: VacuumsFilters;
+  filters: Partial<VacuumsFilters>;
   owned?: boolean;
   page?: number;
   limit?: number;

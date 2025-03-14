@@ -9,20 +9,23 @@ import { useSiteConfig } from "../../providers/site-config";
 import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSearchVacuums } from "../../database/hooks";
 import { VacuumsTable } from "../../components/vacuums-table";
+import { useContentScroll } from "../../hooks/use-disable-body-scroll";
 
 export function AdminDashboardPage() {
+  useContentScroll();
+
   useProtectedRoute();
 
   const [page, setPage] = useState(1);
 
-  const { userToken, currency, logout } = useSiteConfig();
+  const { user, userToken, currency, logout } = useSiteConfig();
   const windowWidth = useWindowWidth();
 
   const vacuumsQuery = useSearchVacuums({
     filters: {},
     owned: true,
     page,
-    limit: 5,
+    limit: 15,
   });
   const refetch = vacuumsQuery.refetch;
   const vacuums = useMemo(() => vacuumsQuery.data, [vacuumsQuery.data]);
@@ -33,6 +36,8 @@ export function AdminDashboardPage() {
     }
   }, [currency, userToken, refetch]);
 
+  const displayName = user?.user_metadata.full_name ?? user?.email;
+
   return (
     <>
       <Helmet>
@@ -40,10 +45,10 @@ export function AdminDashboardPage() {
         <title>Dashboard - Robot Vacuum Finder & Guide</title>
         <meta name="description" content="Add or update any robot vacuum in the collection" />
       </Helmet>
-      <div className="flex flex-col min-h-screen bg-background text-text w-full">
+      <div className="flex flex-col bg-background text-text w-full">
         <PageHeader
           title="Dashboard"
-          subtitle="Add or update any robot vacuum in the collection"
+          subtitle={`Welcome back, ${displayName}`}
           containerClassName="border-b border-border"
         >
           <Button onClick={logout} className="w-fit bg-background-alt border! border-border! hover:border-red-800">

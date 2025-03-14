@@ -1,48 +1,64 @@
 import { Link } from "react-router";
-
 import { Footer } from "../components/footer";
 import { PageHeader } from "../components/page-header";
+import { FaRobot, FaQuestionCircle, FaMagic, FaCheckCircle } from "react-icons/fa";
+import { IoIosArrowForward } from "react-icons/io";
 
 const copy = {
   hero: {
     title: "Robot Vacuum Finder: Your Shortcut to a Cleaner Home",
     subtitle:
-      "Tired of scrolling through endless options? Share a few details about your space, and we'll do the heavy lifting to match you with the perfect robot vacuum.",
+      "Ditch the endless scrolling and cryptic specs. Share a bit about your space, and we'll find your perfect robot vacuum match—effortlessly.",
   },
   whyThisTool: {
-    heading: "Why This Tool?",
+    heading: "Why Thousands Trust Our Tool",
     items: [
       {
-        title: "Personalized Results",
-        text: "Tell us about your home layout, floor types, and whether you have pets. We’ll pinpoint vacuums that match your exact situation.",
+        icon: <FaMagic size={32} className="text-accent" />,
+        title: "Made Just For You",
+        text: "From pet hair jungles to tricky floor layouts, our recommendations fit your exact needs. No guesswork, just great matches.",
       },
       {
-        title: "Quick & Confident Decisions",
-        text: "No more reading through countless reviews. Our system filters through top-rated models, so you can make a smart choice faster.",
+        icon: <FaRobot size={32} className="text-accent" />,
+        title: "Data You Can Trust",
+        text: "Our picks come from carefully vetted, staff-verified data and thousands of user-submitted experiences—saving you from the hype.",
       },
       {
-        title: "Straightforward Explanations",
-        text: "Wondering about suction power, battery life, or noise levels? We break down each feature in plain language, so you know exactly what you're getting.",
+        icon: <FaQuestionCircle size={32} className="text-accent" />,
+        title: "Complex Tech, Simplified",
+        text: (
+          <>
+            Confused about LiDAR sensors, suction power (seriously, what's a Pascal?), or battery cycles? We make it
+            clear and simple. Need more help? Visit our{" "}
+            <Link to="/guide" className="underline font-medium hover:text-accent">
+              full guide
+            </Link>
+            .
+          </>
+        ),
       },
     ],
   },
   howItWorks: {
-    heading: "How It Works",
+    heading: "Getting Your Robot Vacuum in 3 Easy Steps",
     steps: [
       {
         step: 1,
-        title: "Answer a Few Questions",
-        text: "Fill us in on your home size, floor types, number of rooms, and any special considerations—like pets or a preference for mopping.",
+        title: "Describe Your Home",
+        text: "Give us the quick facts about your floors, pets, and cleaning style. Sit back—we got you.",
+        imageUrl: "robot-home-search.png",
       },
       {
         step: 2,
-        title: "We Analyze & Suggest",
-        text: "Our tool compares popular models, assessing everything from dustbin capacity to noise levels, to create your custom shortlist.",
+        title: "Our Magic Happens",
+        text: "We instantly analyze your answers against our verified database of robot vacuums to create your perfect shortlist.",
+        imageUrl: "robot-home-search.png",
       },
       {
         step: 3,
-        title: "Choose & Purchase",
-        text: "Review the recommendations, compare their features, and pick the one you like best. You’ll have a reliable robot vacuum in no time.",
+        title: "Pick & Celebrate",
+        text: "Check out your personalized recommendations, choose your winner, and say hello to effortless cleaning.",
+        imageUrl: "robot-home-search.png",
       },
     ],
   },
@@ -50,10 +66,10 @@ const copy = {
 
 const tryLink = (
   <Link
-    to="/vacuums"
-    className="px-6 py-3 rounded border border-accent! text-background dark:text-black bg-accent! hover:bg-accent/50! font-semibold"
+    to="/quiz"
+    className="px-6 py-3 rounded border border-accent! text-background dark:text-black bg-accent! hover:bg-accent/50! font-semibold flex items-center gap-2"
   >
-    Try it Now
+    Find My Vacuum <IoIosArrowForward />
   </Link>
 );
 
@@ -66,14 +82,15 @@ export const HomePage = () => {
         title={copy.hero.title}
         subtitle={copy.hero.subtitle}
       >
-        <div className="mt-8 flex gap-4">{tryLink}</div>
+        <div className="mt-8 flex justify-center gap-4">{tryLink}</div>
       </PageHeader>
 
       <section className="mx-auto max-w-7xl px-6 py-10 md:py-16">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">{copy.whyThisTool.heading}</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-center">{copy.whyThisTool.heading}</h2>
         <div className="grid gap-8 md:grid-cols-3">
           {copy.whyThisTool.items.map((item, index) => (
-            <div key={index} className="p-6 border border-border rounded hover:shadow-md transition-shadow">
+            <div key={index} className="p-6 border border-border rounded hover:shadow-lg transition-shadow text-center">
+              <div className="mb-4 flex justify-center">{item.icon}</div>
               <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
               <p className="text-sm text-text/90">{item.text}</p>
             </div>
@@ -84,18 +101,24 @@ export const HomePage = () => {
       <section className="bg-background-alt w-full py-10 md:py-16">
         <div className="mx-auto max-w-7xl px-6">
           <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-center">{copy.howItWorks.heading}</h2>
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="flex flex-col gap-8 md:gap-28">
             {copy.howItWorks.steps.map((stepData) => (
-              <div key={stepData.step} className="flex flex-col items-center text-center">
-                <div className="mb-4 h-14 w-14 flex items-center justify-center rounded-full bg-accent/10 text-accent font-bold text-xl">
+              <div key={stepData.step} className="flex flex-col items-center text-center gap-4">
+                <div className="mb-2 h-12 w-12 flex items-center justify-center rounded-full bg-accent text-background font-bold text-xl">
                   {stepData.step}
                 </div>
-                <h3 className="font-semibold mb-2">{stepData.title}</h3>
-                <p className="text-sm text-text/90">{stepData.text}</p>
+                <img src={`/images/${stepData.imageUrl}`} alt="" className="w-full h-[300px] object-contain" />
+
+                <div className="flex flex-col items-center">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <FaCheckCircle className="text-accent" /> {stepData.title}
+                  </h3>
+                  <p className="text-sm text-text/90 text-center">{stepData.text}</p>
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-8 flex justify-center">{tryLink}</div>
+          <div className="mt-10 flex justify-center">{tryLink}</div>
         </div>
       </section>
 

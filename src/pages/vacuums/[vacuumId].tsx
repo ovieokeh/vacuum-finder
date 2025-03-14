@@ -42,7 +42,7 @@ export function VacuumInfoPage() {
             <>
               <VacuumInfo
                 vacuum={vacuum}
-                className="flex-row"
+                className="md:flex-row"
                 imageClassName="w-full h-64 md:size-64 mx-auto grow"
                 withLink={false}
               />

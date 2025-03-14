@@ -1,13 +1,38 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
 
 import vacuumFiltersReducer from "./vacuum-filters-reducer";
-import { useDispatch, useSelector } from "react-redux";
+
+let isomorphicStorage: any;
+if (typeof window === "undefined") {
+  await import("redux-persist-node-storage").then((module) => {
+    const AsyncNodeStorage = module.AsyncNodeStorage;
+    isomorphicStorage = new AsyncNodeStorage("./.storage");
+  });
+} else {
+  await import("redux-persist/lib/storage").then((module) => {
+    const clientStorage = module.default;
+    isomorphicStorage = clientStorage;
+  });
+}
+
+const persistConfig = {
+  key: "root",
+  storage: isomorphicStorage,
+  whiteList: ["vacuumsFilters"],
+};
+
+const reducers = combineReducers({
+  vacuumsFilters: vacuumFiltersReducer,
+});
+const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const reduxStore = configureStore({
-  reducer: {
-    vacuumsFilters: vacuumFiltersReducer,
-  },
+  reducer: persistedReducer,
 });
+
+export const persistor = persistStore(reduxStore);
 
 export type RootState = ReturnType<typeof reduxStore.getState>;
 export type AppDispatch = typeof reduxStore.dispatch;

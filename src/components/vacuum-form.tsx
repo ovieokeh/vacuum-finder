@@ -20,12 +20,15 @@ import {
   VacuumWithAffiliateLinks,
 } from "../database";
 import {
+  CURRENCY_OPTIONS,
   FormComboboxField,
   FormImageUploadField,
   FormSelectField,
   FormSubmitButton,
   FormTabField,
   FormTextField,
+  MAPPING_TECHNOLOGY_OPTIONS,
+  REGION_OPTIONS,
 } from "./form-components";
 
 interface AdminVacuumFormProps {
@@ -152,8 +155,8 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
   const searchVacuumQuery = useSearchVacuums({
     filters: {
-      brand,
-      model,
+      brand: brand as string,
+      model: model as string,
     },
     enabled: !!brand && !!model,
   });
@@ -216,12 +219,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                     <Controller
                       name={`affiliateLinks[${index}].region`}
                       render={({ field, fieldState }) => (
-                        <FormSelectField
-                          label="Region"
-                          options={["americas", "europe", "asia"]}
-                          {...field}
-                          state={fieldState}
-                        />
+                        <FormSelectField label="Region" options={REGION_OPTIONS} {...field} state={fieldState} />
                       )}
                     />
 
@@ -230,7 +228,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                       render={({ field, fieldState }) => (
                         <FormSelectField
                           label="Currency"
-                          options={["usd", "eur", "gbp"]}
+                          options={CURRENCY_OPTIONS}
                           {...field}
                           state={fieldState}
                           labelClassName="uppercase"
@@ -319,7 +317,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormSelectField
                   label="Mapping Technology"
-                  options={["laser", "camera"]}
+                  options={MAPPING_TECHNOLOGY_OPTIONS}
                   {...field}
                   state={fieldState}
                 />
