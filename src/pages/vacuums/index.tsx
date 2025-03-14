@@ -5,44 +5,29 @@ import { FormProvider, useForm, useWatch } from "react-hook-form";
 
 import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSiteConfig } from "../../providers/site-config";
-import { replaceState } from "../../redux/vacuum-filters-reducer";
+import { initialSearchFiltersState, replaceState } from "../../redux/vacuum-filters-reducer";
 import { useInfiniteQueryFetcher, useSearchVacuumsInfinite } from "../../database/hooks";
 import { useAppDispatch } from "../../redux";
 import { VacuumSearchForm } from "../../components/vacuum-search-form";
 import { VacuumResults } from "../../components/vacuum-results";
 import { VacuumsFilters } from "../../types";
 
+const markAllValuesAsDefined = <T extends Record<string, unknown | undefined>>(obj: any): T => {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => {
+      return [key, value ?? ""];
+    })
+  ) as T;
+};
+
 export function VacuumSearchPage() {
   const windowWidth = useWindowWidth();
   const { navHeight, region, currency } = useSiteConfig();
   const filtersContainerRef = useRef<HTMLDivElement>(null);
   const form = useForm<VacuumsFilters>({
-    defaultValues: {
-      budget: 10000,
-      numPets: 0,
-      mopFunction: false,
-      region,
-      currency,
-
-      brand: "",
-      mappingTechnology: "laser" as const,
-      minBatteryLifeInMinutes: 60,
-      minSuctionPowerInPascals: 2000,
-      maxNoiseLevelInDecibels: 70,
-      minWaterTankCapacityInLiters: 0,
-      minDustbinCapacityInLiters: 0,
-      hasMoppingFeature: false,
-      hasSelfEmptyingFeature: false,
-      hasZoneCleaningFeature: false,
-      hasMultiFloorMappingFeature: false,
-      hasVirtualWallsFeature: false,
-      hasSmartHomeIntegration: false,
-      hasAppControl: false,
-      hasRemoteControl: false,
-      hasManualControl: false,
-    },
+    defaultValues: initialSearchFiltersState,
   });
-  const [currentFilters, setCurrentFilters] = useState<VacuumsFilters>({});
+  const [currentFilters, setCurrentFilters] = useState<VacuumsFilters>(initialSearchFiltersState);
   const filters = useWatch({ control: form.control });
   const searchVacuumsQuery = useSearchVacuumsInfinite({
     filters: currentFilters,
@@ -72,13 +57,15 @@ export function VacuumSearchPage() {
     setValue("region", region);
   }, [region, setValue]);
 
+  const definedFilters = useMemo(() => markAllValuesAsDefined<VacuumsFilters>(filters), [filters]);
+
   // sync form with redux to share filters with :vacuum page
   useEffect(() => {
-    dispatch(replaceState({ value: filters }));
-  }, [dispatch, filters]);
+    dispatch(replaceState({ value: definedFilters }));
+  }, [dispatch, definedFilters]);
 
   const resetFilters = useCallback(() => {
-    setCurrentFilters({});
+    setCurrentFilters(initialSearchFiltersState);
     reset();
   }, [reset]);
 
@@ -106,7 +93,7 @@ export function VacuumSearchPage() {
       </Helmet>
 
       <div
-        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1240px] px-4 pt-2 md:p-4 h-[calc(100svh-162px)] md:h-full relative`}
+        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1280px] px-4 pt-2 h-[calc(100svh-162px)] md:h-full relative`}
       >
         <div
           className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full"
@@ -123,7 +110,7 @@ export function VacuumSearchPage() {
               filtersContainerHeight={filtersContainerHeight}
               handleSubmit={() => {
                 handleSubmit(() => {
-                  setCurrentFilters(filters);
+                  setCurrentFilters(definedFilters);
                 })();
               }}
               resetFilters={resetFilters}

@@ -1,12 +1,28 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { VacuumsFilters } from "../types";
 
-const initialState: VacuumsFilters = {
-  budget: 500,
+export const initialSearchFiltersState: VacuumsFilters = {
+  budget: 10000,
   numPets: 0,
-  mopFunction: true,
-  region: "americas" as const,
-  currency: "usd" as const,
+  region: "americas",
+  currency: "usd",
+  brand: "",
+  mappingTechnology: "laser" as const,
+  batteryLifeInMinutes: null,
+  suctionPowerInPascals: null,
+  noiseLevelInDecibels: null,
+  waterTankCapacityInLiters: null,
+  dustbinCapacityInLiters: null,
+  hasChildLockFeature: null,
+  hasMoppingFeature: null,
+  hasSelfEmptyingFeature: null,
+  hasZoneCleaningFeature: null,
+  hasMultiFloorMappingFeature: null,
+  hasVirtualWallsFeature: null,
+  hasSmartHomeIntegrationFeature: null,
+  hasAppControlFeature: null,
+  hasVoiceControlFeature: null,
+  hasManualControlFeature: null,
 };
 
 interface UpdateValuePayload {
@@ -15,7 +31,7 @@ interface UpdateValuePayload {
 
 const vacuumFiltersSlice = createSlice({
   name: "vacuumFilters",
-  initialState,
+  initialState: initialSearchFiltersState,
   reducers: {
     replaceState: (state, action: PayloadAction<UpdateValuePayload>) => {
       return action.payload.value;

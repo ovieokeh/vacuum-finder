@@ -17,7 +17,14 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
 export const vacuumsWithAffiliateLinksQuery = supabase.from("Vacuums").select(`
     *,
-    affiliateLinks:AffiliateLinks (*)
+    affiliateLinks:AffiliateLinks (
+      region,
+      currency,
+      price,
+      link,
+      updated_at,
+      created_at
+    )
   `);
 export type Vacuum = Tables<"Vacuums">;
 export type VacuumCreate = TablesInsert<"Vacuums">;
