@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { VacuumsFilters } from "../types";
 
 export const initialSearchFiltersState: VacuumsFilters = {
-  budget: 10000,
+  budget: 1_000,
   numPets: 0,
   region: "americas",
   currency: "usd",

@@ -1,15 +1,17 @@
 // QuizQuestion.tsx
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import ReactMarkdown from "react-markdown";
+
 import {
   FormConnectedBrandsSelect,
   FormConnectedMappingTechnologySelect,
+  FormNumberSliderField,
   FormSelectField,
   FormTabField,
   FormTextField,
 } from "../form-components";
-
-export type QuestionType = "text" | "number" | "select" | "toggle" | "triState";
+import { QuestionType } from "./questions";
 
 export interface QuizQuestionProps {
   field: string;
@@ -47,6 +49,26 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
           name={field}
           control={control}
           render={({ field, fieldState }) => <FormTextField {...field} type="number" state={fieldState} />}
+        />
+      );
+      break;
+    case "number-slider":
+      inputField = (
+        <Controller
+          name={field}
+          control={control}
+          render={({ field, fieldState }) => (
+            <FormNumberSliderField
+              {...field}
+              state={fieldState}
+              step={50}
+              max={10_000}
+              valueFormatter={(value) => {
+                const formatted = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(value);
+                return formatted;
+              }}
+            />
+          )}
         />
       );
       break;
@@ -95,7 +117,11 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
     <div className="quiz-question my-6">
       {type !== "toggle" && <label className="block font-medium mb-1">{question}</label>}
       {inputField}
-      {helperText && <p className="text-text/90 block mt-1 text-sm">{helperText}</p>}
+      {helperText && (
+        <div className="text-text/90 block mt-1 text-sm">
+          <ReactMarkdown>{helperText}</ReactMarkdown>
+        </div>
+      )}
     </div>
   );
 };

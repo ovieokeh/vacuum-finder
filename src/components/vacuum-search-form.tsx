@@ -11,7 +11,13 @@ import { useSiteConfig } from "../providers/site-config";
 import { CurrencySymbolMapping, VacuumsFilters } from "../types";
 import { Modal } from "./modal";
 import { useListBrands } from "../database/hooks";
-import { FormSelectField, FormTabField, FormTextField } from "./form-components";
+import {
+  FormConnectedMappingTechnologySelect,
+  FormNumberSliderField,
+  FormSelectField,
+  FormTabField,
+  FormTextField,
+} from "./form-components";
 
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
@@ -50,11 +56,11 @@ export function VacuumSearchForm({
         <Controller
           name="budget"
           render={({ field, fieldState }) => (
-            <FormTextField
-              type="number"
+            <FormNumberSliderField
               label="Budget"
               labelIcon={<BiWallet className="w-4 h-4 text-primary" />}
               state={fieldState}
+              step={50}
               {...field}
             />
           )}
@@ -63,12 +69,7 @@ export function VacuumSearchForm({
         <Controller
           name="mappingTechnology"
           render={({ field, fieldState }) => (
-            <FormSelectField
-              label="Mapping Technology"
-              options={["laser", "camera"].map((value) => ({ label: value, value }))}
-              state={fieldState}
-              {...field}
-            />
+            <FormConnectedMappingTechnologySelect label="Mapping Technology" state={fieldState} {...field} />
           )}
         />
 

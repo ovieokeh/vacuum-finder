@@ -182,7 +182,7 @@ export type Database = {
     }
     Enums: {
       Currency: "usd" | "eur"
-      MappingTechnology: "laser" | "camera"
+      MappingTechnology: "laser" | "camera" | "laser + camera" | "other"
       Region: "americas" | "europe" | "asia" | "africa" | "australia"
     }
     CompositeTypes: {

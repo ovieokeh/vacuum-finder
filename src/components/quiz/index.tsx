@@ -52,7 +52,10 @@ export const QuizMultiStep: React.FC<QuizMultiStepProps> = ({ steps, onComplete 
     const fieldsToValidate = steps[currentStep].fields;
     if (fieldsToValidate && fieldsToValidate.length > 0) {
       const isValid = await trigger(fieldsToValidate);
-      if (!isValid) return;
+      if (!isValid) {
+        console.log("Validation failed", fieldsToValidate);
+        return;
+      }
     }
     setDirection(1);
 
@@ -123,7 +126,7 @@ export const QuizMultiStep: React.FC<QuizMultiStepProps> = ({ steps, onComplete 
           </div>
         </Transition>
       ))}
-      <div className="fixed left-0 md:left-auto bottom-0 md:bottom-12 w-full md:w-[800px] flex items-center justify-between bg-background-alt p-4 rounded-md shadow">
+      <div className="fixed left-0 md:left-auto bottom-0 w-full md:w-[800px] flex items-center justify-between bg-background-alt p-4 rounded-md shadow">
         {currentStep > 0 ? (
           <>
             <button type="button" onClick={goPrevious} className="px-4 py-2 rounded bg-gray-200 text-gray-800">

@@ -4,6 +4,7 @@ import { ViteDevServer } from "vite";
 import { config } from "dotenv";
 
 import { geolocateHandler } from "./src/api-handlers/geolocate";
+import { enrichHandler } from "./src/api-handlers/enrich";
 
 config();
 
@@ -49,6 +50,7 @@ async function startServer() {
 
   // Utils endpoints
   app.get("/api/geolocate", geolocateHandler);
+  app.get("/api/enrich-amazon", enrichHandler);
 
   // Serve HTML
   app.all("*", async (req, res) => {

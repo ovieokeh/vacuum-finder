@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { createToast } from "vercel-toast";
@@ -91,6 +91,8 @@ const schema = yup.object({
 export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const navigate = useNavigate();
 
+  const [formUrl, setFormUrl] = useState<string>("");
+
   const addVacuumMutation = useAddVacuum({
     onSuccess: () => {
       navigate("/admin");
@@ -160,6 +162,17 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     },
     enabled: !!brand && !!model,
   });
+
+  const populateForm = async () => {
+    if (!formUrl) {
+      return;
+    }
+    const response = await fetch(`/api/enrich-amazon?link=${formUrl}`);
+    const data = await response.json();
+
+    vacuumForm.reset(data);
+  };
+
   const similarVacuums = useMemo(
     () => (brand && model ? searchVacuumQuery.data : null),
     [brand, model, searchVacuumQuery.data]
@@ -200,6 +213,18 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
           });
         }}
       >
+        <div className="flex flex-col gap-4 md:flex-row md:gap-12">
+          <div>
+            <FormTextField name="amazonUrl" label="Amazon URL" value={formUrl} onChange={(e) => setFormUrl(e)} />
+            <Button
+              onClick={() => {
+                populateForm();
+              }}
+            >
+              Populate Form
+            </Button>
+          </div>
+        </div>
         <div className="flex flex-col md:flex-row gap-4 md:gap-12">
           <div className="md:w-1/2 flex flex-col gap-2">
             <Controller

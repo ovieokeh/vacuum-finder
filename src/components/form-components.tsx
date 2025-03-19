@@ -159,6 +159,7 @@ interface FormSelectFieldProps {
   options: SelectOption[];
   labelClassName?: string;
   optionClassName?: string;
+  required?: boolean;
 }
 
 export const FormConnectedBrandsSelect = (props: Omit<FormSelectFieldProps, "options">) => {
@@ -179,7 +180,7 @@ export const FormConnectedMappingTechnologySelect = (props: Omit<FormSelectField
   return (
     <FormSelectField
       {...props}
-      options={["laser", "camera"].map((tech) => ({
+      options={["laser", "camera", "laser + camera", "other"].map((tech) => ({
         label: tech,
         value: tech,
       }))}
@@ -200,6 +201,7 @@ export const FormSelectField = ({
   state,
   labelClassName,
   optionClassName,
+  required = false,
 }: FormSelectFieldProps) => {
   const error = state?.error?.message;
 
@@ -220,7 +222,9 @@ export const FormSelectField = ({
             labelClassName
           )}
         >
-          {selectedOption?.label || <span className="text-text/80 text-sm">Select an option</span>}
+          {selectedOption?.label || (
+            <span className="text-text/80 text-sm">{`Select an option${required ? " *" : " (or leave empty)"}`}</span>
+          )}
           <GoChevronDown className="w-4 h-4" />
         </ListboxButton>
         <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-10">
@@ -417,8 +421,8 @@ export const FormTabField = ({
           <Button
             key={index}
             className={twMerge(
-              "w-fit! grow shrink! text-sm rounded-none! border-none! bg-background text-text/80 capitalize outline-0!",
-              isValueSelected(tab) && "bg-accent text-background"
+              "w-fit! grow shrink! rounded-none! border-none! bg-background! text-sm! text-text/80! capitalize outline-0!",
+              isValueSelected(tab) && "bg-accent! text-background!"
             )}
             onClick={() => onChange(VALUE_MAPPING[tab as keyof typeof VALUE_MAPPING])}
           >
@@ -429,6 +433,61 @@ export const FormTabField = ({
 
       <ErrorRenderer error={error} />
     </Field>
+  );
+};
+
+export const FormNumberSliderField = ({
+  label,
+  labelIcon,
+  value = 100,
+  onChange,
+  state,
+  max = 100000,
+  step = 100,
+  valueFormatter,
+}: FormFieldProps<number> & {
+  onChange: (value: number) => void;
+  label?: string;
+  labelIcon?: React.ReactNode;
+  max?: number;
+  step?: number;
+  valueFormatter?: (value: number) => string;
+}) => {
+  const [sliderValue, setSliderValue] = useState(value);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(event.target.value, 10);
+    if (!isNaN(newValue)) {
+      onChange(Math.min(newValue, max));
+      setSliderValue(newValue);
+    }
+  };
+
+  const error = state?.error?.message;
+  const displayedValue = valueFormatter ? valueFormatter(sliderValue) : sliderValue.toString();
+
+  return (
+    <>
+      <div className="flex justify-between items-center gap-2">
+        {label && (
+          <p className="flex items-center gap-2 text-sm/6 font-medium">
+            {labelIcon}
+            {label}
+          </p>
+        )}
+        <input
+          type="range"
+          min={0}
+          max={max || Infinity}
+          step={step || 1}
+          value={sliderValue.toString()}
+          onChange={handleChange}
+          className="w-full h-5 bg-gray-200 rounded-full cursor-pointer"
+        />
+        <p>{displayedValue}</p>
+      </div>
+      <ErrorRenderer error={error} />
+    </>
   );
 };
 

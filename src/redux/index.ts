@@ -6,22 +6,28 @@ import Cookies from "cookies-js";
 
 import vacuumFiltersReducer from "./vacuum-filters-reducer";
 
-const persistConfig = {
-  key: "root",
-  storage: new CookieStorage(Cookies /*, options */),
-  whiteList: ["vacuumsFilters"],
-};
-
 const reducers = combineReducers({
   vacuumsFilters: vacuumFiltersReducer,
 });
-const persistedReducer = persistReducer(persistConfig, reducers);
 
-export const reduxStore = configureStore({
-  reducer: persistedReducer,
-});
+const storage = typeof window === "undefined" ? undefined : new CookieStorage(Cookies /*, options */);
 
-export const persistor = persistStore(reduxStore);
+export const reduxStore = storage
+  ? configureStore({
+      reducer: persistReducer(
+        {
+          key: "root",
+          storage,
+          whitelist: ["vacuumsFilters"],
+        },
+        reducers
+      ),
+    })
+  : configureStore({
+      reducer: reducers,
+    });
+
+export const persistor = storage ? persistStore(reduxStore) : undefined;
 
 export type RootState = ReturnType<typeof reduxStore.getState>;
 export type AppDispatch = typeof reduxStore.dispatch;

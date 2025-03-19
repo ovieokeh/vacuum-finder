@@ -1,6 +1,6 @@
 import { VacuumsFilters } from "../../types";
 
-export type QuestionType = "text" | "number" | "select" | "toggle" | "triState";
+export type QuestionType = "text" | "number" | "number-slider" | "select" | "toggle" | "triState";
 
 export interface QuizQuestion {
   id: string;
@@ -16,7 +16,7 @@ export const conversationalQuizQuestions: QuizQuestion[] = [
     id: "budget",
     field: "budget",
     question: "What's your budget for a new vacuum?",
-    type: "number",
+    type: "number-slider",
     helperText: "Enter an amount in your local currency.",
   },
   {
@@ -28,8 +28,13 @@ export const conversationalQuizQuestions: QuizQuestion[] = [
       { label: "I'm not picky", value: "" },
       { label: "I want smart, precise navigation", value: "laser" },
       { label: "I prefer simple, basic navigation", value: "camera" },
+      { label: "I want both", value: "laser + camera" },
     ],
-    helperText: "This helps determine how well it maps your space.",
+    helperText: `This helps determine how well it maps your space.
+- Camera is fine if your home has good lighting and few obstacles.
+- Laser is more precise and works well in low light.
+- A combination of both is best for large, complex spaces.
+    `,
   },
   {
     id: "numPets",

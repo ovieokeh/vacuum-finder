@@ -14,7 +14,7 @@ export const quizSchema = yup.object().shape({
   dustbinCapacityInLiters: yup.number().required().nullable(),
   waterTankCapacityInLiters: yup.number().required().nullable(),
   hasChildLockFeature: yup.boolean().required().nullable(),
-  hasMoppingFeature: yup.boolean().required().nullable(),
+  hasMoppingFeature: yup.boolean().nullable(),
   hasSelfEmptyingFeature: yup.boolean().required().nullable(),
   hasZoneCleaningFeature: yup.boolean().required().nullable(),
   hasMultiFloorMappingFeature: yup.boolean().required().nullable(),
