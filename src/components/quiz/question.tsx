@@ -12,6 +12,7 @@ import {
   FormTextField,
 } from "../form-components";
 import { QuestionType } from "./questions";
+import { useSiteConfig } from "../../providers/site-config";
 
 export interface QuizQuestionProps {
   field: string;
@@ -30,7 +31,10 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
   helperText,
   unknownLabel,
 }) => {
+  const { locale, currency } = useSiteConfig();
   const { control } = useFormContext();
+
+  console.log({ locale });
 
   let inputField;
   switch (type) {
@@ -64,7 +68,9 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
               step={50}
               max={10_000}
               valueFormatter={(value) => {
-                const formatted = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(value);
+                const formatted = new Intl.NumberFormat(locale, { style: "currency", currency: currency }).format(
+                  value
+                );
                 return formatted;
               }}
             />

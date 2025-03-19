@@ -1,6 +1,8 @@
 import { VacuumInfo } from "./vacuum-info";
-import { VacuumsWithAffiliateLinks } from "../database";
 import { twMerge } from "tailwind-merge";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
+import { VacuumsWithAffiliateLinks } from "../database";
 
 interface VacuumResultsProps {
   results?: VacuumsWithAffiliateLinks;
@@ -17,8 +19,15 @@ export function VacuumResults({
   className = "",
   linkClassname = "",
   emptyView = (
-    <div className="flex justify-center items-center h-64">
-      <p>No results found. Adjust filters and try again.</p>
+    <div className="flex flex-col justify-center items-center">
+      <div className="size-64 mb-4">
+        <DotLottieReact
+          src="https://lottie.host/ab07f75c-a00f-4906-8141-445c3dfa7c3d/5oI4FBC5dK.lottie"
+          loop
+          autoplay
+        />
+      </div>
+      <p>No results found. You can check other regions/currency, or adjust filters and try again.</p>
     </div>
   ),
   fetchMoreComponent,

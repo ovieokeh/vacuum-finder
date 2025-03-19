@@ -133,7 +133,7 @@ export const QuizMultiStep: React.FC<QuizMultiStepProps> = ({ steps, onComplete 
               Previous
             </button>
 
-            <button type="button" onClick={onComplete} className="text-blue-600 underline">
+            <button type="button" onClick={onComplete} className="text-text underline">
               Skip to Results
             </button>
           </>

@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { Controller, UseFormReturn, useWatch } from "react-hook-form";
 import { Button } from "@headlessui/react";
-import { BiWallet } from "react-icons/bi";
-import { MdPets } from "react-icons/md";
-import { GiSoap } from "react-icons/gi";
+import { BiTrash, BiWallet } from "react-icons/bi";
+import { MdNoiseAware, MdPets } from "react-icons/md";
+import { GiSoap, GiVacuumCleaner, GiWaterTank } from "react-icons/gi";
 import { CiEdit } from "react-icons/ci";
 import { IoFilterOutline } from "react-icons/io5";
 
@@ -16,8 +16,9 @@ import {
   FormNumberSliderField,
   FormSelectField,
   FormTabField,
-  FormTextField,
 } from "./form-components";
+import { TbBuilding, TbEyeSearch } from "react-icons/tb";
+import { FaBatteryHalf } from "react-icons/fa";
 
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
@@ -34,6 +35,7 @@ export function VacuumSearchForm({
   handleSubmit,
   resetFilters,
 }: VacuumSearchFormProps) {
+  const { locale, currency } = useSiteConfig();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const brandsQuery = useListBrands();
@@ -45,47 +47,7 @@ export function VacuumSearchForm({
   // --- Simple Filters ---
   const simpleFilters = useMemo(
     () => (
-      <div className="flex flex-col gap-4 pb-4">
-        <Controller
-          name="brand"
-          render={({ field, fieldState }) => (
-            <FormSelectField label="Brand" options={brandOptions || []} state={fieldState} {...field} />
-          )}
-        />
-
-        <Controller
-          name="budget"
-          render={({ field, fieldState }) => (
-            <FormNumberSliderField
-              label="Budget"
-              labelIcon={<BiWallet className="w-4 h-4 text-primary" />}
-              state={fieldState}
-              step={50}
-              {...field}
-            />
-          )}
-        />
-
-        <Controller
-          name="mappingTechnology"
-          render={({ field, fieldState }) => (
-            <FormConnectedMappingTechnologySelect label="Mapping Technology" state={fieldState} {...field} />
-          )}
-        />
-
-        <Controller
-          name="numPets"
-          render={({ field, fieldState }) => (
-            <FormTextField
-              type="number"
-              label="Number of pets"
-              labelIcon={<MdPets className="w-4 h-4 text-primary" />}
-              state={fieldState}
-              {...field}
-            />
-          )}
-        />
-
+      <div className="flex flex-col gap-8 pb-4">
         <Controller
           name="hasMoppingFeature"
           render={({ field, fieldState }) => (
@@ -98,43 +60,142 @@ export function VacuumSearchForm({
             />
           )}
         />
+
+        <Controller
+          name="budget"
+          render={({ field, fieldState }) => (
+            <FormNumberSliderField
+              label="Budget"
+              labelIcon={<BiWallet className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={50}
+              valueFormatter={(value) => {
+                const formatted = new Intl.NumberFormat(locale, { style: "currency", currency: currency }).format(
+                  value
+                );
+                return formatted;
+              }}
+              {...field}
+            />
+          )}
+        />
+
+        <Controller
+          name="numPets"
+          render={({ field, fieldState }) => (
+            <FormNumberSliderField
+              label="Number of pets"
+              labelIcon={<MdPets className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={1}
+              max={10}
+              valueFormatter={(value) => `${value} ${value === 1 ? "pet" : "pets"}`}
+              {...field}
+            />
+          )}
+        />
+
+        <Controller
+          name="brand"
+          render={({ field, fieldState }) => (
+            <FormSelectField
+              label="Brand"
+              labelIcon={<TbBuilding className="w-4 h-4 text-primary" />}
+              options={brandOptions || []}
+              state={fieldState}
+              {...field}
+            />
+          )}
+        />
+
+        <Controller
+          name="mappingTechnology"
+          render={({ field, fieldState }) => (
+            <FormConnectedMappingTechnologySelect
+              label="Mapping Technology"
+              labelIcon={<TbEyeSearch className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              {...field}
+            />
+          )}
+        />
       </div>
     ),
-    [brandOptions]
+    [brandOptions, currency, locale]
   );
 
   // --- Advanced Filters (all keys from VacuumBase) ---
   const advancedFilters = useMemo(
     () => (
-      <div className="mt-4 flex flex-col gap-4 pb-4">
+      <div className="mt-4 flex flex-col gap-8 pb-4">
         <Controller
           name="batteryLifeInMinutes"
           render={({ field, fieldState }) => (
-            <FormTextField type="number" label="Min Battery Life (minutes)" state={fieldState} {...field} />
+            <FormNumberSliderField
+              label="Min Battery Life"
+              labelIcon={<FaBatteryHalf className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={10}
+              max={600}
+              valueFormatter={(value) => `${value} minutes`}
+              {...field}
+            />
           )}
         />
         <Controller
           name="suctionPowerInPascals"
           render={({ field, fieldState }) => (
-            <FormTextField type="number" label="Min Suction Power (Pascals)" state={fieldState} {...field} />
+            <FormNumberSliderField
+              label="Min Suction Power"
+              labelIcon={<GiVacuumCleaner className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={100}
+              max={5000}
+              valueFormatter={(value) => `${value} Pa`}
+              {...field}
+            />
           )}
         />
         <Controller
           name="noiseLevelInDecibels"
           render={({ field, fieldState }) => (
-            <FormTextField type="number" label="Max Noise Level (dB)" state={fieldState} {...field} />
+            <FormNumberSliderField
+              label="Max Noise Level"
+              labelIcon={<MdNoiseAware className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={1}
+              max={100}
+              valueFormatter={(value) => `${value} dB`}
+              {...field}
+            />
           )}
         />
         <Controller
           name="waterTankCapacityInLiters"
           render={({ field, fieldState }) => (
-            <FormTextField type="number" label="Min Water Tank Capacity (liters)" state={fieldState} {...field} />
+            <FormNumberSliderField
+              label="Min Water Tank Capacity"
+              labelIcon={<GiWaterTank className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={0.1}
+              max={5}
+              valueFormatter={(value) => `${value} liters`}
+              {...field}
+            />
           )}
         />
         <Controller
           name="dustbinCapacityInLiters"
           render={({ field, fieldState }) => (
-            <FormTextField type="number" label="Min Dustbin Capacity (liters)" state={fieldState} {...field} />
+            <FormNumberSliderField
+              label="Min Dustbin Capacity"
+              labelIcon={<BiTrash className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={0.1}
+              max={5}
+              valueFormatter={(value) => `${value} liters`}
+              {...field}
+            />
           )}
         />
         <Controller
@@ -204,7 +265,7 @@ export function VacuumSearchForm({
   const desktopFilters = (
     <div className="hidden md:block">
       <div
-        className={`overflow-y-scroll space-y-2`}
+        className={`overflow-y-scroll space-y-2 p-4`}
         style={{
           height: `calc(${filtersContainerHeight - navHeight - 68}px)`,
           overflow: "hidden",
@@ -216,7 +277,7 @@ export function VacuumSearchForm({
         {showAdvanced && advancedFilters}
       </div>
 
-      <div className="flex gap-4 pt-4">
+      <div className="flex gap-4 p-4">
         {isFormDirty && (
           <Button
             type="button"
@@ -254,7 +315,7 @@ export function VacuumSearchForm({
 
   return (
     <form
-      className="px-4 py-2 md:p-4 flex flex-col gap-4"
+      className="px-4 py-2 md:p-0 flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
         handleSubmit();

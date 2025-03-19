@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, TableOptions } from "@tanstack/react-table";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import { VacuumsFilters } from "../types";
 import { TableContainer } from "./table";
@@ -28,7 +29,8 @@ export function VacuumsTable({
   navigateRoot = "/vacuums",
   emptyView = (
     <div className="flex justify-center items-center h-64">
-      <p>No results found. Adjust filters and try again.</p>
+      <DotLottieReact src="https://lottie.host/ab07f75c-a00f-4906-8141-445c3dfa7c3d/5oI4FBC5dK.lottie" loop autoplay />
+      <p>No results found. You can check other regions/currency, or adjust filters and try again.</p>
     </div>
   ),
   containerWidth,

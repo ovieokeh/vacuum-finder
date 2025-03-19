@@ -155,7 +155,7 @@ interface FormSelectFieldProps {
   state?: ControllerFieldState;
   value: string;
   label?: string;
-  icon?: React.ReactNode;
+  labelIcon?: React.ReactNode;
   options: SelectOption[];
   labelClassName?: string;
   optionClassName?: string;
@@ -194,7 +194,7 @@ interface SelectOption {
 }
 export const FormSelectField = ({
   label,
-  icon,
+  labelIcon,
   options,
   value,
   onChange,
@@ -212,7 +212,7 @@ export const FormSelectField = ({
       <div className="flex flex-col gap-2">
         {label && (
           <Label className="flex items-center gap-2 text-sm/6 font-medium">
-            {icon}
+            {labelIcon}
             {label}
           </Label>
         )}
@@ -467,14 +467,14 @@ export const FormNumberSliderField = ({
   const displayedValue = valueFormatter ? valueFormatter(sliderValue) : sliderValue.toString();
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
+      {label && (
+        <p className="flex items-center gap-2 text-sm/6 font-medium">
+          {labelIcon}
+          {label}
+        </p>
+      )}
       <div className="flex justify-between items-center gap-2">
-        {label && (
-          <p className="flex items-center gap-2 text-sm/6 font-medium">
-            {labelIcon}
-            {label}
-          </p>
-        )}
         <input
           type="range"
           min={0}
@@ -484,10 +484,20 @@ export const FormNumberSliderField = ({
           onChange={handleChange}
           className="w-full h-5 bg-gray-200 rounded-full cursor-pointer"
         />
-        <p>{displayedValue}</p>
+
+        <input
+          type="number"
+          value={sliderValue}
+          onChange={handleChange}
+          className="w-20 text-center bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary"
+          step={step}
+          max={max}
+          min={0}
+        />
       </div>
+      <p className="p-2 bg-accent/10 rounded text-sm">{displayedValue}</p>
       <ErrorRenderer error={error} />
-    </>
+    </div>
   );
 };
 

@@ -95,12 +95,10 @@ export function VacuumSearchPage() {
         className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1280px] px-4 pt-2 h-[calc(100svh-162px)] md:h-[calc(100svh-76px)] relative`}
       >
         <div
-          className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full"
+          className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full md:min-w-1/4 md:max-w-1/4"
           ref={filtersContainerRef}
         >
-          <div className="hidden md:block p-4 pb-0">
-            <h2 className="text-lg font-bold text-secondary">Refine your search</h2>
-          </div>
+          <h2 className="hidden md:block p-4 pb-0 text-lg font-bold text-secondary">Refine your search</h2>
 
           <FormProvider {...form}>
             <VacuumSearchForm
@@ -118,7 +116,7 @@ export function VacuumSearchPage() {
         </div>
 
         <div
-          className={`md:border md:border-border md:w-3/4 overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-4 pt-0`}
+          className={`md:border md:border-border md:w-3/4 overflow-y-scroll md:overflow-auto py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0`}
         >
           <VacuumResults
             className="flex flex-wrap gap-4 md:gap-0"

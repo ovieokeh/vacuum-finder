@@ -9,11 +9,11 @@ interface SiteConfigContextProps {
   user: User | undefined;
   userToken: string | undefined;
   navHeight: number;
-  language: string;
+  locale: string;
   region: Region;
   currency: Currency;
   setNavHeight: (height: number) => void;
-  setLanguage: (language: string) => void;
+  setLocale: (locale: string) => void;
   setRegion: (region: Region) => void;
   setCurrency: (currency: Currency) => void;
   login: (email: string, password: string) => Promise<{ error: string | undefined } | undefined>;
@@ -23,8 +23,8 @@ interface SiteConfigContextProps {
 const SiteConfigContext = createContext<SiteConfigContextProps | undefined>(undefined);
 
 export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
-  const { region: userRegion, language: userLanguage } = useUserLocation();
-  const [language, setLanguage] = useState<string>(() => userLanguage);
+  const { region: userRegion, locale: userLocale } = useUserLocation();
+  const [locale, setLocale] = useState<string>(() => userLocale);
   const [region, setRegion] = useState<Region>(() => userRegion);
   const [currency, setCurrency] = useState<Currency>(() => (region === "europe" ? "eur" : "usd"));
   const [navHeight, setNavHeight] = useState<number>(0);
@@ -71,15 +71,17 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (userLanguage) {
-      setLanguage(userLanguage);
+    if (userLocale) {
+      setLocale(userLocale);
     }
 
     if (userRegion) {
       setRegion(userRegion);
       setCurrency(userRegion === "europe" ? "eur" : "usd");
     }
-  }, [userLanguage, userRegion]);
+  }, [userLocale, userRegion]);
+
+  console.log({ locale, region, currency });
 
   return (
     <SiteConfigContext.Provider
@@ -88,11 +90,11 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
         user,
         userToken,
         navHeight,
-        language,
+        locale,
         region,
         currency,
         setNavHeight,
-        setLanguage,
+        setLocale,
         setRegion,
         setCurrency,
         login,
