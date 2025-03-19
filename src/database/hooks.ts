@@ -20,6 +20,10 @@ export const useGetVacuum = (id: string) => {
 
 interface UseSearchVacuumsArgs {
   filters: Partial<VacuumsFilters>;
+  sorting?: {
+    key: string;
+    direction: "asc" | "desc";
+  };
   owned?: boolean;
   page?: number;
   limit?: number;
@@ -45,15 +49,18 @@ export const useSearchVacuums = ({ filters, owned, page = 1, limit = 10, enabled
   return query;
 };
 
-export const useSearchVacuumsInfinite = ({ filters, owned, page = 0, limit = 10 }: UseSearchVacuumsArgs) => {
+export const useSearchVacuumsInfinite = ({ filters, sorting, owned, page = 0, limit = 10 }: UseSearchVacuumsArgs) => {
   const stringifiedFilters = JSON.stringify(filters);
+  const stringifiedSorting = `${sorting?.key}-${sorting?.direction}`;
   const query = useInfiniteQuery({
-    queryKey: ["search-vacuums", stringifiedFilters, owned],
+    queryKey: ["search-vacuums", stringifiedFilters, stringifiedSorting, owned],
     queryFn: (context) =>
       searchVacuums({
         filters: {
           ...filters,
           owned,
+          sortBy: sorting?.key,
+          sortOrder: sorting?.direction,
         },
         page: context.pageParam ?? page,
         limit,
@@ -107,8 +114,11 @@ export const useUpdateVacuum = (args: { onSuccess?: () => void } = {}) => {
     mutationKey: ["update-vacuum"],
     mutationFn: updateVacuum,
     onSettled: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["search-vacuums"] });
-      if (data && args.onSuccess) args.onSuccess();
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ["search-vacuums"] });
+        queryClient.invalidateQueries({ queryKey: ["get-vacuum", data.id] });
+        if (args.onSuccess) args.onSuccess();
+      }
     },
   });
 };

@@ -92,13 +92,15 @@ export const FormTextField = <T extends string | number>({
           onChange={(e) => onChange(e.target.value as T)}
         />
 
-        {shouldShowClearButton() && (
+        {shouldShowClearButton() ? (
           <button
-            onClick={() => (type === "string" ? onChange("" as T) : onChange(0 as T))}
+            onClick={() => (type === "text" ? onChange("" as T) : onChange(0 as T))}
             className="flex items-center justify-center bg-background-alt w-fit! p-0!"
           >
             <IoMdCloseCircle className="size-5 text-text" />
           </button>
+        ) : (
+          <div className="min-w-[22px]" />
         )}
       </div>
 
@@ -157,6 +159,7 @@ interface FormSelectFieldProps {
   label?: string;
   labelIcon?: React.ReactNode;
   options: SelectOption[];
+  className?: string;
   labelClassName?: string;
   optionClassName?: string;
   required?: boolean;
@@ -180,7 +183,7 @@ export const FormConnectedMappingTechnologySelect = (props: Omit<FormSelectField
   return (
     <FormSelectField
       {...props}
-      options={["laser", "camera", "laser + camera", "other"].map((tech) => ({
+      options={["laser", "camera", "laser + camera"].map((tech) => ({
         label: tech,
         value: tech,
       }))}
@@ -199,6 +202,7 @@ export const FormSelectField = ({
   value,
   onChange,
   state,
+  className,
   labelClassName,
   optionClassName,
   required = false,
@@ -209,7 +213,7 @@ export const FormSelectField = ({
 
   return (
     <Listbox value={value} onChange={(value) => onChange(value)}>
-      <div className="flex flex-col gap-2">
+      <div className={twMerge("flex flex-col gap-2", className)}>
         {label && (
           <Label className="flex items-center gap-2 text-sm/6 font-medium">
             {labelIcon}
@@ -455,10 +459,17 @@ export const FormNumberSliderField = ({
 }) => {
   const [sliderValue, setSliderValue] = useState(value);
 
+  // Debounce onChange call so it fires only after the user stops dragging
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onChange(Math.min(sliderValue, max));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [sliderValue, onChange, max]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(event.target.value, 10);
     if (!isNaN(newValue)) {
-      onChange(Math.min(newValue, max));
       setSliderValue(newValue);
     }
   };

@@ -52,8 +52,6 @@ export const geolocateHandler = async (req: Request, res: Response) => {
       region = SUPPORTED_REGIONS.includes(splitRegion as Region) ? splitRegion : "americas";
     }
 
-    console.log({ ip, locale, region, country, timezone });
-
     // 4) Return data
     res.json({
       ip,

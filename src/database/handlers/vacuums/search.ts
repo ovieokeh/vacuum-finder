@@ -31,7 +31,7 @@ const applyFiltersToQuery = (
     numPets: (query, value) => query.gte("suctionPowerInPascals", 2000 * (value ?? 0)),
     batteryLifeInMinutes: (query, value) => query.gte("batteryLifeInMinutes", value),
     suctionPowerInPascals: (query, value) => query.gte("suctionPowerInPascals", value),
-    noiseLevelInDecibels: (query, value) => query.lte("noiseLevelInDecibels", value),
+    noiseLevelInDecibels: (query, value) => query.or(`noiseLevelInDecibels.is.null,noiseLevelInDecibels.lte.${value}`),
     waterTankCapacityInLiters: (query, value) => query.gte("waterTankCapacityInLiters", value),
     dustbinCapacityInLiters: (query, value) => query.gte("dustbinCapacityInLiters", value),
   };
@@ -55,12 +55,19 @@ export const searchVacuums = async ({
   page,
   limit,
 }: {
-  filters: Partial<VacuumsFilters> & { model?: string; owned?: boolean; budget?: number; currency?: string };
+  filters: Partial<VacuumsFilters> & {
+    model?: string;
+    owned?: boolean;
+    budget?: number;
+    currency?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  };
   page: number;
   limit: number;
 }): Promise<VacuumsSearchResult> => {
   const { data: userSession } = await supabase.auth.getSession();
-  const { owned, budget, currency, model, ...rest } = filters;
+  const { owned, budget, currency, model, sortBy, sortOrder, ...rest } = filters;
   const offset = (page - 1) * limit;
 
   const userEmail = userSession?.session?.user?.email;
@@ -97,6 +104,22 @@ export const searchVacuums = async ({
     // 2. The aggregated affiliate link has a matching currency and a min_price <= budget.
     supabaseQuery.or(`min_price.is.null,and(currency.eq.${currency},min_price.lte.${budget})`);
     matchCountQuery.or(`min_price.is.null,and(currency.eq.${currency},min_price.lte.${budget})`);
+  }
+
+  // Define mapping from sortBy values to actual database column names
+  const sortMapping: { [key: string]: string } = {
+    price: "min_price",
+    batteryLife: "batteryLifeInMinutes",
+    suctionPower: "suctionPowerInPascals",
+    noiseLevel: "noiseLevelInDecibels",
+    waterTankCapacity: "waterTankCapacityInLiters",
+    dustbinCapacity: "dustbinCapacityInLiters",
+  };
+
+  // Apply sorting if sortBy is provided and valid
+  if (sortBy && sortMapping[sortBy]) {
+    // Use ascending order if sortOrder is 'asc', otherwise descending
+    supabaseQuery.order(sortMapping[sortBy], { ascending: sortOrder === "asc", nullsFirst: false });
   }
 
   const [queryResponse, countQueryResponse] = await Promise.allSettled([

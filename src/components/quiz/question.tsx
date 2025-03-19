@@ -34,8 +34,6 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
   const { locale, currency } = useSiteConfig();
   const { control } = useFormContext();
 
-  console.log({ locale });
-
   let inputField;
   switch (type) {
     case "text":

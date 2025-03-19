@@ -20,9 +20,11 @@ export const VacuumFeatures = ({
   vacuum,
   exclude = [],
   limit,
+  truncate,
 }: Omit<VacuumResultProps, "filters"> & {
   exclude?: (keyof Vacuum)[];
   limit?: number;
+  truncate?: boolean;
 }) => {
   const featureKeyMapping: Partial<Record<keyof Vacuum, { icon: ReactNode; text: string }>> = {
     ["batteryLifeInMinutes"]: { icon: <FaBatteryHalf />, text: `${vacuum.batteryLifeInMinutes} min` },
@@ -51,7 +53,7 @@ export const VacuumFeatures = ({
     return null;
   }
 
-  const truncated = keys.length > 5;
+  const truncated = keys.length > 5 && truncate;
   const renderKeys = truncated ? keys.slice(0, 5) : keys;
 
   return (

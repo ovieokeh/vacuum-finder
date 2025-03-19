@@ -6,6 +6,8 @@ import { MdNoiseAware, MdPets } from "react-icons/md";
 import { GiSoap, GiVacuumCleaner, GiWaterTank } from "react-icons/gi";
 import { CiEdit } from "react-icons/ci";
 import { IoFilterOutline } from "react-icons/io5";
+import { TbBuilding, TbEyeSearch } from "react-icons/tb";
+import { FaBatteryHalf } from "react-icons/fa";
 
 import { useSiteConfig } from "../providers/site-config";
 import { CurrencySymbolMapping, VacuumsFilters } from "../types";
@@ -17,8 +19,6 @@ import {
   FormSelectField,
   FormTabField,
 } from "./form-components";
-import { TbBuilding, TbEyeSearch } from "react-icons/tb";
-import { FaBatteryHalf } from "react-icons/fa";
 
 interface VacuumSearchFormProps {
   form: UseFormReturn<VacuumsFilters>;
@@ -277,7 +277,7 @@ export function VacuumSearchForm({
         {showAdvanced && advancedFilters}
       </div>
 
-      <div className="flex gap-4 p-4">
+      <div className="p-4">
         {isFormDirty && (
           <Button
             type="button"
@@ -287,13 +287,6 @@ export function VacuumSearchForm({
             Reset
           </Button>
         )}
-        <Button
-          type="button"
-          onClick={() => handleSubmit()}
-          className="w-full bg-background border! border-border! px-3! py-2!"
-        >
-          Search
-        </Button>
       </div>
     </div>
   );

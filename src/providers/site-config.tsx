@@ -81,8 +81,6 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [userLocale, userRegion]);
 
-  console.log({ locale, region, currency });
-
   return (
     <SiteConfigContext.Provider
       value={{

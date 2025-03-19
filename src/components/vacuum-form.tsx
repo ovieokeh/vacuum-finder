@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { createToast } from "vercel-toast";
-import { FaChevronDown, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
-import { LuInfo, LuPlus } from "react-icons/lu";
+import { FaChevronDown, FaPlus, FaTrash } from "react-icons/fa";
+import { LuInfo, LuMinus, LuPlus } from "react-icons/lu";
 import { Controller, Form, FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -113,7 +113,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const brands = useMemo(() => brandsQuery.data, [brandsQuery.data]);
 
   const vacuumForm = useForm<FormValues>({
-    defaultValues: {
+    defaultValues: vacuum || {
       imageUrl: "https://cevxzvsqlweccdszjadm.supabase.co/storage/v1/object/public/product-images//empty.jpg",
       mappingTechnology: "laser",
       brand: "",
@@ -142,7 +142,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
   useEffect(() => {
     if (vacuum?.id) {
-      reset(vacuum as any);
+      reset(vacuum);
     }
   }, [reset, vacuum]);
 
@@ -196,10 +196,15 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
 
           if (vacuum?.id) {
             const dirtyFields = extractDirtyFields(vacuum, data);
-            updateVacuumMutation.mutate({
-              data: dirtyFields as VacuumWithAffiliateLinks,
+            console.log(dirtyFields);
+            updateVacuumMutation.mutateAsync({
+              data: {
+                ...(dirtyFields as VacuumWithAffiliateLinks),
+                id: vacuum.id,
+              },
             });
             toastMessage = "Vacuum updated successfully";
+            reset();
           } else {
             addVacuumMutation.mutate({
               data,
@@ -396,39 +401,32 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                         <FormTextField
                           inputContainerClassName="flex-row-reverse"
                           icon={
-                            <button
-                              type="button"
-                              className="outline-0! focus-within:outline-0! border-0! py-0! px-0! cursor-pointer"
-                              onClick={() => field.onChange(otherFeatures.filter((_, i) => i !== index))}
-                            >
-                              <FaMinus className="w-4 h-4" />
-                            </button>
+                            otherFeatures.length > 1 ? (
+                              <button
+                                type="button"
+                                className="outline-0! focus-within:outline-0! border-0! py-0! px-0! cursor-pointer"
+                                onClick={() =>
+                                  vacuumForm.setValue(
+                                    "otherFeatures",
+                                    otherFeatures.filter((_, i) => i !== index)
+                                  )
+                                }
+                              >
+                                <LuMinus className="w-4 h-4" />
+                              </button>
+                            ) : null
                           }
                           {...field}
                           state={fieldState}
                         />
                       )}
                     />
-
-                    {index !== otherFeatures.length - 1 && (
-                      <Button
-                        className="flex items-center gap-2 text-accent"
-                        onClick={() =>
-                          vacuumForm.setValue(
-                            "otherFeatures",
-                            otherFeatures.filter((_, i) => i !== index)
-                          )
-                        }
-                      >
-                        <FaTrash className="w-4 h-4" />
-                      </Button>
-                    )}
                   </div>
                 );
               })}
 
               <Button
-                className="flex items-center gap-2 text-accent px-0!"
+                className="flex items-center gap-2 text-accent border-border! w-fit"
                 onClick={() => vacuumForm.setValue("otherFeatures", [...(otherFeatures ?? []), ""])}
               >
                 <LuPlus className="w-4 h-4" />

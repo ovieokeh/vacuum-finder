@@ -12,6 +12,7 @@ interface VacuumResultProps {
   imageClassName?: string;
   withLink?: boolean;
   navigateRoot?: string;
+  truncateFeatures?: boolean;
 }
 
 export const VacuumInfo = ({
@@ -20,6 +21,7 @@ export const VacuumInfo = ({
   imageClassName = "",
   navigateRoot = "",
   withLink = true,
+  truncateFeatures = true,
 }: VacuumResultProps) => {
   const name = `${vacuum.brand} ${vacuum.model}`;
 
@@ -41,13 +43,13 @@ export const VacuumInfo = ({
           <div>
             <p className="text-sm font-semibold">Features</p>
             <div className="p-1">
-              <VacuumFeatures vacuum={vacuum} />
+              <VacuumFeatures vacuum={vacuum} truncate={truncateFeatures} />
             </div>
           </div>
         </div>
       </>
     ),
-    [vacuum, imageClassName, name]
+    [vacuum, imageClassName, name, truncateFeatures]
   );
 
   const sharedClassname = twMerge(

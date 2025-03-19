@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, TableOptions } from "@tanstack/react-table";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import { VacuumsFilters } from "../types";
 import { TableContainer } from "./table";
 import { VacuumInfo } from "./vacuum-info";
 import { VacuumFeatures } from "./vacuum-features";
 import { PriceDisplay } from "./price-display";
+import { EmptyVacuumResults } from "./vacuum-results";
 import { VacuumsWithAffiliateLinks, VacuumWithAffiliateLinks } from "../database";
 
 interface VacuumResultsProps {
@@ -27,12 +27,7 @@ export function VacuumsTable({
   results = [],
   filters,
   navigateRoot = "/vacuums",
-  emptyView = (
-    <div className="flex justify-center items-center h-64">
-      <DotLottieReact src="https://lottie.host/ab07f75c-a00f-4906-8141-445c3dfa7c3d/5oI4FBC5dK.lottie" loop autoplay />
-      <p>No results found. You can check other regions/currency, or adjust filters and try again.</p>
-    </div>
-  ),
+  emptyView = <EmptyVacuumResults />,
   containerWidth,
 }: VacuumResultsProps & {
   containerWidth: number;
