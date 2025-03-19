@@ -48,13 +48,6 @@ export type Database = {
             foreignKeyName: "AffiliateLinks_vacuumId_fkey"
             columns: ["vacuumId"]
             isOneToOne: false
-            referencedRelation: "vacuumaffiliatesummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "AffiliateLinks_vacuumId_fkey"
-            columns: ["vacuumId"]
-            isOneToOne: false
             referencedRelation: "Vacuums"
             referencedColumns: ["id"]
           },
@@ -67,22 +60,26 @@ export type Database = {
           createdAt: string
           dustbinCapacityInLiters: number | null
           hasAppControlFeature: boolean | null
+          hasAutoLiftMopFeature: boolean | null
           hasChildLockFeature: boolean | null
+          hasGoogleOrAlexaIntegrationFeature: boolean | null
           hasManualControlFeature: boolean | null
           hasMoppingFeature: boolean | null
           hasMultiFloorMappingFeature: boolean | null
+          hasSelfCleaningFeature: boolean | null
           hasSelfEmptyingFeature: boolean | null
-          hasSmartHomeIntegrationFeature: boolean | null
           hasVirtualWallsFeature: boolean | null
           hasVoiceControlFeature: boolean | null
           hasZoneCleaningFeature: boolean | null
           id: string
           imageUrl: string
           mappingTechnology: Database["public"]["Enums"]["MappingTechnology"]
+          maxObjectClearanceInMillimeters: number | null
           model: string
           noiseLevelInDecibels: number | null
           otherFeatures: string[]
           suctionPowerInPascals: number | null
+          surfaceRecommendations: string[] | null
           updatedAt: string
           userEmail: string
           waterTankCapacityInLiters: number | null
@@ -93,22 +90,26 @@ export type Database = {
           createdAt?: string
           dustbinCapacityInLiters?: number | null
           hasAppControlFeature?: boolean | null
+          hasAutoLiftMopFeature?: boolean | null
           hasChildLockFeature?: boolean | null
+          hasGoogleOrAlexaIntegrationFeature?: boolean | null
           hasManualControlFeature?: boolean | null
           hasMoppingFeature?: boolean | null
           hasMultiFloorMappingFeature?: boolean | null
+          hasSelfCleaningFeature?: boolean | null
           hasSelfEmptyingFeature?: boolean | null
-          hasSmartHomeIntegrationFeature?: boolean | null
           hasVirtualWallsFeature?: boolean | null
           hasVoiceControlFeature?: boolean | null
           hasZoneCleaningFeature?: boolean | null
           id?: string
           imageUrl?: string
           mappingTechnology?: Database["public"]["Enums"]["MappingTechnology"]
+          maxObjectClearanceInMillimeters?: number | null
           model?: string
           noiseLevelInDecibels?: number | null
           otherFeatures: string[]
           suctionPowerInPascals?: number | null
+          surfaceRecommendations?: string[] | null
           updatedAt?: string
           userEmail: string
           waterTankCapacityInLiters?: number | null
@@ -119,22 +120,26 @@ export type Database = {
           createdAt?: string
           dustbinCapacityInLiters?: number | null
           hasAppControlFeature?: boolean | null
+          hasAutoLiftMopFeature?: boolean | null
           hasChildLockFeature?: boolean | null
+          hasGoogleOrAlexaIntegrationFeature?: boolean | null
           hasManualControlFeature?: boolean | null
           hasMoppingFeature?: boolean | null
           hasMultiFloorMappingFeature?: boolean | null
+          hasSelfCleaningFeature?: boolean | null
           hasSelfEmptyingFeature?: boolean | null
-          hasSmartHomeIntegrationFeature?: boolean | null
           hasVirtualWallsFeature?: boolean | null
           hasVoiceControlFeature?: boolean | null
           hasZoneCleaningFeature?: boolean | null
           id?: string
           imageUrl?: string
           mappingTechnology?: Database["public"]["Enums"]["MappingTechnology"]
+          maxObjectClearanceInMillimeters?: number | null
           model?: string
           noiseLevelInDecibels?: number | null
           otherFeatures?: string[]
           suctionPowerInPascals?: number | null
+          surfaceRecommendations?: string[] | null
           updatedAt?: string
           userEmail?: string
           waterTankCapacityInLiters?: number | null
@@ -143,39 +148,7 @@ export type Database = {
       }
     }
     Views: {
-      vacuumaffiliatesummary: {
-        Row: {
-          batteryLifeInMinutes: number | null
-          brand: string | null
-          createdAt: string | null
-          currency: Database["public"]["Enums"]["Currency"] | null
-          dustbinCapacityInLiters: number | null
-          hasAppControlFeature: boolean | null
-          hasChildLockFeature: boolean | null
-          hasManualControlFeature: boolean | null
-          hasMoppingFeature: boolean | null
-          hasMultiFloorMappingFeature: boolean | null
-          hasSelfEmptyingFeature: boolean | null
-          hasSmartHomeIntegrationFeature: boolean | null
-          hasVirtualWallsFeature: boolean | null
-          hasVoiceControlFeature: boolean | null
-          hasZoneCleaningFeature: boolean | null
-          id: string | null
-          imageUrl: string | null
-          mappingTechnology:
-            | Database["public"]["Enums"]["MappingTechnology"]
-            | null
-          min_price: number | null
-          model: string | null
-          noiseLevelInDecibels: number | null
-          otherFeatures: string[] | null
-          suctionPowerInPascals: number | null
-          updatedAt: string | null
-          userEmail: string | null
-          waterTankCapacityInLiters: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       [_ in never]: never

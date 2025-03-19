@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
@@ -21,6 +21,7 @@ import { persistor, reduxStore } from "./redux";
 import "./index.css";
 
 import { useSeoSetup } from "./hooks/use-seo-setup";
+import { useDisableNumberInputScroll } from "./hooks/use-disable-number-input-scroll";
 import { PersistGate } from "redux-persist/integration/react";
 
 const queryClient = new QueryClient();
@@ -29,7 +30,9 @@ export default function App() {
   const location = useLocation();
   const navRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
   useSeoSetup();
+  useDisableNumberInputScroll();
 
   // scroll restoration
   useEffect(() => {
@@ -38,46 +41,55 @@ export default function App() {
     }
   }, [location.pathname]);
 
-  return (
-    <>
+  const children = useMemo(
+    () => (
+      <QueryClientProvider client={queryClient}>
+        <SiteConfigProvider>
+          <Helmet>
+            <meta charSet="utf-8" />
+            <title>Robot Vacuum Finder & Guide</title>
+            <meta
+              name="description"
+              content="Find the best robot vacuum for your needs with our vacuum finder tool. Compare robot vacuums by features, price, and more."
+            />
+          </Helmet>
+          <Navigation ref={navRef} />
+
+          <div id="content" className={`mt-0 overflow-y-scroll pb-12 h-[calc(100svh-66px)]`} ref={scrollRef}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="guides" element={<GuidesPage />} />
+              <Route path="vacuums" element={<VacuumSearchPage />}>
+                <Route path=":vacuumId" element={<VacuumInfoPage />} />
+              </Route>
+              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="terms-of-service" element={<TermsOfServicePage />} />
+
+              <Route path="admin/auth" element={<AdminAuthPage />} />
+
+              <Route path="admin/vacuums/add" element={<AdminVacuumAddPage />} />
+              <Route path="admin" element={<AdminDashboardPage />}>
+                <Route path="vacuums/:vacuumId" element={<AdminVacuumEditPage />} />
+              </Route>
+
+              <Route path="quiz" element={<QuizPage />} />
+            </Routes>
+          </div>
+        </SiteConfigProvider>
+      </QueryClientProvider>
+    ),
+    [navRef, scrollRef]
+  );
+
+  if (persistor) {
+    return (
       <Provider store={reduxStore}>
         <PersistGate loading={null} persistor={persistor}>
-          <QueryClientProvider client={queryClient}>
-            <SiteConfigProvider>
-              <Helmet>
-                <meta charSet="utf-8" />
-                <title>Robot Vacuum Finder & Guide</title>
-                <meta
-                  name="description"
-                  content="Find the best robot vacuum for your needs with our vacuum finder tool. Compare robot vacuums by features, price, and more."
-                />
-              </Helmet>
-              <Navigation ref={navRef} />
-
-              <div id="content" className={`mt-0 overflow-y-scroll pb-12 h-[calc(100svh-66px)]`} ref={scrollRef}>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="guides" element={<GuidesPage />} />
-                  <Route path="vacuums" element={<VacuumSearchPage />}>
-                    <Route path=":vacuumId" element={<VacuumInfoPage />} />
-                  </Route>
-                  <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-                  <Route path="terms-of-service" element={<TermsOfServicePage />} />
-
-                  <Route path="admin/auth" element={<AdminAuthPage />} />
-
-                  <Route path="admin/vacuums/add" element={<AdminVacuumAddPage />} />
-                  <Route path="admin" element={<AdminDashboardPage />}>
-                    <Route path="vacuums/:vacuumId" element={<AdminVacuumEditPage />} />
-                  </Route>
-
-                  <Route path="quiz" element={<QuizPage />} />
-                </Routes>
-              </div>
-            </SiteConfigProvider>
-          </QueryClientProvider>
+          {children}
         </PersistGate>
       </Provider>
-    </>
-  );
+    );
+  }
+
+  return <Provider store={reduxStore}>{children}</Provider>;
 }

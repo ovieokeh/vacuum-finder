@@ -20,5 +20,10 @@ export const getVacuum = async (vacuumId: string) => {
     return null;
   }
 
+  const hasEmptyOtherFeatures = vacuum.otherFeatures?.length === 1 && vacuum.otherFeatures[0] === "";
+  if (hasEmptyOtherFeatures) {
+    vacuum.otherFeatures = [];
+  }
+
   return vacuum;
 };

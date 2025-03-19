@@ -14,28 +14,7 @@ export const addVacuum = async ({
     throw new Error("Missing user email.");
   }
 
-  const {
-    imageUrl,
-    brand,
-    model,
-    mappingTechnology,
-    batteryLifeInMinutes,
-    suctionPowerInPascals,
-    noiseLevelInDecibels,
-    waterTankCapacityInLiters,
-    dustbinCapacityInLiters,
-    hasMoppingFeature,
-    hasSelfEmptyingFeature,
-    hasZoneCleaningFeature,
-    hasMultiFloorMappingFeature,
-    hasVirtualWallsFeature,
-    hasSmartHomeIntegrationFeature,
-    hasAppControlFeature,
-    hasManualControlFeature,
-    hasChildLockFeature,
-    hasVoiceControlFeature,
-    otherFeatures,
-  } = data;
+  const { imageUrl, brand, model, mappingTechnology } = data;
 
   if (!imageUrl || !brand || !model) {
     throw new Error("Vacuum brand, model, and image URL are required.");
@@ -44,26 +23,11 @@ export const addVacuum = async ({
   const { data: response, error } = await supabase
     .from("Vacuums")
     .insert({
+      ...data,
       brand: brand.trim(),
       model: model.trim(),
       imageUrl: imageUrl.trim(),
       mappingTechnology: mappingTechnology as MappingTechnology,
-      batteryLifeInMinutes,
-      suctionPowerInPascals,
-      noiseLevelInDecibels,
-      waterTankCapacityInLiters,
-      dustbinCapacityInLiters,
-      hasMoppingFeature,
-      hasSelfEmptyingFeature,
-      hasZoneCleaningFeature,
-      hasMultiFloorMappingFeature,
-      hasVirtualWallsFeature,
-      hasSmartHomeIntegrationFeature,
-      hasAppControlFeature,
-      hasManualControlFeature,
-      hasChildLockFeature,
-      hasVoiceControlFeature,
-      otherFeatures,
       userEmail,
     })
     .select();

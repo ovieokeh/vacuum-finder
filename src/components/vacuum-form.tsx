@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { Button, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { createToast } from "vercel-toast";
 import { FaChevronDown, FaPlus, FaTrash } from "react-icons/fa";
-import { LuInfo, LuMinus, LuPlus } from "react-icons/lu";
+import { LuInfo, LuLoader } from "react-icons/lu";
 import { Controller, Form, FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -21,6 +21,7 @@ import {
 } from "../database";
 import {
   CURRENCY_OPTIONS,
+  FormArrayField,
   FormComboboxField,
   FormImageUploadField,
   FormSelectField,
@@ -35,21 +36,8 @@ interface AdminVacuumFormProps {
   vacuum?: VacuumWithAffiliateLinks | null;
 }
 
-type FormValues = VacuumCreate & { affiliateLinks: AffiliateLinkCreate[] };
-
-const extractDirtyFields = (original: VacuumCreate, updated: VacuumCreate) => {
-  const dirtyFields: Record<string, any> = {};
-
-  for (const key in updated) {
-    const originalValue = original[key as keyof VacuumCreate];
-    const updatedValue = updated[key as keyof VacuumCreate];
-
-    if (originalValue?.toString().toLowerCase() !== updatedValue?.toString().toLowerCase()) {
-      dirtyFields[key] = updatedValue;
-    }
-  }
-
-  return dirtyFields;
+type FormValues = VacuumCreate & {
+  affiliateLinks: AffiliateLinkCreate[];
 };
 
 const schema = yup.object({
@@ -62,17 +50,21 @@ const schema = yup.object({
   noiseLevelInDecibels: yup.number().required().nullable(),
   dustbinCapacityInLiters: yup.number().required().nullable(),
   waterTankCapacityInLiters: yup.number().required().nullable(),
+  maxObjectClearanceInMillimeters: yup.number().required().nullable(),
   hasChildLockFeature: yup.boolean().required().nullable(),
   hasMoppingFeature: yup.boolean().required().nullable(),
+  hasAutoLiftMopFeature: yup.boolean().required().nullable(),
   hasSelfEmptyingFeature: yup.boolean().required().nullable(),
+  hasSelfCleaningFeature: yup.boolean().required().nullable(),
+  hasGoogleOrAlexaIntegrationFeature: yup.boolean().required().nullable(),
   hasZoneCleaningFeature: yup.boolean().required().nullable(),
   hasMultiFloorMappingFeature: yup.boolean().required().nullable(),
   hasVirtualWallsFeature: yup.boolean().required().nullable(),
   hasAppControlFeature: yup.boolean().required().nullable(),
-  hasSmartHomeIntegrationFeature: yup.boolean().required().nullable(),
   hasManualControlFeature: yup.boolean().required().nullable(),
   hasVoiceControlFeature: yup.boolean().required().nullable(),
-  otherFeatures: yup.array().of(yup.string().required()).required(),
+  surfaceRecommendations: yup.array().of(yup.string().required()).nullable(),
+  otherFeatures: yup.array().of(yup.string().required()).nullable(),
   affiliateLinks: yup
     .array()
     .of(
@@ -92,6 +84,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const navigate = useNavigate();
 
   const [formUrl, setFormUrl] = useState<string>("");
+  const [isPopulating, setIsPopulating] = useState(false);
 
   const addVacuumMutation = useAddVacuum({
     onSuccess: () => {
@@ -113,28 +106,11 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
   const brands = useMemo(() => brandsQuery.data, [brandsQuery.data]);
 
   const vacuumForm = useForm<FormValues>({
-    defaultValues: vacuum || {
+    defaultValues: vacuum ?? {
       imageUrl: "https://cevxzvsqlweccdszjadm.supabase.co/storage/v1/object/public/product-images//empty.jpg",
       mappingTechnology: "laser",
       brand: "",
       model: "",
-      batteryLifeInMinutes: null,
-      suctionPowerInPascals: null,
-      noiseLevelInDecibels: null,
-      dustbinCapacityInLiters: null,
-      waterTankCapacityInLiters: null,
-      hasChildLockFeature: null,
-      hasMoppingFeature: null,
-      hasSelfEmptyingFeature: null,
-      hasZoneCleaningFeature: null,
-      hasMultiFloorMappingFeature: null,
-      hasVirtualWallsFeature: null,
-      hasAppControlFeature: null,
-      hasSmartHomeIntegrationFeature: null,
-      hasManualControlFeature: null,
-      hasVoiceControlFeature: null,
-      otherFeatures: [""],
-      affiliateLinks: [],
     },
     resolver: yupResolver(schema),
   });
@@ -146,7 +122,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     }
   }, [reset, vacuum]);
 
-  const { brand, model, otherFeatures } = useWatch({
+  const { brand, model } = useWatch({
     control: vacuumForm.control,
   });
 
@@ -167,10 +143,22 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
     if (!formUrl) {
       return;
     }
-    const response = await fetch(`/api/enrich-amazon?link=${formUrl}`);
-    const data = await response.json();
 
-    vacuumForm.reset(data);
+    setIsPopulating(true);
+
+    try {
+      const response = await fetch(`/api/enrich-amazon?link=${formUrl}`);
+      const data = await response.json();
+
+      vacuumForm.reset(data);
+    } catch {
+      createToast("Failed to populate form", {
+        type: "error",
+        timeout: 3000,
+      });
+    } finally {
+      setIsPopulating(false);
+    }
   };
 
   const similarVacuums = useMemo(
@@ -195,16 +183,14 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
           let toastMessage = "Vacuum added successfully";
 
           if (vacuum?.id) {
-            const dirtyFields = extractDirtyFields(vacuum, data);
-            console.log(dirtyFields);
             updateVacuumMutation.mutateAsync({
               data: {
-                ...(dirtyFields as VacuumWithAffiliateLinks),
+                ...(data as VacuumWithAffiliateLinks),
                 id: vacuum.id,
               },
             });
             toastMessage = "Vacuum updated successfully";
-            reset();
+            reset(data);
           } else {
             addVacuumMutation.mutate({
               data,
@@ -219,14 +205,21 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
         }}
       >
         <div className="flex flex-col gap-4 md:flex-row md:gap-12">
-          <div>
+          <div className="w-full">
+            <p className="text-sm">
+              Paste in the Amazon URL to a robot vacuum and populate the fields automatically. Ensure to verify data
+              before saving!
+            </p>
             <FormTextField name="amazonUrl" label="Amazon URL" value={formUrl} onChange={(e) => setFormUrl(e)} />
             <Button
               onClick={() => {
                 populateForm();
               }}
+              disabled={!formUrl || isPopulating}
+              className="disabled:opacity-50 border-border! flex items-center gap-2"
             >
               Populate Form
+              {isPopulating && <LuLoader className={`animate-spin ${isPopulating ? "w-6 h-6" : "hidden"}`} />}
             </Button>
           </div>
         </div>
@@ -388,111 +381,96 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 <FormTextField type="number" label="Water Tank Capacity (L)" {...field} state={fieldState} />
               )}
             />
+            <Controller
+              name="maxObjectClearanceInMillimeters"
+              render={({ field, fieldState }) => (
+                <FormTextField type="number" label="Max Object Clearance (mm)" {...field} state={fieldState} />
+              )}
+            />
 
             <div className="flex flex-col gap-2 mb-6">
-              <p className="text-sm/6 font-medium">Other Features</p>
-
-              {otherFeatures?.map((_field, index) => {
-                return (
-                  <div key={index} className="flex gap-2">
-                    <Controller
-                      name={`otherFeatures[${index}]`}
-                      render={({ field, fieldState }) => (
-                        <FormTextField
-                          inputContainerClassName="flex-row-reverse"
-                          icon={
-                            otherFeatures.length > 1 ? (
-                              <button
-                                type="button"
-                                className="outline-0! focus-within:outline-0! border-0! py-0! px-0! cursor-pointer"
-                                onClick={() =>
-                                  vacuumForm.setValue(
-                                    "otherFeatures",
-                                    otherFeatures.filter((_, i) => i !== index)
-                                  )
-                                }
-                              >
-                                <LuMinus className="w-4 h-4" />
-                              </button>
-                            ) : null
-                          }
-                          {...field}
-                          state={fieldState}
-                        />
-                      )}
-                    />
-                  </div>
-                );
-              })}
-
-              <Button
-                className="flex items-center gap-2 text-accent border-border! w-fit"
-                onClick={() => vacuumForm.setValue("otherFeatures", [...(otherFeatures ?? []), ""])}
-              >
-                <LuPlus className="w-4 h-4" />
-                Add Feature
-              </Button>
+              <FormArrayField name="surfaceRecommendations" label="Surface Recommendations (e.g Carpet, Hardwood)" />
+              <FormArrayField name="otherFeatures" label="Other Features (e.g. HEPA Filter, Hot water cleaning)" />
             </div>
 
-            <Controller
-              name="hasChildLockFeature"
-              render={({ field, fieldState }) => <FormTabField label="Child Lock" {...field} state={fieldState} />}
-            />
+            <div className="flex gap-4 flex-wrap">
+              <Controller
+                name="hasChildLockFeature"
+                render={({ field, fieldState }) => <FormTabField label="Child Lock" {...field} state={fieldState} />}
+              />
 
-            <Controller
-              name="hasMoppingFeature"
-              render={({ field, fieldState }) => <FormTabField label="Mopping Feature" {...field} state={fieldState} />}
-            />
+              <Controller
+                name="hasMoppingFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Mopping Feature" {...field} state={fieldState} />
+                )}
+              />
+              <Controller
+                name="hasAutoLiftMopFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Auto-lift Mop Feature" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasSelfEmptyingFeature"
-              render={({ field, fieldState }) => (
-                <FormTabField label="Self Emptying Feature" {...field} state={fieldState} />
-              )}
-            />
+              <Controller
+                name="hasSelfEmptyingFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Self Emptying Feature" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasZoneCleaningFeature"
-              render={({ field, fieldState }) => (
-                <FormTabField label="Zone Cleaning Feature" {...field} state={fieldState} />
-              )}
-            />
+              <Controller
+                name="hasSelfCleaningFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Self Cleaning Feature" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasMultiFloorMappingFeature"
-              render={({ field, fieldState }) => (
-                <FormTabField label="Multi Floor Mapping Feature" {...field} state={fieldState} />
-              )}
-            />
+              <Controller
+                name="hasZoneCleaningFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Zone Cleaning Feature" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasVirtualWallsFeature"
-              render={({ field, fieldState }) => (
-                <FormTabField label="Virtual Walls Feature" {...field} state={fieldState} />
-              )}
-            />
+              <Controller
+                name="hasMultiFloorMappingFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Multi Floor Mapping Feature" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasAppControlFeature"
-              render={({ field, fieldState }) => <FormTabField label="App Control" {...field} state={fieldState} />}
-            />
+              <Controller
+                name="hasVirtualWallsFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Virtual Walls Feature" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasSmartHomeIntegrationFeature"
-              render={({ field, fieldState }) => (
-                <FormTabField label="Smart Home Integration" {...field} state={fieldState} />
-              )}
-            />
+              <Controller
+                name="hasAppControlFeature"
+                render={({ field, fieldState }) => <FormTabField label="App Control" {...field} state={fieldState} />}
+              />
 
-            <Controller
-              name="hasManualControlFeature"
-              render={({ field, fieldState }) => <FormTabField label="Manual Control" {...field} state={fieldState} />}
-            />
+              <Controller
+                name="hasGoogleOrAlexaIntegrationFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Google or Alexa Integration" {...field} state={fieldState} />
+                )}
+              />
 
-            <Controller
-              name="hasVoiceControlFeature"
-              render={({ field, fieldState }) => <FormTabField label="Voice Control" {...field} state={fieldState} />}
-            />
+              <Controller
+                name="hasManualControlFeature"
+                render={({ field, fieldState }) => (
+                  <FormTabField label="Manual Control" {...field} state={fieldState} />
+                )}
+              />
+
+              <Controller
+                name="hasVoiceControlFeature"
+                render={({ field, fieldState }) => <FormTabField label="Voice Control" {...field} state={fieldState} />}
+              />
+            </div>
           </div>
         </div>
 

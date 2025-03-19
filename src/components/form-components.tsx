@@ -14,13 +14,14 @@ import {
   ComboboxOption,
   ComboboxInput,
 } from "@headlessui/react";
-import { ControllerFieldState } from "react-hook-form";
+import { Controller, ControllerFieldState, useFormContext } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { GoChevronDown } from "react-icons/go";
 import { IoMdCloseCircle } from "react-icons/io";
 
 import ImageUpload from "./image-upload";
 import { useListBrands } from "../database/hooks";
+import { LuMinus, LuPlus } from "react-icons/lu";
 
 const ErrorRenderer = ({ error }: { error?: string }) => {
   if (!error) {
@@ -34,6 +35,7 @@ interface FormFieldProps<T> {
   value: T;
   onChange: (value: T) => void;
   state?: ControllerFieldState;
+  disabled?: boolean;
 }
 
 export const FormTextField = <T extends string | number>({
@@ -44,6 +46,7 @@ export const FormTextField = <T extends string | number>({
   inputContainerClassName,
   onChange,
   state,
+  disabled,
   ...rest
 }: FormFieldProps<T> & {
   type?: string;
@@ -71,7 +74,7 @@ export const FormTextField = <T extends string | number>({
   };
 
   return (
-    <Field className="space-y-2">
+    <Field className="space-y-2 grow">
       {label && (
         <Label className="flex items-center gap-2 text-sm/6 font-medium">
           {labelIcon}
@@ -86,16 +89,18 @@ export const FormTextField = <T extends string | number>({
           {...rest}
           type={type}
           className={twMerge(
-            "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
+            "w-full! block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
             !!error && "border-red-500"
           )}
           onChange={(e) => onChange(e.target.value as T)}
+          disabled={disabled}
         />
 
         {shouldShowClearButton() ? (
           <button
             onClick={() => (type === "text" ? onChange("" as T) : onChange(0 as T))}
             className="flex items-center justify-center bg-background-alt w-fit! p-0!"
+            disabled={disabled}
           >
             <IoMdCloseCircle className="size-5 text-text" />
           </button>
@@ -106,6 +111,63 @@ export const FormTextField = <T extends string | number>({
 
       <ErrorRenderer error={error} />
     </Field>
+  );
+};
+
+type FormArrayFieldProps = {
+  label: string;
+  name: string;
+  addLabel?: string;
+  removeLabel?: string;
+};
+
+export const FormArrayField = ({ label, name, addLabel = "Add" }: FormArrayFieldProps) => {
+  const { control, getValues, setValue } = useFormContext();
+  const values = getValues(name) as string[] | null | undefined;
+  const items = values ?? [];
+
+  return (
+    <div className="flex flex-col gap-2 mb-6 grow">
+      <p className="text-sm/6 font-medium">{label}</p>
+      {items.map((item, index) => (
+        <div key={index} className="flex gap-2">
+          <Controller
+            name={`${name}[${index}]`}
+            control={control}
+            render={({ field, fieldState }) => (
+              <FormTextField
+                inputContainerClassName="flex-row-reverse"
+                icon={
+                  <button
+                    type="button"
+                    className="outline-0 focus:outline-0 border-0 py-0 px-0 cursor-pointer"
+                    onClick={() =>
+                      items.length > 1
+                        ? setValue(
+                            name,
+                            items.filter((_, i) => i !== index)
+                          )
+                        : setValue(name, null)
+                    }
+                  >
+                    <LuMinus className="w-4 h-4" />
+                  </button>
+                }
+                {...field}
+                state={fieldState}
+              />
+            )}
+          />
+        </div>
+      ))}
+      <Button
+        className="flex items-center gap-2 text-accent border-border w-fit"
+        onClick={() => setValue(name, [...items, ""])}
+      >
+        <LuPlus className="w-4 h-4" />
+        {addLabel}
+      </Button>
+    </div>
   );
 };
 
@@ -307,7 +369,7 @@ export const FormComboboxField = <T extends string>({
 
       <ComboboxInput
         className={twMerge(
-          "w-full block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
+          "block bg-background-alt px-2 py-1 rounded-md border border-border focus:ring-primary focus:border-primary",
           !!error && "border-red-500"
         )}
         aria-label={label}
@@ -443,7 +505,7 @@ export const FormTabField = ({
 export const FormNumberSliderField = ({
   label,
   labelIcon,
-  value = 100,
+  value = 0,
   onChange,
   state,
   max = 100000,

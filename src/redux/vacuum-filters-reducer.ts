@@ -16,13 +16,17 @@ export const initialSearchFiltersState: VacuumsFilters = {
   hasChildLockFeature: null,
   hasMoppingFeature: null,
   hasSelfEmptyingFeature: null,
+  hasSelfCleaningFeature: null,
   hasZoneCleaningFeature: null,
   hasMultiFloorMappingFeature: null,
   hasVirtualWallsFeature: null,
-  hasSmartHomeIntegrationFeature: null,
   hasAppControlFeature: null,
   hasVoiceControlFeature: null,
   hasManualControlFeature: null,
+  hasAutoLiftMopFeature: null,
+  hasGoogleOrAlexaIntegrationFeature: null,
+  maxObjectClearanceInMillimeters: 0,
+  surfaceRecommendations: [],
 };
 
 interface UpdateValuePayload {

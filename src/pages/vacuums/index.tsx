@@ -14,12 +14,14 @@ import { VacuumsFilters } from "../../types";
 import { markAllValuesAsDefined } from "../../shared-utils/object";
 import { useContentScroll } from "../../hooks/use-disable-body-scroll";
 import { FormSelectField } from "../../components/form-components";
+import { twMerge } from "tailwind-merge";
 
 interface SortingBarProps {
   onSortChange: (sort: string, order: string) => void;
   sortValue: string;
+  className?: string;
 }
-const SortingBar = ({ sortValue, onSortChange }: SortingBarProps) => {
+const SortingBar = ({ sortValue, className, onSortChange }: SortingBarProps) => {
   const sortingOptions = [
     { label: "Price: Low to High", value: "price-asc" },
     { label: "Price: High to Low", value: "price-desc" },
@@ -36,7 +38,7 @@ const SortingBar = ({ sortValue, onSortChange }: SortingBarProps) => {
   ];
 
   return (
-    <div className="flex justify-between items-center py-4 md:px-4 border-b border-border">
+    <div className={twMerge("flex justify-between items-center py-4 md:px-4 border-b border-border", className)}>
       <div className="flex items-center gap-2">
         <FormSelectField
           className="flex-row gap-4"
@@ -156,8 +158,9 @@ export function VacuumSearchPage() {
           </FormProvider>
         </div>
 
-        <div className="md:border md:border-border md:w-3/4 py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0 overflow-hidden">
+        <div className="flex flex-col md:border md:border-border md:w-3/4 py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0 overflow-hidden">
           <SortingBar
+            className="w-full justify-end"
             sortValue={sort + "-" + order}
             onSortChange={(sort, order) => {
               setSort(sort);

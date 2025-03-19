@@ -37,7 +37,7 @@ export const VacuumFeatures = ({
     ["hasSelfEmptyingFeature"]: { icon: <FaTrashAlt />, text: "Self-empty" },
     ["hasAppControlFeature"]: { icon: <FaMobileAlt />, text: "App Control" },
     ["hasZoneCleaningFeature"]: { icon: <LuTarget />, text: "Zone cleaning" },
-    ["hasSmartHomeIntegrationFeature"]: { icon: <TbSmartHome />, text: "Smart home" },
+    ["hasGoogleOrAlexaIntegrationFeature"]: { icon: <TbSmartHome />, text: "Smart Assistant Compatible" },
     ["hasManualControlFeature"]: { icon: <IoGameController />, text: "Manual control" },
     ["hasVoiceControlFeature"]: { icon: <LuSpeech />, text: "Voice control" },
     ["hasChildLockFeature"]: { icon: <FaChild />, text: "Child lock" },

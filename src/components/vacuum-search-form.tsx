@@ -199,15 +199,49 @@ export function VacuumSearchForm({
           )}
         />
         <Controller
+          name="maxObjectClearanceInMillimeters"
+          render={({ field, fieldState }) => (
+            <FormNumberSliderField
+              label="Min Object Clearance"
+              labelIcon={<BiTrash className="w-4 h-4 text-primary" />}
+              state={fieldState}
+              step={0.1}
+              max={5}
+              valueFormatter={(value) => `${value} mm`}
+              {...field}
+            />
+          )}
+        />
+
+        <Controller
+          name="hasChildLockFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Child Lock" state={fieldState} {...field} />
+          )}
+        />
+
+        <Controller
           name="hasSelfEmptyingFeature"
           render={({ field, fieldState }) => (
             <FormTabField unknownLabel="Don't care" label="Self-emptying" state={fieldState} {...field} />
           )}
         />
         <Controller
+          name="hasSelfCleaningFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Self-cleaning" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
           name="hasZoneCleaningFeature"
           render={({ field, fieldState }) => (
             <FormTabField unknownLabel="Don't care" label="Zone cleaning" state={fieldState} {...field} />
+          )}
+        />
+        <Controller
+          name="hasAutoLiftMopFeature"
+          render={({ field, fieldState }) => (
+            <FormTabField unknownLabel="Don't care" label="Auto-lift Mop" state={fieldState} {...field} />
           )}
         />
         <Controller
@@ -224,9 +258,9 @@ export function VacuumSearchForm({
           )}
         />
         <Controller
-          name="hasSmartHomeIntegrationFeature"
+          name="hasGoogleOrAlexaIntegrationFeature"
           render={({ field, fieldState }) => (
-            <FormTabField unknownLabel="Don't care" label="Smart home integration" state={fieldState} {...field} />
+            <FormTabField unknownLabel="Don't care" label="Google or Alexa integration" state={fieldState} {...field} />
           )}
         />
 
