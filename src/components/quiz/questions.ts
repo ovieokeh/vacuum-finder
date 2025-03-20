@@ -159,9 +159,9 @@ export const conversationalQuizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: "hasSmartHomeIntegrationFeature",
-    field: "hasSmartHomeIntegrationFeature",
-    question: "Should your vacuum connect with your smart home system?",
+    id: "hasGoogleOrAlexaIntegrationFeature",
+    field: "hasGoogleOrAlexaIntegrationFeature",
+    question: "Should your vacuum connect with your smart home system (e.g. Google Home, Alexa)?",
     type: "triState",
     options: [
       { label: "Don't Care", value: null },

@@ -192,9 +192,10 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
             toastMessage = "Vacuum updated successfully";
             reset(data);
           } else {
+            const { affiliateLinks, ...rest } = data;
             addVacuumMutation.mutate({
-              data,
-              affiliateLinks: data.affiliateLinks,
+              affiliateLinks,
+              data: rest,
             });
           }
 
@@ -230,6 +231,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormImageUploadField label="Click to upload image" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <div className="flex flex-col gap-2 bg-background p-4">
@@ -244,6 +246,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                       render={({ field, fieldState }) => (
                         <FormSelectField label="Region" options={REGION_OPTIONS} {...field} state={fieldState} />
                       )}
+                      disabled={isPopulating}
                     />
 
                     <Controller
@@ -258,6 +261,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                           optionClassName="uppercase"
                         />
                       )}
+                      disabled={isPopulating}
                     />
 
                     <Controller
@@ -265,11 +269,13 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                       render={({ field, fieldState }) => (
                         <FormTextField type="number" label="Price" {...field} state={fieldState} />
                       )}
+                      disabled={isPopulating}
                     />
 
                     <Controller
                       name={`affiliateLinks[${index}].link`}
                       render={({ field, fieldState }) => <FormTextField label="URL" {...field} state={fieldState} />}
+                      disabled={isPopulating}
                     />
 
                     <button
@@ -300,6 +306,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormComboboxField label="Brand" options={brands || []} {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -333,6 +340,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                   ) : null}
                 </>
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -345,6 +353,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                   state={fieldState}
                 />
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -352,6 +361,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormTextField type="number" label="Battery Runtime (minutes)" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -359,6 +369,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormTextField type="number" label="Suction Power (Pa)" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -366,6 +377,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormTextField type="number" label="Noise Level (dB)" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -373,6 +385,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormTextField type="number" label="Dustbin Capacity (L)" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <Controller
@@ -380,23 +393,34 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
               render={({ field, fieldState }) => (
                 <FormTextField type="number" label="Water Tank Capacity (L)" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
             <Controller
               name="maxObjectClearanceInMillimeters"
               render={({ field, fieldState }) => (
                 <FormTextField type="number" label="Max Object Clearance (mm)" {...field} state={fieldState} />
               )}
+              disabled={isPopulating}
             />
 
             <div className="flex flex-col gap-2 mb-6">
-              <FormArrayField name="surfaceRecommendations" label="Surface Recommendations (e.g Carpet, Hardwood)" />
-              <FormArrayField name="otherFeatures" label="Other Features (e.g. HEPA Filter, Hot water cleaning)" />
+              <FormArrayField
+                name="surfaceRecommendations"
+                label="Surface Recommendations (e.g Carpet, Hardwood)"
+                disabled={isPopulating}
+              />
+              <FormArrayField
+                name="otherFeatures"
+                label="Other Features (e.g. HEPA Filter, Hot water cleaning)"
+                disabled={isPopulating}
+              />
             </div>
 
-            <div className="flex gap-4 flex-wrap">
+            <div className="flex gap-4 flex-wrap *:grow">
               <Controller
                 name="hasChildLockFeature"
                 render={({ field, fieldState }) => <FormTabField label="Child Lock" {...field} state={fieldState} />}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -404,12 +428,14 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Mopping Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
               <Controller
                 name="hasAutoLiftMopFeature"
                 render={({ field, fieldState }) => (
                   <FormTabField label="Auto-lift Mop Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -417,6 +443,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Self Emptying Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -424,6 +451,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Self Cleaning Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -431,6 +459,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Zone Cleaning Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -438,6 +467,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Multi Floor Mapping Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -445,11 +475,13 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Virtual Walls Feature" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
                 name="hasAppControlFeature"
                 render={({ field, fieldState }) => <FormTabField label="App Control" {...field} state={fieldState} />}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -457,6 +489,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Google or Alexa Integration" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
@@ -464,11 +497,13 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 render={({ field, fieldState }) => (
                   <FormTabField label="Manual Control" {...field} state={fieldState} />
                 )}
+                disabled={isPopulating}
               />
 
               <Controller
                 name="hasVoiceControlFeature"
                 render={({ field, fieldState }) => <FormTabField label="Voice Control" {...field} state={fieldState} />}
+                disabled={isPopulating}
               />
             </div>
           </div>
@@ -487,7 +522,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                 Delete
               </ConfirmButton>
             ) : null}
-            <FormSubmitButton>Save</FormSubmitButton>
+            <FormSubmitButton disabled={isPopulating}>Save</FormSubmitButton>
           </div>
         </div>
       </Form>

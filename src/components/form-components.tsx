@@ -119,9 +119,10 @@ type FormArrayFieldProps = {
   name: string;
   addLabel?: string;
   removeLabel?: string;
+  disabled?: boolean;
 };
 
-export const FormArrayField = ({ label, name, addLabel = "Add" }: FormArrayFieldProps) => {
+export const FormArrayField = ({ label, name, addLabel = "Add", disabled }: FormArrayFieldProps) => {
   const { control, getValues, setValue } = useFormContext();
   const values = getValues(name) as string[] | null | undefined;
   const items = values ?? [];
@@ -157,6 +158,7 @@ export const FormArrayField = ({ label, name, addLabel = "Add" }: FormArrayField
                 state={fieldState}
               />
             )}
+            disabled={disabled}
           />
         </div>
       ))}
@@ -408,14 +410,16 @@ export const FormComboboxField = <T extends string>({
 export const FormSubmitButton = ({
   type = "submit",
   className,
+  disabled,
   children,
 }: {
   type?: "submit" | "button";
   className?: string;
+  disabled?: boolean;
   children: React.ReactNode;
 }) => {
   return (
-    <Button type={type} className={twMerge("bg-background! border! border-border!", className)}>
+    <Button type={type} className={twMerge("bg-background! border! border-border!", className)} disabled={disabled}>
       {children}
     </Button>
   );

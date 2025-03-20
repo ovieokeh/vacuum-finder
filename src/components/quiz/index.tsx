@@ -156,7 +156,7 @@ const stepFourQuestionsFields = [
   "hasZoneCleaningFeature",
   "hasMultiFloorMappingFeature",
   "hasVirtualWallsFeature",
-  "hasSmartHomeIntegrationFeature",
+  "hasGoogleOrAlexaIntegrationFeatureIntegrationFeature",
   "hasAppControlFeature",
   "hasManualControlFeature",
 ];

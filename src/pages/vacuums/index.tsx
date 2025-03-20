@@ -159,14 +159,20 @@ export function VacuumSearchPage() {
         </div>
 
         <div className="flex flex-col md:border md:border-border md:w-3/4 py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0 overflow-hidden">
-          <SortingBar
-            className="w-full justify-end"
-            sortValue={sort + "-" + order}
-            onSortChange={(sort, order) => {
-              setSort(sort);
-              setOrder(order as "asc" | "desc");
-            }}
-          />
+          <div className="flex flex-col md:flex-row items-center justify-between md:px-4 relative">
+            <p className="text-sm md:absolute">
+              We think these are the best options that match your criteria (
+              {searchVacuumsQuery.data?.pages[searchVacuumsQuery.data.pages.length - 1].total ?? 0} results)
+            </p>
+            <SortingBar
+              className="w-full justify-end"
+              sortValue={sort + "-" + order}
+              onSortChange={(sort, order) => {
+                setSort(sort);
+                setOrder(order as "asc" | "desc");
+              }}
+            />
+          </div>
           <div className={`h-[calc(100%-1px)] md:h-[calc(100%-64px)] overflow-y-scroll md:overflow-auto`}>
             <VacuumResults
               className="flex flex-wrap gap-4 md:gap-0 px-0! md:px-4!"
