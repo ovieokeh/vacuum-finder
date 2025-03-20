@@ -10,11 +10,11 @@ import { deleteVacuum } from "./handlers/vacuums/admin/delete";
 import { updateVacuum } from "./handlers/vacuums/admin/update";
 import { getVacuum } from "./handlers/vacuums/get";
 
-export const useGetVacuum = (id: string) => {
+export const useGetVacuum = (id?: string) => {
   return useQuery({
     queryKey: ["get-vacuum", id],
-    queryFn: () => getVacuum(id),
-    enabled: true,
+    queryFn: () => getVacuum(id ?? ""),
+    enabled: !!id,
   });
 };
 

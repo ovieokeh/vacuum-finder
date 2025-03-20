@@ -38,7 +38,7 @@ export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
 
   return (
     <div className="z-20 p-4 grow shadow sticky h-[66px]" ref={navRef}>
-      <div className="max-w-[1240px] mx-auto flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-6 text-sm md:text-base text-text!">
           <Link to="/" className="text-text! font-semibold">
             <span className="hidden md:block">Robot Vacuum Finder</span>

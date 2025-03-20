@@ -135,10 +135,10 @@ export function VacuumSearchPage() {
       </Helmet>
 
       <div
-        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1280px] px-4 md:pt-2 h-[calc(100svh-162px)] md:h-[calc(100svh-76px)] relative`}
+        className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1440px] px-4 md:pt-2 h-[calc(100svh-128px)] md:h-[calc(100svh-76px)] relative`}
       >
         <div
-          className="fixed left-0 right-0 bottom-0 md:relative grow bg-background-alt border border-border md:border-r-0 md:rounded-tl-lg md:rounded-bl-lg md:h-full md:min-w-1/4 md:max-w-1/4"
+          className="fixed left-0 right-0 bottom-0 md:relative grow md:rounded-tl-lg md:rounded-bl-lg md:h-full md:min-w-1/4 md:max-w-1/4"
           ref={filtersContainerRef}
         >
           <h2 className="hidden md:block p-4 pb-0 text-lg font-bold text-secondary">Refine your search</h2>
@@ -158,9 +158,9 @@ export function VacuumSearchPage() {
           </FormProvider>
         </div>
 
-        <div className="flex flex-col md:border md:border-border md:w-3/4 py-4 pb-8 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0 overflow-hidden">
+        <div className="flex flex-col md:w-3/4 py-4 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0 overflow-hidden">
           <div className="flex flex-col md:flex-row items-center justify-between md:px-4 relative">
-            <p className="text-sm md:absolute">
+            <p className="text-sm pt-4 md:pt-0">
               We think these are the best options that match your criteria (
               {searchVacuumsQuery.data?.pages[searchVacuumsQuery.data.pages.length - 1].total ?? 0} results)
             </p>
@@ -176,7 +176,7 @@ export function VacuumSearchPage() {
           <div className={`h-[calc(100%-1px)] md:h-[calc(100%-64px)] overflow-y-scroll md:overflow-auto`}>
             <VacuumResults
               className="flex flex-wrap gap-4 md:gap-0 px-0! md:px-4!"
-              linkClassname="md:basis-1/2 lg:basis-1/3"
+              linkClassname="md:basis-1/2 lg:basis-1/3 border-0 shadow-sm"
               containerWidth={vacuumResultsWidth}
               results={vacuums}
               fetchMoreComponent={fetchMoreComponent}

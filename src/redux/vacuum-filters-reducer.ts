@@ -34,7 +34,7 @@ interface UpdateValuePayload {
 }
 
 const vacuumFiltersSlice = createSlice({
-  name: "vacuumFilters",
+  name: "vacuumsFilters",
   initialState: initialSearchFiltersState,
   reducers: {
     replaceState: (state, action: PayloadAction<UpdateValuePayload>) => {
@@ -44,5 +44,5 @@ const vacuumFiltersSlice = createSlice({
 });
 
 export const { replaceState } = vacuumFiltersSlice.actions;
-export const selectVacuumFilters = (state: { vacuumFilters: VacuumsFilters }) => state.vacuumFilters;
+export const selectVacuumFilters = (state: { vacuumsFilters: VacuumsFilters }) => state.vacuumsFilters;
 export default vacuumFiltersSlice.reducer;

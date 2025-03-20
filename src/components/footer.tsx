@@ -8,7 +8,7 @@ export const Footer = () => {
           &copy; {new Date().getFullYear()} Robot Vacuum Finder. All rights reserved.
         </p>
         <nav className="mt-4 md:mt-0">
-          <ul className="flex gap-4 text-sm">
+          <ul className="flex gap-4 text-sm px-0! *:list-none!">
             <li>
               <Link to="/terms-of-service" className="text-text! hover:underline">
                 Terms of Service
@@ -20,6 +20,10 @@ export const Footer = () => {
               </Link>
             </li>
           </ul>
+          <p className="text-sm text-text/70">
+            Vacuum Finder is not affiliated with any vacuum brands or manufacturers. We are a participant in the Amazon
+            Services LLC Associates Program.
+          </p>
         </nav>
       </div>
     </footer>

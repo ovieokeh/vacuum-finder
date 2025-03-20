@@ -15,5 +15,5 @@ export const useWindowWidth = () => {
     }
   }, [isClient]);
 
-  return Math.min(width, 1240);
+  return Math.min(width, 1400);
 };

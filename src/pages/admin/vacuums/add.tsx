@@ -21,7 +21,7 @@ export function AdminVacuumAddPage() {
         showBreadcrumbs
       />
 
-      <div className="md:mx-auto md:max-w-[1240px] pt-2 px-4">
+      <div className="md:mx-auto md:max-w-[1400px] pt-2 px-4">
         <AdminVacuumForm />
       </div>
     </>

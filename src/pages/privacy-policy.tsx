@@ -13,7 +13,7 @@ export const PrivacyPolicyPage = () => {
         <PageHeader title="Privacy Policy" subtitle="Last Updated: March 5, 2025" showBreadcrumbs />
 
         {/* Main Content */}
-        <main className="flex-grow mx-auto max-w-[1240px] px-4 py-8 md:py-12 text-sm md:text-base leading-6 space-y-6">
+        <main className="flex-grow mx-auto max-w-[1400px] px-4 py-8 md:py-12 text-sm md:text-base leading-6 space-y-6">
           <section>
             <h2 className="text-xl font-semibold mb-2">1. Introduction</h2>
             <p>

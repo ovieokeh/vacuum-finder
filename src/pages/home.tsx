@@ -14,16 +14,6 @@ const copy = {
     heading: "Why Thousands Trust Our Tool",
     items: [
       {
-        icon: <FaMagic size={32} className="text-accent" />,
-        title: "Made Just For You",
-        text: "From pet hair jungles to tricky floor layouts, our recommendations fit your exact needs. No guesswork, just great matches.",
-      },
-      {
-        icon: <FaRobot size={32} className="text-accent" />,
-        title: "Data You Can Trust",
-        text: "Our picks come from carefully vetted, staff-verified data and thousands of user-submitted experiences—saving you from the hype.",
-      },
-      {
         icon: <FaQuestionCircle size={32} className="text-accent" />,
         title: "Complex Tech, Simplified",
         text: (
@@ -37,6 +27,16 @@ const copy = {
           </>
         ),
       },
+      {
+        icon: <FaMagic size={32} className="text-accent" />,
+        title: "Made Just For You",
+        text: "From pet hair jungles to tricky floor layouts, our recommendations fit your exact needs. No guesswork, just great matches.",
+      },
+      {
+        icon: <FaRobot size={32} className="text-accent" />,
+        title: "Data You Can Trust",
+        text: "Our picks come from carefully vetted, staff-verified data-saving you from having to sift through hundreds of confusing options.",
+      },
     ],
   },
   howItWorks: {
@@ -44,21 +44,21 @@ const copy = {
     steps: [
       {
         step: 1,
-        title: "Describe Your Home",
+        title: "Tell us about your space",
         text: "Give us the quick facts about your floors, pets, and cleaning style. Sit back—we got you.",
-        imageUrl: "robot-home-search.png",
+        imageUrl: "take-quiz.png",
       },
       {
         step: 2,
         title: "Our Magic Happens",
         text: "We instantly analyze your answers against our verified database of robot vacuums to create your perfect shortlist.",
-        imageUrl: "robot-home-search.png",
+        imageUrl: "refine-search-demo.png",
       },
       {
         step: 3,
         title: "Pick & Celebrate",
         text: "Check out your personalized recommendations, choose your winner, and say hello to effortless cleaning.",
-        imageUrl: "robot-home-search.png",
+        imageUrl: "view-product-demo.png",
       },
     ],
   },
@@ -69,7 +69,7 @@ const tryLink = (
     to="/quiz"
     className="px-6 py-3 rounded border border-accent! text-background dark:text-black bg-accent! hover:bg-accent/50! font-semibold flex items-center gap-2"
   >
-    Find My Vacuum <IoIosArrowForward />
+    Take a short skippable quiz <IoIosArrowForward />
   </Link>
 );
 
