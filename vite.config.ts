@@ -10,7 +10,13 @@ import { config } from "dotenv";
 config();
 
 const buildRoutes = () => {
-  const routes: string[] = ["/", "/privacy-policy", "/terms-of-service", "/guides", "/vacuums"];
+  const routes: string[] = [
+    "/",
+    "/privacy-policy",
+    "/terms-of-service",
+    // "/guides",
+    "/vacuums",
+  ];
 
   try {
     // const vacuums = await supabase.from('Vacuums').select('id').select()

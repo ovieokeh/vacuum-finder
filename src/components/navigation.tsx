@@ -54,9 +54,9 @@ export const Navigation = forwardRef<HTMLDivElement>((_, ref) => {
                 Search
               </Link>
             )}
-            <Link to="/guides" className="text-text hover:text-text/90">
+            {/* <Link to="/guides" className="text-text hover:text-text/90">
               Guides
-            </Link>
+            </Link> */}
           </div>
         </div>
 

@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet";
 import { SiteConfigProvider } from "./providers/site-config";
 import { Navigation } from "./components/navigation";
 import { HomePage } from "./pages/home";
-import { GuidesPage } from "./pages/guides";
+// import { GuidesPage } from "./pages/guides";
 import { VacuumSearchPage } from "./pages/vacuums";
 import { VacuumInfoPage } from "./pages/vacuums/[vacuumId]";
 import { PrivacyPolicyPage } from "./pages/privacy-policy";
@@ -23,6 +23,7 @@ import "./index.css";
 import { useSeoSetup } from "./hooks/use-seo-setup";
 import { useDisableNumberInputScroll } from "./hooks/use-disable-number-input-scroll";
 import { PersistGate } from "redux-persist/integration/react";
+import { PageHeader } from "./components/page-header";
 
 const queryClient = new QueryClient();
 
@@ -58,7 +59,7 @@ export default function App() {
           <div id="content" className={`mt-0 overflow-y-scroll pb-12 h-[calc(100svh-66px)]`} ref={scrollRef}>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="guides" element={<GuidesPage />} />
+              {/* <Route path="guides" element={<GuidesPage />} /> */}
               <Route path="vacuums" element={<VacuumSearchPage />}>
                 <Route path=":vacuumId" element={<VacuumInfoPage />} />
               </Route>
@@ -73,6 +74,8 @@ export default function App() {
               </Route>
 
               <Route path="quiz" element={<QuizPage />} />
+
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
         </SiteConfigProvider>
@@ -93,3 +96,16 @@ export default function App() {
 
   return <Provider store={reduxStore}>{children}</Provider>;
 }
+
+const NotFoundPage = () => {
+  return (
+    <div className="flex items-center justify-center h-[calc(100vh-66px)]">
+      <PageHeader
+        title="404 - Page Not Found"
+        subtitle="The page you are looking for does not exist. Try checking the URL for errors or return to the homepage."
+        showBreadcrumbs
+      />
+      <h1 className="text-3xl font-semibold">404 - Page Not Found</h1>
+    </div>
+  );
+};
