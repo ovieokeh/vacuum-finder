@@ -6,7 +6,7 @@ import { config } from "dotenv";
 
 config();
 
-import App from "./app";
+import App from "./main";
 
 export function render() {
   const html = renderToString(

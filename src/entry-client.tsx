@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
-
-import App from "./app";
 import { BrowserRouter } from "react-router";
+
+import App from "./main";
 
 hydrateRoot(
   document.getElementById("root") as HTMLElement,

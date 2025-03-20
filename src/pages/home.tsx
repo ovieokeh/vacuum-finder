@@ -107,13 +107,17 @@ export const HomePage = () => {
                 <div className="mb-2 h-12 w-12 flex items-center justify-center rounded-full bg-accent text-background font-bold text-xl">
                   {stepData.step}
                 </div>
-                <img src={`/images/${stepData.imageUrl}`} alt="" className="w-full h-[300px] object-contain" />
+                <img
+                  src={`/images/${stepData.imageUrl}`}
+                  alt=""
+                  className="w-full h-[300px] md:h-[480px] object-contain"
+                />
 
                 <div className="flex flex-col items-center">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
                     <FaCheckCircle className="text-accent" /> {stepData.title}
                   </h3>
-                  <p className="text-sm text-text/90 text-center">{stepData.text}</p>
+                  <p className="text-text/90 text-center">{stepData.text}</p>
                 </div>
               </div>
             ))}

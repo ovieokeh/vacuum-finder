@@ -4,6 +4,8 @@
 ARG NODE_VERSION=22.9.0
 FROM node:${NODE_VERSION}-slim AS base
 
+USER root
+
 LABEL fly_launch_runtime="Node.js"
 
 # Node.js app lives here
@@ -43,5 +45,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-ENV DATABASE_URL="file:///data/database.db"
 CMD [ "npm", "run", "start" ]
