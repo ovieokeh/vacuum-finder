@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { invariant } from "es-toolkit";
 import { CiCircleInfo } from "react-icons/ci";
@@ -18,7 +18,7 @@ export function VacuumInfoPage() {
   const navigate = useNavigate();
   const vacuumQuery = useGetVacuum(vacuumId);
   const vacuum = vacuumQuery.data;
-  const name = `${vacuum?.brand} ${vacuum?.model}`;
+  const name = useMemo(() => `${vacuum?.brand} ${vacuum?.model}`, [vacuum?.brand, vacuum?.model]);
 
   const filters = useAppSelector((state) => state.vacuumsFilters);
 
@@ -28,8 +28,12 @@ export function VacuumInfoPage() {
 
   return (
     <>
-      <Helmet>
-        <title>{`${name} - Robot Vacuum Finder & Guide`}</title>
+      <Helmet
+        meta={[
+          { name: "title", content: vacuum ? `${name} - Robot Vacuum Finder & Guide` : "Robot Vacuum Finder & Guide" },
+        ]}
+      >
+        {vacuum ? <title>{`${name} - Robot Vacuum Finder & Guide`}</title> : <title>Robot Vacuum Finder & Guide</title>}
         <meta
           name="description"
           content={`Read about the ${name} robot vacuum cleaner. Compare features, price, and more.`}
@@ -201,7 +205,7 @@ interface FilterMatchSummaryProps {
 function FilterMatchSummary({ vacuum, userFilters }: FilterMatchSummaryProps) {
   const { matchedCount, totalFilters } = compareFilters(vacuum, userFilters);
   return (
-    <section className="bg-green-200 p-4 rounded">
+    <section className="bg-green-200 text-black p-4 rounded">
       <p>
         This vacuum meets {matchedCount} of your {totalFilters} search criteria.
       </p>
@@ -354,7 +358,7 @@ function FeatureBadge({ label, filterKey, active, vacuum, userFilters }: Feature
   const meets = meetsFilter(filterKey, vacuum, userFilters);
   const bgClass = meets ? "bg-green-200" : "bg-gray-100";
   return (
-    <span className={`inline-block px-3 py-1 rounded ${bgClass}`}>
+    <span className={`inline-block px-3 py-1 rounded text-black ${bgClass}`}>
       {label}: {active ? "Yes" : "No"}
     </span>
   );

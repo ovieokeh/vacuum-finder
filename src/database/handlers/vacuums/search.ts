@@ -28,12 +28,13 @@ const applyFiltersToQuery = (
   } = {
     brand: (query, value) => query.ilike("brand", `%${value}%`),
     mappingTechnology: (query, value) => query.eq("mappingTechnology", value),
-    numPets: (query, value) => query.gte("suctionPowerInPascals", 2000 * (value ?? 0)),
-    batteryLifeInMinutes: (query, value) => query.gte("batteryLifeInMinutes", value),
-    suctionPowerInPascals: (query, value) => query.gte("suctionPowerInPascals", value),
-    noiseLevelInDecibels: (query, value) => query.or(`noiseLevelInDecibels.is.null,noiseLevelInDecibels.lte.${value}`),
-    waterTankCapacityInLiters: (query, value) => query.gte("waterTankCapacityInLiters", value),
-    dustbinCapacityInLiters: (query, value) => query.gte("dustbinCapacityInLiters", value),
+    numPets: (query, value) => (value ? query.gte("suctionPowerInPascals", 2000 * (value ?? 0)) : query),
+    batteryLifeInMinutes: (query, value) => (value ? query.gte("batteryLifeInMinutes", value) : query),
+    suctionPowerInPascals: (query, value) => (value ? query.gte("suctionPowerInPascals", value) : query),
+    noiseLevelInDecibels: (query, value) =>
+      value ? query.or(`noiseLevelInDecibels.is.null,noiseLevelInDecibels.lte.${value}`) : query,
+    waterTankCapacityInLiters: (query, value) => (value ? query.gte("waterTankCapacityInLiters", value) : query),
+    dustbinCapacityInLiters: (query, value) => (value ? query.gte("dustbinCapacityInLiters", value) : query),
   };
 
   Object.entries(filters).forEach(([key, value]) => {

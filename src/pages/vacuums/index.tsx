@@ -38,7 +38,7 @@ const SortingBar = ({ sortValue, className, onSortChange }: SortingBarProps) => 
   ];
 
   return (
-    <div className={twMerge("flex justify-between items-center py-4 md:px-4 border-b border-border", className)}>
+    <div className={twMerge("flex justify-between items-center py-4 md:px-4", className)}>
       <div className="flex items-center gap-2">
         <FormSelectField
           className="flex-row gap-4"
@@ -159,7 +159,7 @@ export function VacuumSearchPage() {
         </div>
 
         <div className="flex flex-col md:w-3/4 py-4 md:pb-4 md:rounded-tr-lg md:rounded-br-lg md:p-0 pt-0 overflow-hidden">
-          <div className="flex flex-col md:flex-row items-center justify-between md:px-4 relative">
+          <div className="flex flex-col md:flex-row items-center justify-between md:px-4 relative border-b border-border">
             <p className="text-sm pt-4 md:pt-0">
               We think these are the best options that match your criteria (
               {searchVacuumsQuery.data?.pages[searchVacuumsQuery.data.pages.length - 1].total ?? 0} results)
@@ -176,7 +176,7 @@ export function VacuumSearchPage() {
           <div className={`h-[calc(100%-1px)] md:h-[calc(100%-64px)] overflow-y-scroll md:overflow-auto`}>
             <VacuumResults
               className="flex flex-wrap gap-4 md:gap-0 px-0! md:px-4!"
-              linkClassname="md:basis-1/2 lg:basis-1/3 border-0 shadow-sm"
+              linkClassname="md:basis-1/2 lg:basis-1/3 dark:border shadow-sm"
               containerWidth={vacuumResultsWidth}
               results={vacuums}
               fetchMoreComponent={fetchMoreComponent}
