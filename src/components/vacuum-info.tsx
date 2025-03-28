@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { VacuumFeatures } from "./vacuum-features";
 import { PriceDisplay } from "./price-display";
 import { VacuumWithAffiliateLink } from "../database/types";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { useMemo } from "react";
 import { useSearchVacuums } from "../database/hooks";
 
@@ -25,6 +25,7 @@ export const VacuumInfo = ({
   truncateFeatures = true,
 }: VacuumResultProps) => {
   const name = `${vacuum.brand} ${vacuum.model}`;
+  const [searchParams] = useSearchParams();
   const similarQuery = useSearchVacuums({
     filters: {
       brand: vacuum.brand,
@@ -33,6 +34,12 @@ export const VacuumInfo = ({
     enabled: true,
   });
   const similarVacuums = similarQuery.data?.results.filter((v: VacuumWithAffiliateLink) => v.id !== vacuum.id);
+
+  const buildNavigateRoot = (searchParams: URLSearchParams) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("page");
+    return newParams.toString() ? `?${newParams.toString()}` : "";
+  };
 
   const content = useMemo(
     () => (
@@ -67,7 +74,7 @@ export const VacuumInfo = ({
   );
 
   return withLink ? (
-    <Link to={navigateRoot ? `${navigateRoot}/${vacuum.id}` : vacuum.id} className={sharedClassname}>
+    <Link className={sharedClassname} to={`${navigateRoot}/${vacuum.id}${buildNavigateRoot(searchParams)}`}>
       {content}
     </Link>
   ) : (

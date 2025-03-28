@@ -45,7 +45,7 @@ export function VacuumResults({
       ) : (
         <ul className={twMerge(className)}>
           {results?.map((vacuum) => (
-            <VacuumInfo key={vacuum.id} vacuum={vacuum} className={linkClassname} />
+            <VacuumInfo key={vacuum.id} vacuum={vacuum} className={linkClassname} navigateRoot="/vacuums" />
           ))}
 
           {fetchMoreComponent}

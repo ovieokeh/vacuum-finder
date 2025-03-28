@@ -12,11 +12,7 @@ const buildOpts = {
   outfile: "dist/server/entry-server.js",
   format: "esm",
   allowOverwrite: true,
-  plugins: [
-    nodeExternalsPlugin({
-      allowList: ["redux-persist"],
-    }),
-  ],
+  plugins: [nodeExternalsPlugin()],
   banner: {
     js: `
     import * as requireReact from 'react';

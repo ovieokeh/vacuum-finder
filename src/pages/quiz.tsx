@@ -1,33 +1,25 @@
 import { useForm, FormProvider, useWatch } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 
 import { PageHeader } from "../components/page-header";
 import { QuizContainer } from "../components/quiz";
 import { Outlet, useNavigate } from "react-router";
-import { QuizFormValues, quizSchema } from "../components/quiz/shared";
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../redux";
-import { replaceState } from "../redux/vacuum-filters-reducer";
-import { markAllValuesAsDefined } from "../shared-utils/object";
+import { QuizFormValues } from "../components/quiz/shared";
 import { SEO } from "../components/seo";
+import { initialSearchFiltersState } from "../shared-utils/vacuum-filters";
+import { filtersToParamsString } from "../hooks/use-filters-params";
 
 export function QuizPage() {
-  const vacuumFilters = useAppSelector((state) => state.vacuumsFilters);
   const form = useForm<QuizFormValues>({
-    resolver: yupResolver(quizSchema),
-    defaultValues: vacuumFilters,
+    defaultValues: initialSearchFiltersState,
   });
 
   const values = useWatch({ control: form.control });
+
   const navigate = useNavigate();
 
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    dispatch(replaceState({ value: markAllValuesAsDefined(values) }));
-  }, [values, dispatch]);
-
   const handleComplete = () => {
-    navigate("/vacuums");
+    const params = filtersToParamsString(values);
+    navigate("/vacuums?" + params);
   };
 
   return (

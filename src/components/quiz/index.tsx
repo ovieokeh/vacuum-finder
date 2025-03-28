@@ -3,7 +3,6 @@ import { QuizQuestion } from "./question";
 import { Transition } from "@headlessui/react";
 
 import conversationalQuizQuestions from "./questions";
-import { useFormContext } from "react-hook-form";
 import { useSearchParams } from "react-router";
 
 export interface QuizSectionProps {
@@ -44,19 +43,10 @@ export const QuizMultiStep: React.FC<QuizMultiStepProps> = ({ steps, onComplete 
     searchParams.get("step") ? parseInt(searchParams.get("step") as string) - 1 : 0
   );
   const [direction, setDirection] = useState(1);
-  const { trigger } = useFormContext();
   const currentSectionRef = React.useRef<HTMLDivElement>(null);
   const [currentSectionHeight, setCurrentSectionHeight] = useState<number>(0);
 
   const goNext = async () => {
-    const fieldsToValidate = steps[currentStep].fields;
-    if (fieldsToValidate && fieldsToValidate.length > 0) {
-      const isValid = await trigger(fieldsToValidate);
-      if (!isValid) {
-        console.log("Validation failed", fieldsToValidate);
-        return;
-      }
-    }
     setDirection(1);
 
     if (currentStep < steps.length - 1) {

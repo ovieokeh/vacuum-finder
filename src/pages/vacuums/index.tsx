@@ -7,9 +7,7 @@ import { IoGlobeOutline } from "react-icons/io5";
 
 import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSiteConfig } from "../../providers/site-config";
-import { replaceState } from "../../redux/vacuum-filters-reducer";
 import { useInfiniteQueryFetcher, useSearchVacuumsInfinite } from "../../database/hooks";
-import { useAppDispatch, useAppSelector } from "../../redux";
 import { VacuumSearchForm } from "../../components/vacuum-search-form";
 import { VacuumResults } from "../../components/vacuum-results";
 import { VacuumsFilters } from "../../types";
@@ -21,6 +19,8 @@ import { useListCountries } from "../../database/hooks";
 import { RegionIconMapping } from "../../types";
 import { countryCodeToReadable } from "../../shared-utils/locale/locale";
 import { SEO } from "../../components/seo";
+import { initialSearchFiltersState } from "../../shared-utils/vacuum-filters";
+import { useFiltersParams, useSyncFiltersToParams } from "../../hooks/use-filters-params";
 
 interface SortingBarProps {
   onSortChange: (sort: string, order: string) => void;
@@ -123,14 +123,14 @@ export function VacuumSearchPage() {
   useContentScroll(false);
 
   const { navHeight, region, currency } = useSiteConfig();
-  const sharedFilters = useAppSelector((state) => state.vacuumsFilters);
+  const { filters: paramsFilters } = useFiltersParams();
   const defaultFilters = useMemo(
-    () => ({ ...sharedFilters, budget: REGION_BUDGETS[region], region, currency }),
-    [sharedFilters, region, currency]
+    () => ({ ...initialSearchFiltersState, budget: REGION_BUDGETS[region], region, currency, ...paramsFilters }),
+    [region, currency, paramsFilters]
   );
   const filtersContainerRef = useRef<HTMLDivElement>(null);
   const form = useForm<VacuumsFilters>({
-    defaultValues: sharedFilters,
+    defaultValues: defaultFilters,
   });
   const filters = useWatch({ control: form.control });
   const [sort, setSort] = useState("price");
@@ -156,21 +156,16 @@ export function VacuumSearchPage() {
     refetch();
   }, [refetch, currency, region]);
 
-  const dispatch = useAppDispatch();
-
   const { handleSubmit, setValue, reset } = form;
 
   useEffect(() => {
     setValue("currency", currency);
     setValue("region", region);
-    setValue("budget", REGION_BUDGETS[region]);
+    setValue("budget", paramsFilters.budget ?? REGION_BUDGETS[region]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [region, setValue]);
 
-  // sync form with redux to share filters with :vacuum page
-  useEffect(() => {
-    dispatch(replaceState({ value: filters as any }));
-  }, [dispatch, filters]);
+  useSyncFiltersToParams(filters as VacuumsFilters);
 
   const resetFilters = useCallback(() => {
     reset(defaultFilters);

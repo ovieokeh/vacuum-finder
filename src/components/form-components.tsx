@@ -249,7 +249,7 @@ export const FormConnectedMappingTechnologySelect = (props: Omit<FormSelectField
   return (
     <FormSelectField
       {...props}
-      options={["laser", "camera", "laser + camera"].map((tech) => ({
+      options={["laser", "camera"].map((tech) => ({
         label: tech,
         value: tech,
       }))}
@@ -542,11 +542,11 @@ export const FormNumberSliderField = ({
   step?: number;
   valueFormatter?: (value: number) => string;
 }) => {
-  const [sliderValue, setSliderValue] = useState(value);
+  const [sliderValue, setSliderValue] = useState(value ?? 0);
 
   // Debounce onChange call so it fires only after the user stops dragging
   useEffect(() => {
-    setSliderValue(value);
+    setSliderValue(value ?? 0);
   }, [value]);
 
   const debouncedOnChange = useDebounce(onChange, 300);

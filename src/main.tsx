@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Provider } from "react-redux";
 
 import { SiteConfigProvider } from "./providers/site-config";
 import { Navigation } from "./components/navigation";
@@ -16,7 +15,6 @@ import { AdminDashboardPage } from "./pages/admin/dashboard";
 import { AdminVacuumAddPage } from "./pages/admin/vacuums/add";
 import { AdminVacuumEditPage } from "./pages/admin/vacuums/[vacuumId]";
 import { QuizPage } from "./pages/quiz";
-import { reduxStore } from "./redux";
 import "./index.css";
 
 import { useDisableNumberInputScroll } from "./hooks/use-disable-number-input-scroll";
@@ -40,38 +38,36 @@ export default function App() {
   }, [location.pathname]);
 
   return (
-    <Provider store={reduxStore}>
-      <QueryClientProvider client={queryClient}>
-        <SiteConfigProvider>
-          <SEO />
-          <Navigation ref={navRef} />
+    <QueryClientProvider client={queryClient}>
+      <SiteConfigProvider>
+        <SEO />
+        <Navigation ref={navRef} />
 
-          <div id="content" className={`mt-0 overflow-y-scroll pb-12 h-[calc(100svh-66px)]`} ref={scrollRef}>
-            <Routes>
-              {/* <Route path="guides" element={<GuidesPage />} /> */}
-              <Route path="vacuums" element={<VacuumSearchPage />}>
-                <Route path=":vacuumId" element={<VacuumInfoPage />} />
-              </Route>
-              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="terms-of-service" element={<TermsOfServicePage />} />
+        <div id="content" className={`mt-0 overflow-y-scroll pb-12 h-[calc(100svh-66px)]`} ref={scrollRef}>
+          <Routes>
+            {/* <Route path="guides" element={<GuidesPage />} /> */}
+            <Route path="vacuums" element={<VacuumSearchPage />}>
+              <Route path=":vacuumId" element={<VacuumInfoPage />} />
+            </Route>
+            <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="terms-of-service" element={<TermsOfServicePage />} />
 
-              <Route path="admin/auth" element={<AdminAuthPage />} />
+            <Route path="admin/auth" element={<AdminAuthPage />} />
 
-              <Route path="admin/vacuums/add" element={<AdminVacuumAddPage />} />
-              <Route path="admin" element={<AdminDashboardPage />}>
-                <Route path="vacuums/:vacuumId" element={<AdminVacuumEditPage />} />
-              </Route>
+            <Route path="admin/vacuums/add" element={<AdminVacuumAddPage />} />
+            <Route path="admin" element={<AdminDashboardPage />}>
+              <Route path="vacuums/:vacuumId" element={<AdminVacuumEditPage />} />
+            </Route>
 
-              <Route path="quiz" element={<QuizPage />} />
+            <Route path="quiz" element={<QuizPage />} />
 
-              <Route path="/" element={<HomePage />} index />
+            <Route path="/" element={<HomePage />} index />
 
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </div>
-        </SiteConfigProvider>
-      </QueryClientProvider>
-    </Provider>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </div>
+      </SiteConfigProvider>
+    </QueryClientProvider>
   );
 }
 

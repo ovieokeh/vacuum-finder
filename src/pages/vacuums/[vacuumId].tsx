@@ -1,30 +1,33 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { invariant } from "es-toolkit";
 import { CiCircleInfo } from "react-icons/ci";
 
 import { Modal } from "../../components/modal";
-import { useAppSelector } from "../../redux";
 
 import { useGetVacuum } from "../../database/hooks";
 import { CurrencySymbolMapping, VacuumsFilters } from "../../types";
 import { AffiliateLink, VacuumWithAffiliateLink } from "../../database/types";
 import { countryCodeToReadable } from "../../shared-utils/locale/locale";
 import { SEO } from "../../components/seo";
+import { useFiltersParams } from "../../hooks/use-filters-params";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();
   invariant(vacuumId, "Expected vacuumId to be defined");
+  const searchParams = useSearchParams();
 
   const navigate = useNavigate();
   const vacuumQuery = useGetVacuum(vacuumId);
   const vacuum = vacuumQuery.data;
   const name = useMemo(() => `${vacuum?.brand} ${vacuum?.model}`, [vacuum?.brand, vacuum?.model]);
 
-  const filters = useAppSelector((state) => state.vacuumsFilters);
+  const { filters } = useFiltersParams();
 
   const handleClose = () => {
-    navigate(-1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("vacuumId");
+    navigate("/vacuums" + (params.toString() ? `?${params.toString()}` : ""));
   };
 
   return (

@@ -28,12 +28,11 @@ export const conversationalQuizQuestions: QuizQuestion[] = [
       { label: "I'm not picky", value: "" },
       { label: "I want smart, precise navigation", value: "laser" },
       { label: "I prefer simple, basic navigation", value: "camera" },
-      { label: "I want both", value: "laser + camera" },
+      // { label: "I want both", value: "laser + camera" },
     ],
     helperText: `This helps determine how well it maps your space.
 - Camera is fine if your home has good lighting and few obstacles.
 - Laser is more precise and works well in low light.
-- A combination of both is best for large, complex spaces.
     `,
   },
   {
