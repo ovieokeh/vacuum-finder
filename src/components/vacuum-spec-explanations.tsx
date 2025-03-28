@@ -1,8 +1,8 @@
-import { MappingTechnology, VacuumWithAffiliateLinks } from "../database";
+import { MappingTechnology, VacuumWithAffiliateLink } from "../database/types";
 import { VacuumsFilters } from "../types";
 
 interface VacuumSpecExplanationsProps {
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
   filters: VacuumsFilters;
 }
 

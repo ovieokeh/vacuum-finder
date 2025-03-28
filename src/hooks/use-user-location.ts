@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { Region } from "../database";
+import { Region } from "../database/types";
 
 interface UserLocation {
   locale: string;

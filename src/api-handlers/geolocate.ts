@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import geoip from "geoip-lite";
 import { publicIpv4 } from "public-ip";
 import { SUPPORTED_REGIONS } from "../types";
-import { Region } from "../database";
+import { Region } from "../database/types";
 
 // Geolocate a user by IP address
 export const geolocateHandler = async (req: Request, res: Response) => {

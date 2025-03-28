@@ -1,6 +1,6 @@
 import { BsCurrencyDollar, BsCurrencyEuro, BsCurrencyPound } from "react-icons/bs";
 import { FaGlobe, FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
-import { Currency, Region, Vacuum } from "./database";
+import { Currency, Region, Vacuum } from "./database/types";
 
 export type WithId<T> = T & { id: string };
 
@@ -38,9 +38,7 @@ export const CurrencyIconMapping: {
   aud: BsCurrencyDollar,
   zar: BsCurrencyDollar,
 };
-export const CurrencySymbolMapping: {
-  [type in Currency]: string;
-} = {
+export const CurrencySymbolMapping: Record<Currency, string> = {
   usd: "$",
   eur: "€",
   gbp: "£",

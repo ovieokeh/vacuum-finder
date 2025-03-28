@@ -56,22 +56,40 @@ async function startServer() {
   app.all("*", async (req, res) => {
     try {
       const url = req.originalUrl.replace(base, "");
-
-      let template: string;
-      let render: (url: string) => Promise<{ head?: string; html?: string }>;
       let html: string;
 
       if (!isProduction && vite) {
-        // Always read fresh template in development
-        template = await fs.readFile("./index.html", "utf-8");
+        let template = await fs.readFile("./index.html", "utf-8");
         template = await vite.transformIndexHtml(url, template);
-        render = (await vite.ssrLoadModule("/src/entry-server.tsx")).render;
+        const { render } = await vite.ssrLoadModule("/src/entry-server.tsx");
         const rendered = await render(url);
         html = template.replace(`<!--app-head-->`, rendered.head ?? "").replace(`<!--app-html-->`, rendered.html ?? "");
       } else {
-        template = templateHtml;
-        // Use string concatenation to avoid static resolution during build
-        html = templateHtml;
+        const template = templateHtml; // Cached HTML from "./dist/client/index.html"
+
+        const manifestContent = await fs.readFile("./dist/client/.vite/manifest.json", "utf8");
+        const manifest = JSON.parse(manifestContent);
+
+        const clientEntry = manifest["index.html"];
+        if (!clientEntry) {
+          throw new Error("Client entry not found in manifest.");
+        }
+
+        // Build the URLs for JS and CSS assets
+        const clientScriptUrl = `${base}${clientEntry.file}`;
+        const clientCssLinks = clientEntry.css
+          ? clientEntry.css.map((cssFile: string) => `<link rel="stylesheet" href="${base}${cssFile}" />`).join("\n")
+          : "";
+
+        // Run SSR render to get HTML and head content
+        const { render } = await import("" + "./entry-server.js");
+        const rendered = await render(req.originalUrl.replace(base, ""));
+
+        // Replace placeholders in template
+        html = template
+          .replace(`<!--app-head-->`, `${rendered.head ?? ""}\n${clientCssLinks}`)
+          .replace(`<!--app-html-->`, rendered.html ?? "")
+          .replace(`<!--app-script-->`, `<script type="module" src="${clientScriptUrl}"></script>`);
       }
 
       res.status(200).set({ "Content-Type": "text/html" }).send(html);

@@ -1,8 +1,9 @@
-import { Currency, Region, supabase, VacuumWithAffiliateLinks } from "../../..";
+import { supabase } from "../../..";
+import { Currency, Region, VacuumWithAffiliateLink } from "../../../types";
 import { TRACKING_LINK } from "../../affiliate-links/shared";
 
 // Update a vacuum by id
-export const updateVacuum = async ({ data }: { data: VacuumWithAffiliateLinks }) => {
+export const updateVacuum = async ({ data }: { data: VacuumWithAffiliateLink }) => {
   const vacuumId = data.id;
 
   if (!data) {
@@ -54,5 +55,5 @@ export const updateVacuum = async ({ data }: { data: VacuumWithAffiliateLinks })
     throw updated.error;
   }
 
-  return updated.data as unknown as VacuumWithAffiliateLinks;
+  return updated.data as unknown as VacuumWithAffiliateLink;
 };

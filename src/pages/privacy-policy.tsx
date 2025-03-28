@@ -1,14 +1,15 @@
-import { Helmet } from "react-helmet";
 import { Footer } from "../components/footer";
 import { PageHeader } from "../components/page-header";
+import { SEO } from "../components/seo";
 
 export const PrivacyPolicyPage = () => {
   return (
     <>
-      <Helmet>
-        <title>Privacy Policy - Robot Vacuum Finder</title>
-        <meta name="description" content="Read the privacy policy for the Vacuum Finder website." />
-      </Helmet>
+      <SEO
+        title="Privacy Policy - Robot Vacuum Finder"
+        description="Read the privacy policy for the Vacuum Finder website."
+      />
+
       <div className="flex flex-col min-h-screen bg-background">
         <PageHeader title="Privacy Policy" subtitle="Last Updated: March 5, 2025" showBreadcrumbs />
 

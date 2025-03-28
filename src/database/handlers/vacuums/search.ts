@@ -1,8 +1,9 @@
-import { VacuumsWithAffiliateLinks, supabase } from "../..";
+import { supabase } from "../..";
+import { VacuumWithAffiliateLink } from "../../types";
 import { VacuumsFilters } from "../../../types";
 
 export interface VacuumsSearchResult {
-  results: VacuumsWithAffiliateLinks;
+  results: VacuumWithAffiliateLink[];
   page: number;
   limit: number;
   total: number;
@@ -146,7 +147,7 @@ export const searchVacuums = async ({
   }
 
   return {
-    results: data as VacuumsWithAffiliateLinks,
+    results: data as VacuumWithAffiliateLink[],
     page,
     limit,
     total: total as number,

@@ -17,8 +17,8 @@ import {
   MappingTechnology,
   Region,
   VacuumCreate,
-  VacuumWithAffiliateLinks,
-} from "../database";
+  VacuumWithAffiliateLink,
+} from "../database/types";
 import {
   CURRENCY_OPTIONS,
   FormArrayField,
@@ -33,7 +33,7 @@ import {
 } from "./form-components";
 
 interface AdminVacuumFormProps {
-  vacuum?: VacuumWithAffiliateLinks | null;
+  vacuum?: VacuumWithAffiliateLink | null;
 }
 
 type FormValues = VacuumCreate & {
@@ -185,7 +185,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
           if (vacuum?.id) {
             updateVacuumMutation.mutateAsync({
               data: {
-                ...(data as VacuumWithAffiliateLinks),
+                ...(data as VacuumWithAffiliateLink),
                 id: vacuum.id,
               },
             });
@@ -324,7 +324,7 @@ export function AdminVacuumForm({ vacuum }: AdminVacuumFormProps) {
                         </span>
                       </p>
                       <ul>
-                        {similarVacuums.results.map((vacuum) => (
+                        {similarVacuums.results.map((vacuum: VacuumWithAffiliateLink) => (
                           <li key={vacuum.id}>
                             <Link
                               to={`/vacuums/${vacuum.id}`}

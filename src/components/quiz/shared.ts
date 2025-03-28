@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { MappingTechnology } from "../../database";
+import { MappingTechnology } from "../../database/types";
 
 export const quizSchema = yup.object().shape({
   brand: yup.string().optional(),

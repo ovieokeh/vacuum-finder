@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet } from "react-router";
-import { Helmet } from "react-helmet";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
@@ -16,11 +15,12 @@ import { VacuumResults } from "../../components/vacuum-results";
 import { VacuumsFilters } from "../../types";
 import { useContentScroll } from "../../hooks/use-disable-body-scroll";
 import { FormSelectField } from "../../components/form-components";
-import { Region } from "../../database";
+import { Region } from "../../database/types";
 
 import { useListCountries } from "../../database/hooks";
 import { RegionIconMapping } from "../../types";
 import { countryCodeToReadable } from "../../shared-utils/locale/locale";
+import { SEO } from "../../components/seo";
 
 interface SortingBarProps {
   onSortChange: (sort: string, order: string) => void;
@@ -50,6 +50,11 @@ const SortingBar = ({ sortValue, className, onSortChange }: SortingBarProps) => 
       setCountryCode(country);
     }
   };
+  useEffect(() => {
+    if (userCountryCode) {
+      setCountryCode(userCountryCode);
+    }
+  }, [userCountryCode]);
 
   const sortingOptions = [
     { label: "Price: Low to High", value: "price-asc" },
@@ -189,10 +194,11 @@ export function VacuumSearchPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Robot Vacuum Finder</title>
-        <meta name="description" content="Find the best robot vacuum for your needs with our vacuum finder tool." />
-      </Helmet>
+      <SEO
+        title="Robot Vacuum Finder"
+        description="Find the best robot vacuum for your needs with our vacuum finder tool."
+        image="/images/refine-search-demo.png"
+      />
 
       <div
         className={`flex flex-col justify-between md:flex-row md:justify-normal md:mx-auto md:max-w-[1440px] px-4 md:pt-2 h-[calc(100svh-128px)] md:h-[calc(100svh-76px)] relative`}

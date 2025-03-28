@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
-import { Helmet } from "react-helmet";
 
 import { SiteConfigProvider } from "./providers/site-config";
 import { Navigation } from "./components/navigation";
@@ -17,13 +16,12 @@ import { AdminDashboardPage } from "./pages/admin/dashboard";
 import { AdminVacuumAddPage } from "./pages/admin/vacuums/add";
 import { AdminVacuumEditPage } from "./pages/admin/vacuums/[vacuumId]";
 import { QuizPage } from "./pages/quiz";
-import { persistor, reduxStore } from "./redux";
+import { reduxStore } from "./redux";
 import "./index.css";
 
-import { useSeoSetup } from "./hooks/use-seo-setup";
 import { useDisableNumberInputScroll } from "./hooks/use-disable-number-input-scroll";
-import { PersistGate } from "redux-persist/integration/react";
 import { PageHeader } from "./components/page-header";
+import { SEO } from "./components/seo";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +30,6 @@ export default function App() {
   const navRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useSeoSetup();
   useDisableNumberInputScroll();
 
   // scroll restoration
@@ -42,23 +39,15 @@ export default function App() {
     }
   }, [location.pathname]);
 
-  const children = useMemo(
-    () => (
+  return (
+    <Provider store={reduxStore}>
       <QueryClientProvider client={queryClient}>
         <SiteConfigProvider>
-          <Helmet>
-            <meta charSet="utf-8" />
-            <title>Robot Vacuum Finder & Guide</title>
-            <meta
-              name="description"
-              content="Find the best robot vacuum for your needs with our vacuum finder tool. Compare robot vacuums by features, price, and more."
-            />
-          </Helmet>
+          <SEO />
           <Navigation ref={navRef} />
 
           <div id="content" className={`mt-0 overflow-y-scroll pb-12 h-[calc(100svh-66px)]`} ref={scrollRef}>
             <Routes>
-              <Route path="/" element={<HomePage />} />
               {/* <Route path="guides" element={<GuidesPage />} /> */}
               <Route path="vacuums" element={<VacuumSearchPage />}>
                 <Route path=":vacuumId" element={<VacuumInfoPage />} />
@@ -75,26 +64,15 @@ export default function App() {
 
               <Route path="quiz" element={<QuizPage />} />
 
+              <Route path="/" element={<HomePage />} index />
+
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
         </SiteConfigProvider>
       </QueryClientProvider>
-    ),
-    [navRef, scrollRef]
+    </Provider>
   );
-
-  if (persistor) {
-    return (
-      <Provider store={reduxStore}>
-        <PersistGate loading={null} persistor={persistor}>
-          {children}
-        </PersistGate>
-      </Provider>
-    );
-  }
-
-  return <Provider store={reduxStore}>{children}</Provider>;
 }
 
 const NotFoundPage = () => {

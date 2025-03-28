@@ -2,10 +2,10 @@ import { VacuumInfo } from "./vacuum-info";
 import { twMerge } from "tailwind-merge";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-import { VacuumsWithAffiliateLinks } from "../database";
+import { VacuumWithAffiliateLink } from "../database/types";
 
 interface VacuumResultsProps {
-  results?: VacuumsWithAffiliateLinks;
+  results?: VacuumWithAffiliateLink[];
   isLoading?: boolean;
   linkClassname?: string;
   className?: string;

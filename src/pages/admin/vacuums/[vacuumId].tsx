@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "react-router";
 import { invariant } from "es-toolkit";
-import { Helmet } from "react-helmet";
 
 import { Modal } from "../../../components/modal";
 import { AdminVacuumForm } from "../../../components/vacuum-form";
 import { useProtectedRoute } from "../../../hooks/use-protected-route";
 import { useGetVacuum } from "../../../database/hooks";
+import { SEO } from "../../../components/seo";
 
 export function AdminVacuumEditPage() {
   useProtectedRoute();
@@ -20,9 +20,8 @@ export function AdminVacuumEditPage() {
 
   return (
     <>
-      <Helmet>
-        <title>{`${name} - Edit Vacuum`}</title>
-      </Helmet>
+      <SEO title={`${name} - Edit Vacuum`} description={`Edit the vacuum ${name}`} image={vacuum?.imageUrl} />
+
       <Modal title={name ?? ""} isOpen close={() => navigate("/admin")} panelClassName="min-w-[80%]">
         <div className="flex flex-col flex-grow gap-4">
           <AdminVacuumForm vacuum={vacuum} />

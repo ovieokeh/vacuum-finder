@@ -1,14 +1,15 @@
-import { Helmet } from "react-helmet";
 import { Footer } from "../components/footer";
 import { PageHeader } from "../components/page-header";
+import { SEO } from "../components/seo";
 
 export const TermsOfServicePage = () => {
   return (
     <>
-      <Helmet>
-        <title>Terms of Service - Robot Vacuum Finder</title>
-        <meta name="description" content="Read the terms of service for the Vacuum Finder website." />
-      </Helmet>
+      <SEO
+        title="Terms of Service - Robot Vacuum Finder"
+        description="Read the terms of service for the Vacuum Finder website."
+      />
+
       <div className="flex flex-col min-h-screen bg-background">
         {/* Header / Hero */}
         <PageHeader title="Terms of Service" subtitle="Last Updated: March 5, 2025" showBreadcrumbs />

@@ -1,8 +1,8 @@
 @import "tailwindcss";
+@import "vercel-toast/css";
 
 @tailwind utilities;
 
-@import "vercel-toast/css";
 .toast-inner {
   padding: 1em !important;
 }

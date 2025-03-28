@@ -1,4 +1,5 @@
-import { AffiliateLinkCreate, Currency, MappingTechnology, Region, supabase, VacuumCreate } from "../../..";
+import { supabase } from "../../..";
+import { AffiliateLinkCreate, Currency, MappingTechnology, Region, VacuumCreate } from "../../../types";
 import { TRACKING_LINK } from "../../affiliate-links/shared";
 
 export const addVacuum = async ({

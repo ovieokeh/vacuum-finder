@@ -8,13 +8,13 @@ import { VacuumInfo } from "./vacuum-info";
 import { VacuumFeatures } from "./vacuum-features";
 import { PriceDisplay } from "./price-display";
 import { EmptyVacuumResults } from "./vacuum-results";
-import { VacuumsWithAffiliateLinks, VacuumWithAffiliateLinks } from "../database";
+import { VacuumWithAffiliateLink } from "../database/types";
 
 interface VacuumResultsProps {
   filters?: VacuumsFilters;
   navigateRoot?: string;
   emptyView?: React.ReactNode;
-  results?: VacuumsWithAffiliateLinks;
+  results?: VacuumWithAffiliateLink[];
   isLoading?: boolean;
 }
 
@@ -34,7 +34,7 @@ export function VacuumsTable({
 }) {
   const navigate = useNavigate();
 
-  const tableOptions: TableOptions<VacuumWithAffiliateLinks> = useMemo(
+  const tableOptions: TableOptions<VacuumWithAffiliateLink> = useMemo(
     () => ({
       columns: [
         {
@@ -126,7 +126,7 @@ export function VacuumsTable({
       ) : (
         <>
           <div className="hidden md:block">
-            <TableContainer<VacuumWithAffiliateLinks>
+            <TableContainer<VacuumWithAffiliateLink>
               tableOptions={tableOptions}
               handleRowClick={(vacuum) => navigate(`${navigateRoot}/${vacuum.id}`)}
             />

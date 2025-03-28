@@ -2,13 +2,13 @@ import { twMerge } from "tailwind-merge";
 
 import { VacuumFeatures } from "./vacuum-features";
 import { PriceDisplay } from "./price-display";
-import { VacuumWithAffiliateLinks } from "../database";
+import { VacuumWithAffiliateLink } from "../database/types";
 import { Link } from "react-router";
 import { useMemo } from "react";
 import { useSearchVacuums } from "../database/hooks";
 
 interface VacuumResultProps {
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
   className?: string;
   imageClassName?: string;
   withLink?: boolean;
@@ -32,7 +32,7 @@ export const VacuumInfo = ({
     },
     enabled: true,
   });
-  const similarVacuums = similarQuery.data?.results.filter((v) => v.id !== vacuum.id);
+  const similarVacuums = similarQuery.data?.results.filter((v: VacuumWithAffiliateLink) => v.id !== vacuum.id);
 
   const content = useMemo(
     () => (

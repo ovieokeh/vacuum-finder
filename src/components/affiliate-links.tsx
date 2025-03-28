@@ -3,12 +3,12 @@ import { getCoreRowModel, ColumnDef } from "@tanstack/react-table";
 
 import { TableContainer } from "./table";
 import { FormSelectField, REGION_OPTIONS } from "./form-components";
-import { AffiliateLink, AffiliateLinks, Region } from "../database";
+import { AffiliateLink, Region } from "../database/types";
 import { useSiteConfig } from "../providers/site-config";
 
 interface AffiliateLinksTableProps {
   vacuumName: string;
-  links?: AffiliateLinks;
+  links?: AffiliateLink[];
 }
 
 export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuumName, links }) => {

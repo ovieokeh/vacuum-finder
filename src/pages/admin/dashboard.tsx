@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Link, Outlet } from "react-router";
-import { Helmet } from "react-helmet";
 import { Button } from "@headlessui/react";
 
 import { PageHeader } from "../../components/page-header";
@@ -10,6 +9,7 @@ import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSearchVacuums } from "../../database/hooks";
 import { VacuumsTable } from "../../components/vacuums-table";
 import { useContentScroll } from "../../hooks/use-disable-body-scroll";
+import { SEO } from "../../components/seo";
 
 export function AdminDashboardPage() {
   useContentScroll();
@@ -40,11 +40,11 @@ export function AdminDashboardPage() {
 
   return (
     <>
-      <Helmet>
-        <meta charSet="utf-8" />
-        <title>Dashboard - Robot Vacuum Finder & Guide</title>
-        <meta name="description" content="Add or update any robot vacuum in the collection" />
-      </Helmet>
+      <SEO
+        title="Dashboard - Robot Vacuum Finder & Guide"
+        description="Add or update any robot vacuum in the collection"
+      />
+
       <div className="flex flex-col bg-background text-text w-full">
         <PageHeader
           title="Dashboard"

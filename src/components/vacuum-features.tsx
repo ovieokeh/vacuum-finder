@@ -7,12 +7,12 @@ import { TfiLayoutAccordionSeparated } from "react-icons/tfi";
 import { TbSmartHome } from "react-icons/tb";
 
 import { VacuumsFilters } from "../types";
-import { Vacuum, VacuumWithAffiliateLinks } from "../database";
+import { Vacuum, VacuumWithAffiliateLink } from "../database/types";
 import { LuSpeech, LuTarget } from "react-icons/lu";
 import { IoGameController } from "react-icons/io5";
 
 interface VacuumResultProps {
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
   filters: VacuumsFilters;
 }
 

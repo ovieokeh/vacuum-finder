@@ -1,4 +1,5 @@
-import { AffiliateLinkCreate, supabase } from "../..";
+import { supabase } from "../..";
+import { AffiliateLinkCreate } from "../../types";
 import { TRACKING_LINK } from "./shared";
 
 export const addAffiliateLink = async ({

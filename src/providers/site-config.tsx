@@ -2,7 +2,8 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useUserLocation } from "../hooks/use-user-location";
 import { User } from "@supabase/supabase-js";
-import { Currency, Region, supabase } from "../database";
+import { supabase } from "../database";
+import { Currency, Region } from "../database/types";
 
 interface SiteConfigContextProps {
   isLoaded: boolean;
@@ -25,7 +26,7 @@ const SiteConfigContext = createContext<SiteConfigContextProps | undefined>(unde
 
 export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   const userLocationData = useUserLocation();
-  const { isLoaded: isUserlocationLoaded, locale: userLocale, region: userRegion, countryCode } = userLocationData;
+  const { locale: userLocale, region: userRegion, countryCode } = userLocationData;
   const [locale, setLocale] = useState<string>(() => userLocale);
   const [region, setRegion] = useState<Region>(() => userRegion);
   const [currency, setCurrency] = useState<Currency>(() =>
@@ -117,10 +118,6 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
       );
     }
   }, [userLocale, userRegion]);
-
-  if (!isUserlocationLoaded || !isLoaded) {
-    return null;
-  }
 
   return (
     <SiteConfigContext.Provider

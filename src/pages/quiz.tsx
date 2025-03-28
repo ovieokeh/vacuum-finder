@@ -1,4 +1,3 @@
-import { Helmet } from "react-helmet";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -10,6 +9,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux";
 import { replaceState } from "../redux/vacuum-filters-reducer";
 import { markAllValuesAsDefined } from "../shared-utils/object";
+import { SEO } from "../components/seo";
 
 export function QuizPage() {
   const vacuumFilters = useAppSelector((state) => state.vacuumsFilters);
@@ -32,14 +32,11 @@ export function QuizPage() {
 
   return (
     <>
-      <Helmet>
-        <meta charSet="utf-8" />
-        <title>Quiz - Robot Vacuum Finder & Guide</title>
-        <meta
-          name="description"
-          content="Discover the perfect robot vacuum for your needs with our interactive quiz."
-        />
-      </Helmet>
+      <SEO
+        title="Quiz - Robot Vacuum Finder & Guide"
+        description="Discover the perfect robot vacuum for your needs with our interactive quiz."
+        image="/images/take-quiz.png"
+      />
       <PageHeader
         title="Robot Vacuum Finder Quiz"
         subtitle="Find the perfect robot vacuum for your needs"

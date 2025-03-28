@@ -1,12 +1,12 @@
 import { MdInfoOutline } from "react-icons/md";
 
+import { VacuumWithAffiliateLink } from "../database/types";
 import { CurrencySymbolMapping } from "../types";
-import { VacuumWithAffiliateLinks } from "../database";
 import { getCheapestPrice } from "../shared-utils/price";
 import { useSiteConfig } from "../providers/site-config";
 import { Popover } from "./popover";
 
-export const PriceDisplay = ({ vacuum, hasVariants }: { vacuum: VacuumWithAffiliateLinks; hasVariants?: boolean }) => {
+export const PriceDisplay = ({ vacuum, hasVariants }: { vacuum: VacuumWithAffiliateLink; hasVariants?: boolean }) => {
   const { currency } = useSiteConfig();
 
   if (!vacuum?.affiliateLinks) {

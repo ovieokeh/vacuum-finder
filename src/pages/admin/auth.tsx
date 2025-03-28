@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { Helmet } from "react-helmet";
 
 import { PageHeader } from "../../components/page-header";
 import { useSiteConfig } from "../../providers/site-config";
 import { Footer } from "../../components/footer";
+import { SEO } from "../../components/seo";
 
 export function AdminAuthPage() {
   const navigate = useNavigate();
@@ -35,11 +35,8 @@ export function AdminAuthPage() {
 
   return (
     <>
-      <Helmet>
-        <meta charSet="utf-8" />
-        <title>Auth - Robot Vacuum Finder & Guide</title>
-        <meta name="description" content="Login to your dashboard" />
-      </Helmet>
+      <SEO title="Auth - Robot Vacuum Finder & Guide" description="Login to your dashboard" />
+
       <div className="flex flex-col min-h-screen bg-background text-text">
         {/* Header / Hero style */}
         <PageHeader

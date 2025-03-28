@@ -2,15 +2,15 @@ import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { invariant } from "es-toolkit";
 import { CiCircleInfo } from "react-icons/ci";
-import { Helmet } from "react-helmet";
 
 import { Modal } from "../../components/modal";
 import { useAppSelector } from "../../redux";
 
 import { useGetVacuum } from "../../database/hooks";
 import { CurrencySymbolMapping, VacuumsFilters } from "../../types";
-import { AffiliateLinks, VacuumWithAffiliateLinks } from "../../database";
+import { AffiliateLink, VacuumWithAffiliateLink } from "../../database/types";
 import { countryCodeToReadable } from "../../shared-utils/locale/locale";
+import { SEO } from "../../components/seo";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();
@@ -29,17 +29,11 @@ export function VacuumInfoPage() {
 
   return (
     <>
-      <Helmet
-        meta={[
-          { name: "title", content: vacuum ? `${name} - Robot Vacuum Finder & Guide` : "Robot Vacuum Finder & Guide" },
-        ]}
-      >
-        {vacuum ? <title>{`${name} - Robot Vacuum Finder & Guide`}</title> : <title>Robot Vacuum Finder & Guide</title>}
-        <meta
-          name="description"
-          content={`Read about the ${name} robot vacuum cleaner. Compare features, price, and more.`}
-        />
-      </Helmet>
+      <SEO
+        title={vacuum ? `${name} - Robot Vacuum Finder & Guide` : "Robot Vacuum Finder & Guide"}
+        description={vacuum ? `Read about the ${name} robot vacuum cleaner. Compare features, price, and more.` : ""}
+        image={vacuum?.imageUrl}
+      />
       <Modal title={name ?? ""} isOpen close={handleClose} panelClassName="w-full! max-w-[800px]!">
         <div className="flex flex-col flex-grow gap-4">
           {vacuum ? (
@@ -150,14 +144,14 @@ function VacuumInfoSkeleton() {
 
 function meetsFilter<T extends keyof VacuumsFilters>(
   key: T,
-  vacuum: VacuumWithAffiliateLinks,
+  vacuum: VacuumWithAffiliateLink,
   userFilters: VacuumsFilters
 ): boolean {
   const filterValue = userFilters[key];
   if (filterValue == null) {
     return false; // No filter specified for this key.
   }
-  const vacuumValue = vacuum[key as keyof VacuumWithAffiliateLinks];
+  const vacuumValue = vacuum[key as keyof VacuumWithAffiliateLink];
   if (typeof filterValue === "number") {
     if (typeof vacuumValue !== "number") return false;
     return (vacuumValue as number) >= filterValue;
@@ -173,7 +167,7 @@ function meetsFilter<T extends keyof VacuumsFilters>(
 }
 
 function compareFilters(
-  vacuum: VacuumWithAffiliateLinks,
+  vacuum: VacuumWithAffiliateLink,
   userFilters: VacuumsFilters
 ): { matchedCount: number; totalFilters: number } {
   let matchedCount = 0;
@@ -199,7 +193,7 @@ function compareFilters(
 // --- Subcomponents ---
 
 interface FilterMatchSummaryProps {
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
   userFilters: VacuumsFilters;
 }
 
@@ -215,7 +209,7 @@ function FilterMatchSummary({ vacuum, userFilters }: FilterMatchSummaryProps) {
 }
 
 interface SpecsGridProps {
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
 }
 
 function SpecsGrid({ vacuum }: SpecsGridProps) {
@@ -249,7 +243,7 @@ function SpecItem({ label, value }: SpecItemProps) {
 }
 
 interface FeaturesSectionProps {
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
   userFilters: VacuumsFilters;
 }
 
@@ -351,7 +345,7 @@ interface FeatureBadgeProps {
   label: string;
   filterKey: keyof VacuumsFilters;
   active: boolean | null;
-  vacuum: VacuumWithAffiliateLinks;
+  vacuum: VacuumWithAffiliateLink;
   userFilters: VacuumsFilters;
 }
 
@@ -407,7 +401,7 @@ function OtherFeaturesAccordion({ features }: OtherFeaturesAccordionProps) {
 }
 
 interface PricingSectionProps {
-  affiliateLinks: AffiliateLinks;
+  affiliateLinks: AffiliateLink[];
 }
 
 function PricingSection({ affiliateLinks }: PricingSectionProps) {
