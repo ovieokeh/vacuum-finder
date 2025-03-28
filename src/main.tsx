@@ -99,13 +99,12 @@ export default function App() {
 
 const NotFoundPage = () => {
   return (
-    <div className="flex items-center justify-center h-[calc(100vh-66px)]">
+    <div className="flex items-center justify-center">
       <PageHeader
         title="404 - Page Not Found"
         subtitle="The page you are looking for does not exist. Try checking the URL for errors or return to the homepage."
         showBreadcrumbs
       />
-      <h1 className="text-3xl font-semibold">404 - Page Not Found</h1>
     </div>
   );
 };
