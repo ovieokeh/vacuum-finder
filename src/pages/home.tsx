@@ -3,6 +3,7 @@ import { Footer } from "../components/footer";
 import { PageHeader } from "../components/page-header";
 import { FaRobot, FaQuestionCircle, FaMagic, FaCheckCircle } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
+import { EmailCapture, EmailCapturePopup } from "../components/email-capture";
 
 const copy = {
   hero: {
@@ -122,9 +123,13 @@ export const HomePage = () => {
               </div>
             ))}
           </div>
-          <div className="mt-10 flex justify-center">{tryLink}</div>
+          <div className="my-10 flex justify-center">{tryLink}</div>
+
+          <EmailCapture />
         </div>
       </section>
+
+      <EmailCapturePopup />
 
       <Footer />
     </>

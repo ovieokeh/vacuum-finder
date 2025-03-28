@@ -63,6 +63,24 @@ export type Database = {
           },
         ]
       }
+      Emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: number
+        }
+        Relationships: []
+      }
       Vacuums: {
         Row: {
           batteryLifeInMinutes: number | null
@@ -193,6 +211,15 @@ export type Database = {
           updatedAt: string | null
           userEmail: string | null
           waterTankCapacityInLiters: number | null
+        }
+        Relationships: []
+      }
+      VacuumAffiliateSummary: {
+        Row: {
+          affiliateLinks: Json[] | null
+          brand: string | null
+          min_price: number | null
+          model: string | null
         }
         Relationships: []
       }

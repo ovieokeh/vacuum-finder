@@ -21,6 +21,7 @@ import { countryCodeToReadable } from "../../shared-utils/locale/locale";
 import { SEO } from "../../components/seo";
 import { initialSearchFiltersState } from "../../shared-utils/vacuum-filters";
 import { useFiltersParams, useSyncFiltersToParams } from "../../hooks/use-filters-params";
+import { EmailCapturePopup } from "../../components/email-capture";
 
 interface SortingBarProps {
   onSortChange: (sort: string, order: string) => void;
@@ -245,6 +246,8 @@ export function VacuumSearchPage() {
           </div>
         </div>
       </div>
+      <EmailCapturePopup />
+
       <Outlet />
     </>
   );
