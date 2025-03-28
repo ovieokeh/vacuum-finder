@@ -1,4 +1,4 @@
-import { BsCurrencyDollar, BsCurrencyEuro } from "react-icons/bs";
+import { BsCurrencyDollar, BsCurrencyEuro, BsCurrencyPound } from "react-icons/bs";
 import { FaGlobe, FaGlobeAfrica, FaGlobeAmericas, FaGlobeAsia, FaGlobeEurope } from "react-icons/fa";
 import { Currency, Region, Vacuum } from "./database";
 
@@ -34,10 +34,16 @@ export const CurrencyIconMapping: {
 } = {
   usd: BsCurrencyDollar,
   eur: BsCurrencyEuro,
+  gbp: BsCurrencyPound,
+  aud: BsCurrencyDollar,
+  zar: BsCurrencyDollar,
 };
 export const CurrencySymbolMapping: {
   [type in Currency]: string;
 } = {
   usd: "$",
   eur: "€",
+  gbp: "£",
+  aud: "A$",
+  zar: "R",
 };

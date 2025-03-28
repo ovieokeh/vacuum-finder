@@ -5,6 +5,7 @@ import { PriceDisplay } from "./price-display";
 import { VacuumWithAffiliateLinks } from "../database";
 import { Link } from "react-router";
 import { useMemo } from "react";
+import { useSearchVacuums } from "../database/hooks";
 
 interface VacuumResultProps {
   vacuum: VacuumWithAffiliateLinks;
@@ -24,6 +25,14 @@ export const VacuumInfo = ({
   truncateFeatures = true,
 }: VacuumResultProps) => {
   const name = `${vacuum.brand} ${vacuum.model}`;
+  const similarQuery = useSearchVacuums({
+    filters: {
+      brand: vacuum.brand,
+      model: vacuum.model,
+    },
+    enabled: true,
+  });
+  const similarVacuums = similarQuery.data?.results.filter((v) => v.id !== vacuum.id);
 
   const content = useMemo(
     () => (
@@ -37,7 +46,7 @@ export const VacuumInfo = ({
           <div>
             <h3 className="text-base font-semibold text-primary">{name}</h3>
           </div>
-          <PriceDisplay vacuum={vacuum} />
+          <PriceDisplay vacuum={vacuum} hasVariants={similarVacuums && similarVacuums.length > 1} />
 
           {/* Feature icons */}
           <div>
@@ -49,7 +58,7 @@ export const VacuumInfo = ({
         </div>
       </>
     ),
-    [vacuum, imageClassName, name, truncateFeatures]
+    [vacuum, imageClassName, name, truncateFeatures, similarVacuums]
   );
 
   const sharedClassname = twMerge(

@@ -9,6 +9,7 @@ import { addVacuum } from "./handlers/vacuums/admin/create";
 import { deleteVacuum } from "./handlers/vacuums/admin/delete";
 import { updateVacuum } from "./handlers/vacuums/admin/update";
 import { getVacuum } from "./handlers/vacuums/get";
+import { listCountries } from "./handlers/vacuums/list-countries";
 
 export const useGetVacuum = (id?: string) => {
   return useQuery({
@@ -137,6 +138,13 @@ export const useListBrands = () => {
   return useQuery({
     queryKey: ["list-brands"],
     queryFn: () => listVacuumBrands(),
+    enabled: true,
+  });
+};
+export const useListCountries = () => {
+  return useQuery({
+    queryKey: ["list-countries"],
+    queryFn: () => listCountries(),
     enabled: true,
   });
 };

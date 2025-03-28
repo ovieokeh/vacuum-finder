@@ -10,7 +10,15 @@ const reducers = combineReducers({
   vacuumsFilters: vacuumFiltersReducer,
 });
 
-const storage = typeof window === "undefined" ? undefined : new CookieStorage(Cookies /*, options */);
+const storage =
+  typeof window === "undefined"
+    ? undefined
+    : new CookieStorage(Cookies, {
+        expiration: {
+          // 1 minute
+          default: 60,
+        },
+      });
 
 export const reduxStore = storage
   ? configureStore({

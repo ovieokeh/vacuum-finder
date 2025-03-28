@@ -40,9 +40,16 @@ const vacuumFiltersSlice = createSlice({
     replaceState: (state, action: PayloadAction<UpdateValuePayload>) => {
       return action.payload.value;
     },
+    setField: (state, action: { payload: { key: keyof VacuumsFilters; value: any } }) => {
+      const key = action.payload.key;
+      const typedIndexableState = state as Record<keyof VacuumsFilters, any>;
+      typedIndexableState[key] = action.payload.value;
+
+      return typedIndexableState;
+    },
   },
 });
 
-export const { replaceState } = vacuumFiltersSlice.actions;
+export const { replaceState, setField } = vacuumFiltersSlice.actions;
 export const selectVacuumFilters = (state: { vacuumsFilters: VacuumsFilters }) => state.vacuumsFilters;
 export default vacuumFiltersSlice.reducer;

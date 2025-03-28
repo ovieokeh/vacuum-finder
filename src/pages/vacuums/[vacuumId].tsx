@@ -10,6 +10,7 @@ import { useAppSelector } from "../../redux";
 import { useGetVacuum } from "../../database/hooks";
 import { CurrencySymbolMapping, VacuumsFilters } from "../../types";
 import { AffiliateLinks, VacuumWithAffiliateLinks } from "../../database";
+import { countryCodeToReadable } from "../../shared-utils/locale/locale";
 
 export function VacuumInfoPage() {
   const { vacuumId } = useParams();
@@ -23,7 +24,7 @@ export function VacuumInfoPage() {
   const filters = useAppSelector((state) => state.vacuumsFilters);
 
   const handleClose = () => {
-    navigate("/vacuums");
+    navigate(-1);
   };
 
   return (
@@ -423,7 +424,7 @@ function PricingSection({ affiliateLinks }: PricingSectionProps) {
             rel="noopener noreferrer"
           >
             <div className="font-medium capitalize">
-              {linkItem.region} — {CurrencySymbolMapping[linkItem.currency]}
+              {countryCodeToReadable(linkItem.countryCode!)} — {CurrencySymbolMapping[linkItem.currency]}
               {linkItem.price}
             </div>
             <div className="text-blue-600 underline mt-1">View Offer</div>

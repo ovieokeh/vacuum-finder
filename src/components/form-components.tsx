@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import { useEffect, useRef, useState } from "react";
 import {
   Field,
   Button,
@@ -22,6 +23,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 import ImageUpload from "./image-upload";
 import { useListBrands } from "../database/hooks";
 import { LuMinus, LuPlus } from "react-icons/lu";
+import { noop } from "es-toolkit";
 
 const ErrorRenderer = ({ error }: { error?: string }) => {
   if (!error) {
@@ -506,6 +508,23 @@ export const FormTabField = ({
   );
 };
 
+// custom debounce hook
+const useDebounce = (callback: Function, delay: number) => {
+  const debouncedCallback = useRef<Function>(noop);
+  useEffect(() => {
+    const debounce = (callback: Function, delay: number) => {
+      let timeoutId: NodeJS.Timeout;
+      return (...args: any[]) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => callback(...args), delay);
+      };
+    };
+    debouncedCallback.current = debounce(callback, delay);
+  }, [callback, delay]);
+
+  return debouncedCallback.current;
+};
+
 export const FormNumberSliderField = ({
   label,
   labelIcon,
@@ -527,16 +546,15 @@ export const FormNumberSliderField = ({
 
   // Debounce onChange call so it fires only after the user stops dragging
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onChange(Math.min(sliderValue, max));
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [sliderValue, onChange, max]);
+    setSliderValue(value);
+  }, [value]);
 
+  const debouncedOnChange = useDebounce(onChange, 300);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(event.target.value, 10);
     if (!isNaN(newValue)) {
       setSliderValue(newValue);
+      debouncedOnChange(newValue);
     }
   };
 
@@ -585,7 +603,7 @@ export const REGION_OPTIONS = ["americas", "europe", "asia", "africa", "australi
 }));
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const CURRENCY_OPTIONS = ["usd", "eur", "gbp", "cad", "aud"].map((currency) => ({
+export const CURRENCY_OPTIONS = ["usd", "eur", "gbp", "cad", "aud", "zar"].map((currency) => ({
   value: currency,
   label: currency.toUpperCase(),
 }));

@@ -11,6 +11,7 @@ interface SiteConfigContextProps {
   navHeight: number;
   locale: string;
   region: Region;
+  countryCode: string | undefined;
   currency: Currency;
   setNavHeight: (height: number) => void;
   setLocale: (locale: string) => void;
@@ -23,14 +24,40 @@ interface SiteConfigContextProps {
 const SiteConfigContext = createContext<SiteConfigContextProps | undefined>(undefined);
 
 export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
-  const { region: userRegion, locale: userLocale } = useUserLocation();
+  const userLocationData = useUserLocation();
+  const { isLoaded: isUserlocationLoaded, locale: userLocale, region: userRegion, countryCode } = userLocationData;
   const [locale, setLocale] = useState<string>(() => userLocale);
   const [region, setRegion] = useState<Region>(() => userRegion);
-  const [currency, setCurrency] = useState<Currency>(() => (region === "europe" ? "eur" : "usd"));
+  const [currency, setCurrency] = useState<Currency>(() =>
+    region === "europe"
+      ? "eur"
+      : region === "americas"
+      ? "usd"
+      : region === "africa"
+      ? "zar"
+      : region === "australia"
+      ? "aud"
+      : "usd"
+  );
   const [navHeight, setNavHeight] = useState<number>(0);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [userToken, setUserToken] = useState<string | undefined>(undefined);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  // useEffect(() => {
+  //   if (userLocale) {
+  //     setLocale(userLocale);
+  //   }
+
+  //   if (userRegion) {
+  //     setRegion(userRegion);
+  //     setCurrency(userRegion === "europe" ? "eur" : "usd");
+  //   }
+
+  //   if (userCountry) {
+  //     setCountryCode(userCountry);
+  //   }
+  // }, [userLocale, userRegion, userCountry]);
 
   useEffect(() => {
     // sync user from local storage
@@ -77,9 +104,23 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
 
     if (userRegion) {
       setRegion(userRegion);
-      setCurrency(userRegion === "europe" ? "eur" : "usd");
+      setCurrency(
+        userRegion === "europe"
+          ? "eur"
+          : userRegion === "americas"
+          ? "usd"
+          : userRegion === "africa"
+          ? "zar"
+          : userRegion === "australia"
+          ? "aud"
+          : "usd"
+      );
     }
   }, [userLocale, userRegion]);
+
+  if (!isUserlocationLoaded || !isLoaded) {
+    return null;
+  }
 
   return (
     <SiteConfigContext.Provider
@@ -89,6 +130,7 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
         userToken,
         navHeight,
         locale,
+        countryCode,
         region,
         currency,
         setNavHeight,

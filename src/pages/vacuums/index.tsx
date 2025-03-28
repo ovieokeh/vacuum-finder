@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet } from "react-router";
 import { Helmet } from "react-helmet";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { twMerge } from "tailwind-merge";
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
+import { IoGlobeOutline } from "react-icons/io5";
 
 import { useWindowWidth } from "../../hooks/use-window-width";
 import { useSiteConfig } from "../../providers/site-config";
@@ -11,17 +14,43 @@ import { useAppDispatch, useAppSelector } from "../../redux";
 import { VacuumSearchForm } from "../../components/vacuum-search-form";
 import { VacuumResults } from "../../components/vacuum-results";
 import { VacuumsFilters } from "../../types";
-import { markAllValuesAsDefined } from "../../shared-utils/object";
 import { useContentScroll } from "../../hooks/use-disable-body-scroll";
 import { FormSelectField } from "../../components/form-components";
-import { twMerge } from "tailwind-merge";
+import { Region } from "../../database";
+
+import { useListCountries } from "../../database/hooks";
+import { RegionIconMapping } from "../../types";
+import { countryCodeToReadable } from "../../shared-utils/locale/locale";
 
 interface SortingBarProps {
   onSortChange: (sort: string, order: string) => void;
   sortValue: string;
   className?: string;
 }
+
 const SortingBar = ({ sortValue, className, onSortChange }: SortingBarProps) => {
+  const { region, setRegion, countryCode: userCountryCode, setCurrency } = useSiteConfig();
+  const [countryCode, setCountryCode] = useState(userCountryCode);
+  const countriesQuery = useListCountries();
+
+  const countrySelectOptions = useMemo(
+    () =>
+      countriesQuery.data?.map((country) => ({
+        label: countryCodeToReadable(country.countrycode),
+        value: country.countrycode,
+      })) ?? [],
+    [countriesQuery.data]
+  );
+  const CurrentRegionIcon = RegionIconMapping[region] ?? IoGlobeOutline;
+  const handleSetCountry = (country: string) => {
+    const selectedCountry = countriesQuery.data?.find((c) => c.countrycode === country);
+    if (selectedCountry) {
+      setRegion(selectedCountry.region);
+      setCurrency(selectedCountry.currency);
+      setCountryCode(country);
+    }
+  };
+
   const sortingOptions = [
     { label: "Price: Low to High", value: "price-asc" },
     { label: "Price: High to Low", value: "price-desc" },
@@ -39,7 +68,7 @@ const SortingBar = ({ sortValue, className, onSortChange }: SortingBarProps) => 
 
   return (
     <div className={twMerge("flex justify-between items-center py-4 md:px-4", className)}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-6">
         <FormSelectField
           className="flex-row gap-4"
           label="Sort By"
@@ -50,9 +79,38 @@ const SortingBar = ({ sortValue, className, onSortChange }: SortingBarProps) => 
             onSortChange(sort, order);
           }}
         />
+
+        <Listbox value={countryCode} onChange={handleSetCountry}>
+          <div className="flex flex-col gap-2">
+            <ListboxButton className="flex flex-row items-center justify-between gap-2 text-left px-2! py-1! bg-background!">
+              <span className="hidden md:block">Region</span>
+              <CurrentRegionIcon className="w-4 h-4" />
+              <span className="hidden md:block capitalize">{countryCodeToReadable(countryCode!)}</span>
+            </ListboxButton>
+            <ListboxOptions anchor="bottom start" className="bg-background rounded shadow z-20 w-fit">
+              {countrySelectOptions?.map((type) => (
+                <ListboxOption
+                  key={type.value}
+                  value={type.value}
+                  className="group flex gap-2 px-4 py-2 data-[focus]:bg-background-alt cursor-pointer capitalize"
+                >
+                  {type.label}
+                </ListboxOption>
+              ))}
+            </ListboxOptions>
+          </div>
+        </Listbox>
       </div>
     </div>
   );
+};
+
+const REGION_BUDGETS: { [key in Region]: number } = {
+  europe: 859,
+  americas: 1000,
+  africa: 10000,
+  australia: 1300,
+  asia: 1500,
 };
 
 export function VacuumSearchPage() {
@@ -61,6 +119,10 @@ export function VacuumSearchPage() {
 
   const { navHeight, region, currency } = useSiteConfig();
   const sharedFilters = useAppSelector((state) => state.vacuumsFilters);
+  const defaultFilters = useMemo(
+    () => ({ ...sharedFilters, budget: REGION_BUDGETS[region], region, currency }),
+    [sharedFilters, region, currency]
+  );
   const filtersContainerRef = useRef<HTMLDivElement>(null);
   const form = useForm<VacuumsFilters>({
     defaultValues: sharedFilters,
@@ -95,21 +157,19 @@ export function VacuumSearchPage() {
 
   useEffect(() => {
     setValue("currency", currency);
-  }, [currency, setValue]);
-  useEffect(() => {
     setValue("region", region);
+    setValue("budget", REGION_BUDGETS[region]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [region, setValue]);
-
-  const definedFilters = useMemo(() => markAllValuesAsDefined<VacuumsFilters>(filters), [filters]);
 
   // sync form with redux to share filters with :vacuum page
   useEffect(() => {
-    dispatch(replaceState({ value: definedFilters }));
-  }, [dispatch, definedFilters]);
+    dispatch(replaceState({ value: filters as any }));
+  }, [dispatch, filters]);
 
   const resetFilters = useCallback(() => {
-    reset();
-  }, [reset]);
+    reset(defaultFilters);
+  }, [reset, defaultFilters]);
 
   const filtersContainerWidth = filtersContainerRef.current?.clientWidth ?? 300;
   const filtersContainerHeight = filtersContainerRef.current?.clientHeight ?? 300;
@@ -151,7 +211,7 @@ export function VacuumSearchPage() {
               handleSubmit={() => {
                 handleSubmit(() => {
                   resetFilters();
-                })();
+                });
               }}
               resetFilters={resetFilters}
             />

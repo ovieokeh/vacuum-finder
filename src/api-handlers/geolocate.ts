@@ -21,7 +21,7 @@ export const geolocateHandler = async (req: Request, res: Response) => {
   if (!geo) {
     res.status(404).json({ error: "Unable to geolocate IP address." });
   } else {
-    const { country, timezone } = geo;
+    const { country: geoCountry, timezone } = geo;
 
     // 3) Derive userLocale
     // - userPrefLang could come from request query or body
@@ -33,6 +33,7 @@ export const geolocateHandler = async (req: Request, res: Response) => {
 
     let locale = "";
     let region = "americas";
+    let country = geoCountry;
 
     if (userPrefLang) {
       // If user preference is provided, use it directly
@@ -50,6 +51,7 @@ export const geolocateHandler = async (req: Request, res: Response) => {
     if (timezone) {
       const splitRegion = timezone.split("/")[0].toLowerCase();
       region = SUPPORTED_REGIONS.includes(splitRegion as Region) ? splitRegion : "americas";
+      country = SUPPORTED_REGIONS.includes(splitRegion as Region) ? country : "us";
     }
 
     // 4) Return data

@@ -62,13 +62,14 @@ export const searchVacuums = async ({
     budget?: number;
     currency?: string;
     sortBy?: string;
+    region?: string;
     sortOrder?: "asc" | "desc";
   };
   page: number;
   limit: number;
 }): Promise<VacuumsSearchResult> => {
   const { data: userSession } = await supabase.auth.getSession();
-  const { owned, budget, currency, model, sortBy, sortOrder, ...rest } = filters;
+  const { owned, budget, currency, model, sortBy, sortOrder, region, ...rest } = filters;
   const offset = (page - 1) * limit;
 
   const userEmail = userSession?.session?.user?.email;
@@ -77,10 +78,12 @@ export const searchVacuums = async ({
   }
 
   // Use the view for querying, which includes aggregated affiliate link data.
-  const supabaseQuery = supabase.from("vacuumaffiliatesummary").select(`  *,
+  const supabaseQuery = supabase.from("vacuumaffiliatesummary").select(
+    `*,
   affiliateLinks:AffiliateLinks (
     *
-  )`);
+  )`
+  );
   const matchCountQuery = supabase.from("vacuumaffiliatesummary").select("id", { count: "exact" });
 
   if (owned) {
@@ -103,8 +106,8 @@ export const searchVacuums = async ({
     // 1. There is no affiliate link data (min_price is null),
     // OR
     // 2. The aggregated affiliate link has a matching currency and a min_price <= budget.
-    supabaseQuery.or(`min_price.is.null,and(currency.eq.${currency},min_price.lte.${budget})`);
-    matchCountQuery.or(`min_price.is.null,and(currency.eq.${currency},min_price.lte.${budget})`);
+    supabaseQuery.or(`and(region.eq.${region},currency.eq.${currency},min_price.lte.${budget})`);
+    matchCountQuery.or(`and(region.eq.${region},currency.eq.${currency},min_price.lte.${budget})`);
   }
 
   // Define mapping from sortBy values to actual database column names

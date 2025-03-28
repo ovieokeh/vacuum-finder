@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getCoreRowModel, ColumnDef } from "@tanstack/react-table";
 
 import { TableContainer } from "./table";
-import { CURRENCY_OPTIONS, FormSelectField, REGION_OPTIONS } from "./form-components";
-import { AffiliateLink, AffiliateLinks, Currency, Region } from "../database";
+import { FormSelectField, REGION_OPTIONS } from "./form-components";
+import { AffiliateLink, AffiliateLinks, Region } from "../database";
+import { useSiteConfig } from "../providers/site-config";
 
 interface AffiliateLinksTableProps {
   vacuumName: string;
@@ -11,20 +12,23 @@ interface AffiliateLinksTableProps {
 }
 
 export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuumName, links }) => {
+  const { region } = useSiteConfig();
   // Filter state (with "All" as the default for no filter)
-  const [selectedRegion, setSelectedRegion] = useState<Region | null>("americas");
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>("usd");
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>(region);
+
+  useEffect(() => {
+    setSelectedRegion(region);
+  }, [region]);
 
   // Filter the links array based on the current filter selections.
   const filteredLinks = useMemo(() => {
     return (
       links?.filter((link) => {
         const matchRegion = !selectedRegion || link.region === selectedRegion;
-        const matchCurrency = !selectedCurrency || link.currency === selectedCurrency;
-        return matchRegion && matchCurrency;
+        return matchRegion;
       }) ?? []
     );
-  }, [links, selectedRegion, selectedCurrency]);
+  }, [links, selectedRegion]);
 
   // Define table columns using TanStack react-table types.
   const columns = useMemo<ColumnDef<AffiliateLink>[]>(
@@ -84,7 +88,7 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
             options={REGION_OPTIONS}
           />
         </div>
-        <div className="grow">
+        {/* <div className="grow">
           <FormSelectField
             label="Currency"
             value={selectedCurrency ?? "usd"}
@@ -93,7 +97,7 @@ export const AffiliateLinksTable: React.FC<AffiliateLinksTableProps> = ({ vacuum
             labelClassName="uppercase"
             optionClassName="uppercase"
           />
-        </div>
+        </div> */}
       </div>
       {/* Render the table */}
       {!!links && links.length > 0 ? (

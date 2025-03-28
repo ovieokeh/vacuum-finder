@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       AffiliateLinks: {
         Row: {
+          countryCode: string | null
           created_at: string
           currency: Database["public"]["Enums"]["Currency"]
           id: string
@@ -22,6 +23,7 @@ export type Database = {
           vacuumId: string
         }
         Insert: {
+          countryCode?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["Currency"]
           id?: string
@@ -33,6 +35,7 @@ export type Database = {
           vacuumId: string
         }
         Update: {
+          countryCode?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["Currency"]
           id?: string
@@ -184,6 +187,7 @@ export type Database = {
           model: string | null
           noiseLevelInDecibels: number | null
           otherFeatures: string[] | null
+          region: Database["public"]["Enums"]["Region"] | null
           suctionPowerInPascals: number | null
           surfaceRecommendations: string[] | null
           updatedAt: string | null
@@ -194,10 +198,17 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      list_countries: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          countrycode: string
+          region: Database["public"]["Enums"]["Region"]
+          currency: Database["public"]["Enums"]["Currency"]
+        }[]
+      }
     }
     Enums: {
-      Currency: "usd" | "eur"
+      Currency: "usd" | "eur" | "aud" | "gbp" | "zar"
       MappingTechnology: "laser" | "camera" | "laser + camera" | "other"
       Region: "americas" | "europe" | "asia" | "africa" | "australia"
     }
